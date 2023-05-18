@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "601943296059",
+    "project_id": "rumahsampahta",
+    "storage_bucket": "rumahsampahta.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:601943296059:android:3f33de39f87e86da99f41e",
+        "android_client_info": {
+          "package_name": "com.ilmahannun.rumah_sampah_t_a"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "601943296059-s8cbe8m1t3cafvs0f1s0aa1ataa310k5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWNwj2M0PgFyuy83wrgNUKs5FXZbkNUdc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "601943296059-s8cbe8m1t3cafvs0f1s0aa1ataa310k5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "601943296059-055m7vdb2ov4fr987gmv0gkqnivvur5i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ilmahannun.rumahSampahTa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

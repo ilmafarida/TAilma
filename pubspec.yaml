@@ -1,0 +1,50 @@
+name: rumah_sampah_t_a
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment:
+  sdk: '>=2.19.6 <3.0.0'
+
+dependencies:
+  cloud_firestore: 4.5.0
+  convex_bottom_bar: ^3.2.0
+  cupertino_icons: ^1.0.2
+  dropdown_search: ^5.0.6
+  firebase_auth: 4.4.0
+  firebase_core: 2.9.0
+  firebase_storage: 11.1.0
+  flutter:
+    sdk: flutter
+  flutter_native_splash: ^2.2.19
+  get: 4.6.5
+  http: ^0.13.6
+
+dev_dependencies:
+  flutter_lints: 2.0.1
+  flutter_test:
+    sdk: flutter
+
+flutter_native_splash:
+  #color: "#ffffff"
+  background_image: assets/image/SplashScreen.png
+  android: true
+  fullscreen: true
+  ndroid_gravity: center
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/image/SplashScreen.png
+    - assets/image/logorumahsampah.png
+    - assets/image/waiting.png
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-ExtraLight.ttf
+    - family: Urbanist
+      fonts:
+        - asset: assets/fonts/Urbanist-Light.ttf
+    - family: RockSalt
+      fonts:
+        - asset: assets/fonts/RockSalt-Regular.ttf
