@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
-import '../../../routes/app_pages.dart';
-import '../controllers/login_controller.dart';
+import 'package:rumah_sampah_t_a/app/modules/login/login_controller.dart';
+import '../../routes/app_pages.dart';
 
 class LoginView extends GetView<LoginController> {
   final authC = Get.find<AuthController>();

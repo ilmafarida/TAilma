@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/produk_controller.dart';
+import 'produk_controller.dart';
 
 class ProdukBinding extends Bindings {
   @override

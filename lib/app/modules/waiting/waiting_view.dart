@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/waiting_controller.dart';
+import 'waiting_controller.dart';
 
 class WaitingView extends GetView<WaitingController> {
   const WaitingView({Key? key}) : super(key: key);

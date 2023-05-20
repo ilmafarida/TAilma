@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:rumah_sampah_t_a/app/modules/home/controllers/home_controller.dart';
 import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
-import 'package:rumah_sampah_t_a/app/modules/login/views/login_view.dart';
 
 class LoginController extends GetxController {
   var isPasswordHidden = true.obs;
@@ -27,7 +25,7 @@ class LoginController extends GetxController {
           email: emailC.text,
           password: passwordC.text,
         );
-        //print("log = {$userCredential}");
+        print("log = {$userCredential}");
         Get.offAllNamed(Routes.DASHBOARD);
         // if (userCredential.user != null) {
         //   Get.offAllNamed(Routes.DASHBOARD);

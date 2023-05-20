@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/waiting_controller.dart';
+import 'waiting_controller.dart';
 
 class WaitingBinding extends Bindings {
   @override

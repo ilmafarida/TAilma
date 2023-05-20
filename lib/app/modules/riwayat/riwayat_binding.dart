@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/riwayat_controller.dart';
+import 'riwayat_controller.dart';
 
 class RiwayatBinding extends Bindings {
   @override

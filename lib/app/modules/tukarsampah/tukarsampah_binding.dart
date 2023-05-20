@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/tukarsampah_controller.dart';
+import 'tukarsampah_controller.dart';
 
 class TukarsampahBinding extends Bindings {
   @override

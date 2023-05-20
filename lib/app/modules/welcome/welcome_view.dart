@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../routes/app_pages.dart';
-import '../controllers/welcome_controller.dart';
+import '../../routes/app_pages.dart';
+import 'welcome_controller.dart';
 
 class WelcomeView extends GetView<WelcomeController> {
   const WelcomeView({Key? key}) : super(key: key);

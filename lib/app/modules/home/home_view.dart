@@ -1,16 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
-import 'package:rumah_sampah_t_a/app/modules/dashboard/controllers/dashboard_controller.dart';
-import 'package:rumah_sampah_t_a/app/modules/dashboard/views/dashboard_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/produk/views/produk_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/riwayat/views/riwayat_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/tukarsampah/views/tukarsampah_view.dart';
-import '../../../routes/app_pages.dart';
-import '../controllers/home_controller.dart';
+import '../../routes/app_pages.dart';
 import 'package:flutter/src/widgets/framework.dart';
+
+import '../dashboard/dashboard_controller.dart';
+import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   final authC = Get.find<AuthController>();

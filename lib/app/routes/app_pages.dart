@@ -1,31 +1,32 @@
 import 'package:get/get.dart';
 
-import '../modules/dashboard/bindings/dashboard_binding.dart';
-import '../modules/dashboard/views/dashboard_view.dart';
-import '../modules/home/bindings/home_binding.dart';
-import '../modules/home/views/home_view.dart';
-import '../modules/login/bindings/login_binding.dart';
-import '../modules/login/bindings/login_binding.dart';
-import '../modules/login/views/login_view.dart';
-import '../modules/login/views/login_view.dart';
-import '../modules/produk/bindings/produk_binding.dart';
-import '../modules/produk/views/produk_view.dart';
-import '../modules/riwayat/bindings/riwayat_binding.dart';
-import '../modules/riwayat/views/riwayat_view.dart';
-import '../modules/signup/bindings/signup_binding.dart';
-import '../modules/signup/views/signup_view.dart';
-import '../modules/tukarsampah/bindings/tukarsampah_binding.dart';
-import '../modules/tukarsampah/views/tukarsampah_view.dart';
-import '../modules/waiting/bindings/waiting_binding.dart';
-import '../modules/waiting/views/waiting_view.dart';
-import '../modules/welcome/bindings/welcome_binding.dart';
-import '../modules/welcome/views/welcome_view.dart';
+import '../modules/dashboard/dashboard_binding.dart';
+import '../modules/dashboard/dashboard_view.dart';
+import '../modules/home/home_binding.dart';
+import '../modules/home/home_view.dart';
+import '../modules/login/login_binding.dart';
+import '../modules/login/login_view.dart';
+import '../modules/produk/produk_binding.dart';
+import '../modules/produk/produk_view.dart';
+import '../modules/riwayat/riwayat_binding.dart';
+import '../modules/riwayat/riwayat_view.dart';
+import '../modules/signup/signup_binding.dart';
+import '../modules/signup/signup_view.dart';
+import '../modules/tukarsampah/tukarsampah_binding.dart';
+import '../modules/tukarsampah/tukarsampah_view.dart';
+import '../modules/waiting/waiting_binding.dart';
+import '../modules/waiting/waiting_view.dart';
+import '../modules/welcome/welcome_binding.dart';
+import '../modules/welcome/welcome_view.dart';
+
+
 
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
+  // ignore: constant_identifier_names
   static const INITIAL = Routes.HOME;
 
   static final routes = [

@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
+import 'produk_controller.dart';
 
-import '../controllers/riwayat_controller.dart';
-
-class RiwayatView extends GetView<RiwayatController> {
-  const RiwayatView({Key? key}) : super(key: key);
+class ProdukView extends GetView<ProdukController> {
+  const ProdukView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('RiwayatView'),
+        title: const Text('ProdukView'),
         centerTitle: true,
       ),
       body: Container(
         child: Center(
           child: Text(
-            'Riwayat',
+            'Produk',
             style: TextStyle(fontSize: 20),
           ),
         ),

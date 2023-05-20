@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
-import 'package:rumah_sampah_t_a/app/modules/home/views/home_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/login/views/login_view.dart';
 import 'package:rumah_sampah_t_a/app/utils/loading.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
@@ -51,7 +49,7 @@ class MyApp extends StatelessWidget {
           return GetMaterialApp(
             title: "Application",
             // initialRoute: snapshot.data != null ? Routes.HOME : Routes.LOGIN,
-            initialRoute: Routes.WELCOME,
+            initialRoute: Routes.SIGNUP,
             getPages: AppPages.routes,
             //home:  snapshot.data != null ? HomeView() : LoginView(),
           );
