@@ -1,7 +1,7 @@
 name: rumah_sampah_t_a
 version: 1.0.0+1
 publish_to: none
-description: A new Flutter project.
+description: Aplikaksi rumah sampah by Ilma Faridah Hannun
 environment:
   sdk: '>=2.19.6 <3.0.0'
 
@@ -10,14 +10,23 @@ dependencies:
   convex_bottom_bar: ^3.2.0
   cupertino_icons: ^1.0.2
   dropdown_search: ^5.0.6
+  email_auth: ^1.0.0
+  email_otp: ^2.0.1
+  file_picker: ^5.3.0
+  firebase_app_check: ^0.1.2+1
   firebase_auth: 4.4.0
   firebase_core: 2.9.0
   firebase_storage: 11.1.0
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.2.19
+  flutter_svg: ^2.0.5
   get: 4.6.5
   http: ^0.13.6
+  image_picker: ^0.8.7+5
+  searchable_paginated_dropdown: ^1.2.0
+  shared_preferences: ^2.1.1
 
 dev_dependencies:
   flutter_lints: 2.0.1
@@ -34,17 +43,16 @@ flutter_native_splash:
 flutter:
   uses-material-design: true
   assets:
-    - assets/image/SplashScreen.png
-    - assets/image/logorumahsampah.png
-    - assets/image/waiting.png
-
+    - assets/
+    - assets/image/
+    - assets/fonts/
   fonts:
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-ExtraLight.ttf
     - family: Urbanist
       fonts:
-        - asset: assets/fonts/Urbanist-Light.ttf
+        - asset: assets/fonts/Urbanist-Regular.ttf
     - family: RockSalt
       fonts:
         - asset: assets/fonts/RockSalt-Regular.ttf

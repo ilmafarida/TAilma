@@ -1,4 +1,14 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_view.dart';
 
 import '../modules/dashboard/dashboard_binding.dart';
 import '../modules/dashboard/dashboard_view.dart';
@@ -8,6 +18,8 @@ import '../modules/login/login_binding.dart';
 import '../modules/login/login_view.dart';
 import '../modules/produk/produk_binding.dart';
 import '../modules/produk/produk_view.dart';
+import '../modules/profile/profile_binding.dart';
+import '../modules/profile/profile_view.dart';
 import '../modules/riwayat/riwayat_binding.dart';
 import '../modules/riwayat/riwayat_view.dart';
 import '../modules/signup/signup_binding.dart';
@@ -19,14 +31,12 @@ import '../modules/waiting/waiting_view.dart';
 import '../modules/welcome/welcome_binding.dart';
 import '../modules/welcome/welcome_view.dart';
 
-
-
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  // ignore: constant_identifier_names
+  // ignore: ant_identifier_names
   static const INITIAL = Routes.HOME;
 
   static final routes = [
@@ -54,7 +64,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.WELCOME,
-      page: () => const WelcomeView(),
+      page: () => WelcomeView(),
       binding: WelcomeBinding(),
     ),
     GetPage(
@@ -64,23 +74,48 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PRODUK,
-      page: () => const ProdukView(),
+      page: () => ProdukView(),
       binding: ProdukBinding(),
     ),
     GetPage(
       name: _Paths.TUKARSAMPAH,
-      page: () => const TukarsampahView(),
+      page: () => TukarsampahView(),
       binding: TukarsampahBinding(),
     ),
     GetPage(
       name: _Paths.RIWAYAT,
-      page: () => const RiwayatView(),
+      page: () => RiwayatView(),
       binding: RiwayatBinding(),
     ),
     GetPage(
       name: _Paths.WAITING,
-      page: () => const WaitingView(),
+      page: () => WaitingView(),
       binding: WaitingBinding(),
+    ),
+    GetPage(
+      name: _Paths.LUPA_PASSWORD,
+      page: () => LupaPasswordView(),
+      binding: LupaPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.OTP_VERIFIKASI,
+      page: () => OtpVerifikasiView(),
+      binding: OtpVerifikasiBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROFILE,
+      page: () => ProfileView(),
+      binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.CHANGE_PASSWORD,
+      page: () => ChangePasswordView(),
+      binding: ChangePasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.UBAH_ALAMAT,
+      page: () => UbahAlamatView(),
+      binding: UbahAlamatBinding(),
     ),
   ];
 }

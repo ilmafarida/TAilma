@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
@@ -10,6 +9,8 @@ import 'dashboard_controller.dart';
 
 class DashboardView extends GetView<DashboardController> {
   final authC = Get.find<AuthController>();
+
+  DashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {

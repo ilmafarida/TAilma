@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "601943296059-a4naltptc8i90g4t7cfkp7di3ek2bc3e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ilmahannun.rumah_sampah_t_a",
+            "certificate_hash": "1fb251addb1df2cb0951868badbe59217d560d33"
+          }
+        },
+        {
+          "client_id": "601943296059-u122na0cgl9nf55a6l24krinac2uepdu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ilmahannun.rumah_sampah_t_a",
+            "certificate_hash": "5a5d3ad3c9b7ede30b0ddda653b8945138ef9724"
+          }
+        },
+        {
           "client_id": "601943296059-s8cbe8m1t3cafvs0f1s0aa1ataa310k5.apps.googleusercontent.com",
           "client_type": 3
         }
