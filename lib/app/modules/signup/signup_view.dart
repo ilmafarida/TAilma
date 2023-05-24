@@ -25,142 +25,144 @@ class SignupView extends GetView<SignupController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: controller.loadingAPI.value
-          ? LoadingComponent()
-          : SingleChildScrollView(
-              child: Container(
-                width: Get.width,
-                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 38),
-                child: Column(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _header(),
-                        _emailField(),
-                        Obx(() => _passwordField()),
-                        _namaField(),
-                        _noHpField(),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Text(
-                            "Kota Madiun,",
-                            style: TextStyle(
-                              color: Color(0xFF1E232C),
-                              fontFamily: 'TimesNewRoman',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: controller.loadingAPI.value
+            ? LoadingComponent()
+            : SingleChildScrollView(
+                child: Container(
+                  width: Get.width,
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 38),
+                  child: Column(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          _header(),
+                          _emailField(),
+                          Obx(() => _passwordField()),
+                          _namaField(),
+                          _noHpField(),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              "Kota Madiun,",
+                              style: TextStyle(
+                                color: Color(0xFF1E232C),
+                                fontFamily: 'TimesNewRoman',
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        // DropdownSearch<String>(
-                        //     popupProps: PopupProps.menu(
-                        //       showSelectedItems: true,
-                        //       disabledItemFn: (String s) => s.startsWith('I'),
-                        //     ),
-                        //     items: ["Kartoharjo", "Manguharjo", "Taman"],
-                        //     dropdownDecoratorProps: DropDownDecoratorProps(
-                        //       dropdownSearchDecoration: InputDecoration(
-                        //         hintText: "Pilih kecamatanmu..",
-                        //       ),
-                        //     ),
-                        //     onChanged: print),
-                        // SizedBox(height: 10),
-                        // DropdownSearch<String>(
-                        //     popupProps: PopupProps.menu(
-                        //       showSelectedItems: true,
-                        //       disabledItemFn: (String s) => s.startsWith('I'),
-                        //     ),
-                        //     items: ["Kartoharjo", "Manguharjo", "Taman"],
-                        //     dropdownDecoratorProps: DropDownDecoratorProps(
-                        //       dropdownSearchDecoration: InputDecoration(
-                        //         hintText: "Pilih kelurahanmu..",
-                        //       ),
-                        //     ),
-                        //     onChanged: print),
-                        // DropdownSearch<String>(
-                        //   popupProps: PopupProps.menu(
-                        //       // itemBuilder: (context, item, isSelected) => ListTile(
-                        //       //   title: Text(item.name),
-                        //       // ),
-                        //       //showSelectedItems: true,
-                        //       ),
-                        //   dropdownDecoratorProps: DropDownDecoratorProps(
-                        //     dropdownSearchDecoration: InputDecoration(
-                        //       hintText: "Kecamatan",
-                        //     ),
-                        //   ),
-                        //   onChanged: (value) => print(value),
-                        // dropdownBuilder: (context, selectedItem) =>
-                        //     Text(selectedItem?.name ?? ""),
-                        // asyncItems: (text) async {
-                        //   var response = await http.get(Uri.parse(
-                        //       "https://api.binderbyte.com/wilayah/kecamatan?api_key=$apiKey&id_kabupaten=3577"));
-                        //   if (response.statusCode != 200) {
-                        //     return [];
-                        //   }
-                        //   List allKecamatan = (json.decode(response.body)
-                        //       as Map<String, dynamic>)["value"];
-                        //   List<String> allNameKecamatan = [];
+                          // DropdownSearch<String>(
+                          //     popupProps: PopupProps.menu(
+                          //       showSelectedItems: true,
+                          //       disabledItemFn: (String s) => s.startsWith('I'),
+                          //     ),
+                          //     items: ["Kartoharjo", "Manguharjo", "Taman"],
+                          //     dropdownDecoratorProps: DropDownDecoratorProps(
+                          //       dropdownSearchDecoration: InputDecoration(
+                          //         hintText: "Pilih kecamatanmu..",
+                          //       ),
+                          //     ),
+                          //     onChanged: print),
+                          // SizedBox(height: 10),
+                          // DropdownSearch<String>(
+                          //     popupProps: PopupProps.menu(
+                          //       showSelectedItems: true,
+                          //       disabledItemFn: (String s) => s.startsWith('I'),
+                          //     ),
+                          //     items: ["Kartoharjo", "Manguharjo", "Taman"],
+                          //     dropdownDecoratorProps: DropDownDecoratorProps(
+                          //       dropdownSearchDecoration: InputDecoration(
+                          //         hintText: "Pilih kelurahanmu..",
+                          //       ),
+                          //     ),
+                          //     onChanged: print),
+                          // DropdownSearch<String>(
+                          //   popupProps: PopupProps.menu(
+                          //       // itemBuilder: (context, item, isSelected) => ListTile(
+                          //       //   title: Text(item.name),
+                          //       // ),
+                          //       //showSelectedItems: true,
+                          //       ),
+                          //   dropdownDecoratorProps: DropDownDecoratorProps(
+                          //     dropdownSearchDecoration: InputDecoration(
+                          //       hintText: "Kecamatan",
+                          //     ),
+                          //   ),
+                          //   onChanged: (value) => print(value),
+                          // dropdownBuilder: (context, selectedItem) =>
+                          //     Text(selectedItem?.name ?? ""),
+                          // asyncItems: (text) async {
+                          //   var response = await http.get(Uri.parse(
+                          //       "https://api.binderbyte.com/wilayah/kecamatan?api_key=$apiKey&id_kabupaten=3577"));
+                          //   if (response.statusCode != 200) {
+                          //     return [];
+                          //   }
+                          //   List allKecamatan = (json.decode(response.body)
+                          //       as Map<String, dynamic>)["value"];
+                          //   List<String> allNameKecamatan = [];
 
-                        //   allKecamatan.forEach((element) {
-                        //     allNameKecamatan.add(element["name"]);
-                        //     // Kecamatan(
-                        //   id: element["id"],
-                        //   idKabupaten: element["idKabupaten"],
-                        //   name: element["name"]));
-                        //     });
-                        //     return allNameKecamatan;
-                        //   },
-                        // ),
-                        // SizedBox(height: 10),
-                        // DropdownSearch<Kelurahan>(
-                        //   popupProps: PopupProps.dialog(
-                        //     itemBuilder: (context, item, isSelected) => ListTile(
-                        //       title: Text(item.name),
-                        //     ),
-                        //showSelectedItems: true,
-                        //   ),
-                        //   dropdownDecoratorProps: DropDownDecoratorProps(
-                        //     dropdownSearchDecoration: InputDecoration(
-                        //       hintText: "Kecamatan",
-                        //     ),
-                        //   ),
-                        //   onChanged: (value) => idKec = value?.id,
-                        //   dropdownBuilder: (context, selectedItem) =>
-                        //       Text(selectedItem?.name ?? ""),
-                        //   asyncItems: (text) async {
-                        //     var response = await http.get(Uri.parse(
-                        //         "https://api.binderbyte.com/wilayah/kelurahan?api_key=$apiKey&id_kecamatan=$idKec"));
-                        //     if (response.statusCode != 200) {
-                        //       return [];
-                        //     }
-                        //     List allKelurahan = (json.decode(response.body)
-                        //         as Map<String, dynamic>)["value"];
-                        //     List<Kelurahan> allModelKelurahan = [];
+                          //   allKecamatan.forEach((element) {
+                          //     allNameKecamatan.add(element["name"]);
+                          //     // Kecamatan(
+                          //   id: element["id"],
+                          //   idKabupaten: element["idKabupaten"],
+                          //   name: element["name"]));
+                          //     });
+                          //     return allNameKecamatan;
+                          //   },
+                          // ),
+                          // SizedBox(height: 10),
+                          // DropdownSearch<Kelurahan>(
+                          //   popupProps: PopupProps.dialog(
+                          //     itemBuilder: (context, item, isSelected) => ListTile(
+                          //       title: Text(item.name),
+                          //     ),
+                          //showSelectedItems: true,
+                          //   ),
+                          //   dropdownDecoratorProps: DropDownDecoratorProps(
+                          //     dropdownSearchDecoration: InputDecoration(
+                          //       hintText: "Kecamatan",
+                          //     ),
+                          //   ),
+                          //   onChanged: (value) => idKec = value?.id,
+                          //   dropdownBuilder: (context, selectedItem) =>
+                          //       Text(selectedItem?.name ?? ""),
+                          //   asyncItems: (text) async {
+                          //     var response = await http.get(Uri.parse(
+                          //         "https://api.binderbyte.com/wilayah/kelurahan?api_key=$apiKey&id_kecamatan=$idKec"));
+                          //     if (response.statusCode != 200) {
+                          //       return [];
+                          //     }
+                          //     List allKelurahan = (json.decode(response.body)
+                          //         as Map<String, dynamic>)["value"];
+                          //     List<Kelurahan> allModelKelurahan = [];
 
-                        //     allKelurahan.forEach((element) {
-                        //       allModelKelurahan.add(Kelurahan(
-                        //           id: element["id"],
-                        //           idKecamatan: element["idKecamatan"],
-                        //           name: element["name"]));
-                        //     });
-                        //     return allModelKelurahan;
-                        //   },
-                        // ),
-                        _kecamatanField(),
-                        _kelurahanField(),
-                        _alamatField(),
-                        _uploadKTP(context),
-                        _submitButton(),
-                        _footer()
-                      ],
-                    )
-                  ],
+                          //     allKelurahan.forEach((element) {
+                          //       allModelKelurahan.add(Kelurahan(
+                          //           id: element["id"],
+                          //           idKecamatan: element["idKecamatan"],
+                          //           name: element["name"]));
+                          //     });
+                          //     return allModelKelurahan;
+                          //   },
+                          // ),
+                          _kecamatanField(),
+                          _kelurahanField(),
+                          _alamatField(),
+                          _uploadKTP(context),
+                          _submitButton(),
+                          _footer()
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
@@ -176,7 +178,7 @@ class SignupView extends GetView<SignupController> {
           ),
         ),
         TextButton(
-          onPressed: () => Get.toNamed(Routes.LOGIN),
+          onPressed: () => Get.offNamed(Routes.LOGIN),
           child: Text(
             "Login Sekarang!",
             style: ListTextStyle.textStyleBlack.copyWith(
@@ -354,41 +356,73 @@ class SignupView extends GetView<SignupController> {
   }
 
   Widget _uploadKTP(BuildContext context) {
-    return InkWell(
-      onTap: () => controller.showUpload(context),
-      child: Obx(() {
-        return Container(
-          width: double.infinity,
-          height: 75,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: controller.fileKtp.value != null ? Color(ListColor.colorButtonGreen) : Color(0xFFF7F8F9),
-            border: Border.all(
-              color: Color(ListColor.colorButtonGreen),
-            ),
-          ),
-          alignment: Alignment.center,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/image/logo-upload.png',
-                width: 34,
-                fit: BoxFit.contain,
-              ),
-              Text(
-                controller.fileKtp.value != null ? 'Upload Ulang' : 'Upload KTP',
-                style: TextStyle(
-                  color: controller.fileKtp.value != null ? Colors.white : Color(ListColor.colorTextGray),
-                  fontFamily: 'Urbanist',
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
+    return Align(
+      alignment: Alignment.center,
+      child: InkWell(
+        onTap: () => controller.fileKtp.value == null ? controller.showUpload(context) : controller.previewFile(context),
+        child: Obx(() {
+          return controller.fileKtp.value != null
+              ? Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Color(ListColor.colorButtonGreen),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Image.file(
+                            controller.fileKtp.value!,
+                            fit: BoxFit.fitHeight,
+                            height: 100,
+                          ),
+                          CustomSubmitButton(
+                            onTap: () => controller.showUpload(context),
+                            text: 'Upload Ulang',
+                            height: 40,
+                            width: 100,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Container(
+                  width: double.infinity,
+                  height: 75,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Color(0xFFF7F8F9),
+                    border: Border.all(
+                      color: Color(ListColor.colorButtonGreen),
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/image/logo-upload.png',
+                        width: 34,
+                        fit: BoxFit.contain,
+                      ),
+                      Text(
+                        'Upload KTP',
+                        style: TextStyle(
+                          color: controller.fileKtp.value != null ? Colors.white : Color(ListColor.colorTextGray),
+                          fontFamily: 'Urbanist',
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+        }),
+      ),
     );
   }
 

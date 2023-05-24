@@ -11,8 +11,8 @@ import 'package:rumah_sampah_t_a/models/user_data_model.dart';
 
 class LoginController extends GetxController {
   var isPasswordHidden = true.obs;
-  TextEditingController emailC = TextEditingController(text: 'vindybagus@gmail.com');
-  TextEditingController passwordC = TextEditingController(text: '123456');
+  TextEditingController emailC = TextEditingController();
+  TextEditingController passwordC = TextEditingController();
 
   var authC = Get.find<AuthController>();
   @override
@@ -32,7 +32,7 @@ class LoginController extends GetxController {
         DocumentSnapshot? snapshot = await FirebaseFirestore.instance.collection('user').doc(userCredential.user?.uid).get();
         if (snapshot.exists) {
           authC.userData = UserData.fromSnapshot(snapshot);
-          await SharedPreference.setUserID(authC.userData.uid!);
+          await SharedPreference.setUserId(authC.userData.uid!);
           if (authC.userData.role == 'user') {
             await SharedPreference.setRoleUser(authC.userData.role!);
             if (authC.userData.status != '-1') {

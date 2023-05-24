@@ -8,9 +8,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/shared_preference.dart';
@@ -67,14 +69,12 @@ class SignupController extends GetxController {
   ];
 
   var loadingAPI = false.obs;
+  var authC = Get.find<AuthController>();
 
-  FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   void onClose() {
-    emailC.dispose();
-    passwordC.dispose();
     super.onClose();
   }
 
@@ -87,7 +87,7 @@ class SignupController extends GetxController {
   void signUp() async {
     if (emailC.text.isNotEmpty && passwordC.text.isNotEmpty) {
       try {
-        UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+        UserCredential userCredential = await authC.auth.createUserWithEmailAndPassword(
           email: emailC.text,
           password: passwordC.text,
         );
@@ -114,15 +114,24 @@ class SignupController extends GetxController {
         Get.offAllNamed(Routes.WAITING);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Password lemah, minimal 6 karakter");
+          ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text("Password lemah. Minimal 6 karakter")));
         } else if (e.code == 'email-already-in-use') {
-          Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Email sudah digunakan");
+          ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text("Email sudah digunakan")));
         }
       } catch (e) {
-        Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "'${e.toString()}'");
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("$e")));
       }
+    } else if (emailC.text.isEmpty ||
+        passwordC.text.isEmpty ||
+        fullnameC.text.isEmpty ||
+        noHpC.text.isEmpty ||
+        kecamatanC.text.isEmpty ||
+        kelurahanC.text.isEmpty ||
+        alamatC.text.isEmpty ||
+        fileKtp.value == null) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Field harus diisi semua")));
     } else {
-      Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Email dan password wajib diisi");
+      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Email dan password wajib diisi")));
     }
   }
 
@@ -145,7 +154,7 @@ class SignupController extends GetxController {
                   child: Container(
                     width: 94,
                     height: 5,
-                    decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.all(Radius.circular(90))),
+                    decoration: BoxDecoration(color: Color(ListColor.colorButtonGreen), borderRadius: BorderRadius.all(Radius.circular(90))),
                   )),
               Container(
                 margin: EdgeInsets.only(bottom: 24),
@@ -180,7 +189,7 @@ class SignupController extends GetxController {
                         SizedBox(height: 16),
                         Text(
                           "Ambil Foto",
-                          style: ListTextStyle.textStyleGray.copyWith(color: Colors.white),
+                          style: ListTextStyle.textStyleGray.copyWith(color: Colors.black),
                         ),
                       ],
                     ),
@@ -208,7 +217,7 @@ class SignupController extends GetxController {
                               },
                               child: Container(
                                 padding: EdgeInsets.all(20),
-                                child: Icon(Icons.browse_gallery),
+                                child: Icon(Icons.file_present_rounded, color: Colors.white),
                               ),
                             ),
                           ),
@@ -216,7 +225,7 @@ class SignupController extends GetxController {
                         SizedBox(height: 16),
                         Text(
                           "Upload File",
-                          style: ListTextStyle.textStyleGray.copyWith(color: Colors.white),
+                          style: ListTextStyle.textStyleGray.copyWith(color: Colors.black),
                         ),
                       ],
                     ),
@@ -230,20 +239,19 @@ class SignupController extends GetxController {
 
   void getFromGallery() async {
     XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {}
+    if (pickedFile != null) {
+      fileKtp.value = File(pickedFile.path);
+      log(fileKtp.value!.path);
+    } else {
+      // JIKA USER CANCEL UPLOAD
+      return;
+    }
   }
 
   void getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {}
-  }
-
-  Future<void> uploadKtp() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      // JIKA ADA FILE
-      fileKtp.value = File(result.files.single.path!);
+    if (pickedFile != null) {
+      fileKtp.value = File(pickedFile.path);
       log(fileKtp.value!.path);
     } else {
       // JIKA USER CANCEL UPLOAD
@@ -260,6 +268,47 @@ class SignupController extends GetxController {
     log(downloadUrl);
     // Data telah berhasil diunggah ke Firestore
     await firestore.collection('user').doc(uid).update({'ktp': downloadUrl});
+  }
+
+  previewFile(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final width = ctx.width;
+        final height = ctx.height;
+        return AlertDialog(
+          content: Stack(
+            children: [
+              SizedBox(
+                width: width * 0.9,
+                height: height * 0.7,
+                child: Image.file(
+                  fileKtp.value!,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                    child: Icon(
+                      CupertinoIcons.xmark_circle,
+                      color: Colors.white.withOpacity(0.9),
+                      size: 40,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+          insetPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+        );
+      },
+    );
   }
 
   // Future<void> fetchData() async {

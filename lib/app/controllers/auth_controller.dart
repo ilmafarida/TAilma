@@ -12,41 +12,24 @@ class AuthController extends GetxController {
   FirebaseAuth auth = FirebaseAuth.instance;
   UserData userData = UserData();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-
+  User? get currentUser => auth.currentUser;
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
 
-  // void signup(String email, String password) async {
-  //   try {
-  //     await FirebaseAuth.instance
-  //         .createUserWithEmailAndPassword(email: email, password: password);
-  //     Get.offAllNamed(Routes.HOME);
-  //   } on FirebaseAuthException catch (e) {
-  //     if (e.code == 'weak-password') {
-  //       print('The password provided is too weak.');
-  //     } else if (e.code == 'email-already-in-use') {
-  //       print('The account already exists for that email');
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  var dataKeranjang = Rxn<List<Map<String, dynamic>>>();
+  @override
+  Future<void> onInit() async {
+    print('KERANJANG : $dataKeranjang');
+    super.onInit();
+  }
 
-  // void login(String email, String password) async {
-  //   try {
-  //     await auth.signInWithEmailAndPassword(email: email, password: password);
-  //     Get.offAllNamed(Routes.HOME);
-  //   } on FirebaseAuthException catch (e) {
-  //     if (e.code == 'user-not-found') {
-  //       print('No user found for that email.');
-  //     } else if (e.code == 'wrong password') {
-  //       print('Wrong password provided for that user.');
-  //     }
-  //   }
-  // }
+  @override
+  void onClose() {
+    super.onClose();
+  }
 
-  Stream<DocumentSnapshot> streamUser() async* {
+  Stream<DocumentSnapshot> streamUser() {
     String uid = auth.currentUser!.uid;
-    yield* firestore.collection("user").doc(uid).snapshots();
+    return firestore.collection("user").doc(uid).snapshots();
   }
 
   void logout() async {
@@ -82,7 +65,7 @@ class AuthController extends GetxController {
                     GestureDetector(
                       onTap: () async {
                         await FirebaseAuth.instance.signOut();
-                        // await SharedPreference.clear();
+                        await SharedPreference.clear();
                         Get.offAllNamed(Routes.LOGIN);
                       },
                       child: Text(

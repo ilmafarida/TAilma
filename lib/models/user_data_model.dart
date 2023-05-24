@@ -61,4 +61,9 @@ class UserData {
       "uid": uid,
     };
   }
+
+  @override
+  String toString() {
+    return 'alamat: $alamat, email: $email, fullname: $fullname, kecamatan: $kecamatan, kelurahan: $kelurahan, ktp: $ktp, password: $password, role: $role, status: $status, uid: $uid';
+  }
 }

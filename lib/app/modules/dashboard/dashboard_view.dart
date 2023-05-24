@@ -15,20 +15,6 @@ class DashboardView extends GetView<DashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Color(ListColor.colorBackground),
-      //   elevation: 0,
-      //   actions: [
-      //     IconButton(
-      //       onPressed: () async {
-      //         await FirebaseAuth.instance.signOut();
-      //         Get.offAllNamed(Routes.WELCOME);
-      //       },
-      //       // onPressed: () => authC.logout(),
-      //       icon: Icon(Icons.logout),
-      //     ),
-      //   ],
-      // ),
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
@@ -38,12 +24,12 @@ class DashboardView extends GetView<DashboardController> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _header(),
-              _button(text: 'Verifikasi Akun', onTap: () => print('tes')),
-              _button(text: 'Post Dashboard', onTap: () => print('tes')),
-              _button(text: 'Produk', onTap: () => print('tes')),
-              _button(text: 'Sampah', onTap: () => print('tes')),
-              _button(text: 'Pesanan', onTap: () => print('tes')),
-              _button(text: 'Penukaran Sampah', onTap: () => print('tes')),
+              _button(text: 'Verifikasi Akun', onTap: () => Get.toNamed(Routes.VERIFIKASI_AKUN)),
+              _button(text: 'Post Dashboard', onTap: () => Get.toNamed(Routes.HOME)),
+              _button(text: 'Produk', onTap: () => Get.toNamed(Routes.ADMIN_PRODUCT)),
+              _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH)),
+              _button(text: 'Pesanan', onTap: () => print('tes2')),
+              _button(text: 'Penukaran Sampah', onTap: () => print('tes33')),
             ],
           ),
         ),

@@ -75,7 +75,7 @@ class ProfileView extends GetView<ProfileController> {
           _listProfileContent(title: 'Email', value: '${controller.authC.userData.email}'),
           _listProfileContent(title: 'Alamat', value: '${controller.authC.userData.alamat}', isCanTap: true, onTap: () => Get.toNamed(Routes.UBAH_ALAMAT)),
           _listProfileContent(title: 'No Hp', value: '${controller.authC.userData.nohp}'),
-          _listProfileContent(title: 'Pengaturan Akun', isCanTap: true, onTap: () => Get.toNamed(Routes.CHANGE_PASSWORD)),
+          _listProfileContent(title: 'Pengaturan Akun', value: '', isCanTap: true, onTap: () => Get.toNamed(Routes.CHANGE_PASSWORD)),
           _listProfileContent(title: 'Logout', isLogout: true, onTap: () => controller.authC.logout()),
         ],
       ),
@@ -86,25 +86,44 @@ class ProfileView extends GetView<ProfileController> {
     return Padding(
       padding: EdgeInsets.only(bottom: 20),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          GestureDetector(
-            onTap: (isLogout!) ? onTap : null,
-            child: Text(
-              title!,
-              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, color: isLogout ? Colors.red : Color(0xFF1E232C)),
+          SizedBox(
+            width: 100,
+            child: GestureDetector(
+              onTap: (isLogout!) ? onTap : null,
+              child: Text(
+                title!,
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, color: isLogout ? Colors.red : Color(0xFF1E232C)),
+              ),
             ),
           ),
-          Spacer(),
           if (value != null)
-            Text(
-              value,
-              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: SizedBox(
+                  child: Text(
+                    value,
+                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
+                    maxLines: 3,
+                  ),
+                ),
+              ),
             ),
           if (isCanTap!) ...[
-            SizedBox(width: 5),
-            GestureDetector(
-              onTap: onTap,
-              child: Icon(Icons.arrow_forward_ios_rounded, size: 14),
+            // Spacer(),
+            Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: 15,
+                child: Expanded(
+                  child: GestureDetector(
+                    onTap: onTap,
+                    child: Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                  ),
+                ),
+              ),
             ),
           ]
         ],

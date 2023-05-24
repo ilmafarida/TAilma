@@ -2,50 +2,164 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
-import 'package:rumah_sampah_t_a/app/utils/shared_preference.dart';
+import 'package:path/path.dart' as base;
 import 'package:rumah_sampah_t_a/app/widgets/upload_component.dart';
 
-enum HomeMode { USER, ADMIN, EDIT }
+enum ProductMode { VIEW, EDIT, CREATE }
 
-class HomeController extends GetxController {
-  // var tabIndex = 0;
+class AdminProductController extends GetxController {
   var authC = Get.find<AuthController>();
+  Rx<ProductMode> productMode = ProductMode.VIEW.obs;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Rx<HomeMode> homeMode = HomeMode.USER.obs;
-  var quoteC = TextEditingController();
+  var namaC = TextEditingController();
+  var hargaC = TextEditingController();
+  var poinC = TextEditingController();
   var deskripsiC = TextEditingController();
-  var fileC = Rxn<File>();
+  var file = Rxn<File>();
   UploadComponent uploadComponent = UploadComponent();
 
-  var isUpdate = false.obs;
-  var isLoading = false.obs;
+  Stream<QuerySnapshot>? stream;
+  var dataEdit = Rxn();
+  var dataIndexEdit = 0.obs;
+
+  var isUpload = false.obs;
+
+  void setViewMode(ProductMode mode) {
+    productMode.value = mode;
+  }
 
   @override
-  Future<void> onInit() async {
-    var role = await SharedPreference.getUserRole();
-    if (role != 'user') {
-      setViewMode(HomeMode.ADMIN);
-    }
+  void onInit() {
+    setViewMode(ProductMode.VIEW);
     fetchData();
     super.onInit();
   }
 
   @override
   void onClose() {
+    setViewMode(ProductMode.VIEW);
+    isUpload.value = false;
     super.onClose();
   }
 
-  void setViewMode(HomeMode mode) {
-    homeMode.value = mode;
+  Stream<QuerySnapshot<Map<String, dynamic>>?> fetchData() async* {
+    try {
+      yield* FirebaseFirestore.instance.collection('produk').snapshots();
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
-  Stream<DocumentSnapshot<Object?>>? fetchData() async* {
-    yield* firestore.collection('dashboard').doc('data').snapshots();
+  Stream<DocumentSnapshot> fetchDataDetail() {
+    return FirebaseFirestore.instance.collection('produk').doc('${dataIndexEdit.value}').snapshots();
+  }
+
+  Future<void> prosesSubmit({int? status, int? uid}) async {
+    print('UID: $uid');
+    setViewMode(ProductMode.VIEW);
+    if (status == -1) {
+      try {
+        await firestore.collection('produk').doc('$uid').delete();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Hapus Berhasil")));
+        // print(':::${dataEdit.value['status']}');
+      } catch (e) {
+        log('ERROR : $e');
+      }
+    } else if (status == 0) {
+      uid! + 1;
+      try {
+        await firestore.collection('produk').doc('$uid').set({
+          'deskripsi': deskripsiC.text,
+          'nama': namaC.text,
+          'poin': poinC.text,
+          'harga': hargaC.text,
+          'gambar': '',
+        });
+        if (isUpload.value) {
+          await uploadFileToFirestore(
+            database: 'produk',
+            field: 'gambar',
+            path: 'file-produk',
+            firestore: firestore,
+            uid: '$uid',
+            file: file.value,
+          );
+        }
+
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Ubah berhasil")));
+        // setViewMode(ProductMode.VIEW);
+      } catch (e) {
+        log('$e');
+      }
+    } else {
+      try {
+        if (isUpload.value) {
+          await uploadFileToFirestore(
+            database: 'produk',
+            field: 'gambar',
+            path: 'file-produk',
+            firestore: firestore,
+            uid: '${dataIndexEdit.value}',
+            file: file.value,
+          );
+        }
+        await firestore.collection('produk').doc('$uid').update({
+          'deskripsi': deskripsiC.text,
+          'nama': namaC.text,
+          'poin': poinC.text,
+          'harga': hargaC.text,
+        });
+
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Ubah berhasil")));
+        // setViewMode(ProductMode.VIEW);
+      } catch (e) {
+        log('$e');
+      }
+    }
+    isUpload.value = false;
+    // isLoading.value = false;
+  }
+
+  Future getFromGallery({Rxn<File>? file}) async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      file!.value = File(pickedFile.path);
+      log(base.basename(file.value!.path));
+      return pickedFile;
+    } else {
+      // JIKA USER CANCEL UPLOAD
+      return;
+    }
+  }
+
+  Future getFromCamera({Rxn<File>? file}) async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      file!.value = File(pickedFile.path);
+      log(base.basename(file.value!.path));
+      return pickedFile;
+    } else {
+      // JIKA USER CANCEL UPLOAD
+      return;
+    }
+  }
+
+  Future<void> uploadFileToFirestore({String? uid, String? path, File? file, FirebaseFirestore? firestore, String? database, String? field}) async {
+    String fileName = 'PRODUK - ${DateTime.now()}';
+    Reference storageReference = FirebaseStorage.instance.ref().child('$path/$fileName');
+    UploadTask uploadTask = storageReference.putFile(file!);
+    TaskSnapshot storageSnapshot = await uploadTask.whenComplete(() {});
+    String downloadUrl = await storageSnapshot.ref.getDownloadURL();
+    log("DOWNLOAD :: $downloadUrl");
+    // Data telah berhasil diunggah ke Firestore
+    await firestore!.collection('$database').doc(uid).update({'$field': downloadUrl});
   }
 
   showUpload(BuildContext context) {
@@ -93,9 +207,10 @@ class HomeController extends GetxController {
                               ),
                               onTap: () async {
                                 Get.back();
-                                var res = await uploadComponent.getFromCamera(file: fileC);
+                                var res = await uploadComponent.getFromCamera(file: file);
                                 if (res != null) {
-                                  isUpdate.value = true;
+                                  isUpload.value = true;
+                                  file.refresh();
                                 }
                               },
                               child: Container(padding: EdgeInsets.all(20), child: Icon(Icons.camera, color: Colors.white)),
@@ -129,10 +244,11 @@ class HomeController extends GetxController {
                               ),
                               onTap: () async {
                                 Get.back();
-                                var res = await uploadComponent.getFromGallery(file: fileC);
+                                var res = await uploadComponent.getFromGallery(file: file);
                                 if (res != null) {
-                                  isUpdate.value = true;
+                                  isUpload.value = true;
                                 }
+                                file.refresh();
                               },
                               child: Container(
                                 padding: EdgeInsets.all(20),
@@ -154,30 +270,5 @@ class HomeController extends GetxController {
             ],
           );
         });
-  }
-
-  Future<void> submit() async {
-    isLoading.value = true;
-    try {
-      if (isUpdate.value) {
-        await uploadComponent.uploadFileToFirestore(
-          database: 'dashboard',
-          field: 'image',
-          path: 'file-dashboard',
-          firestore: firestore,
-          uid: 'data',
-          file: fileC.value,
-        );
-      }
-      await firestore.collection("dashboard").doc('data').update({
-        "quote": quoteC.text,
-        "deskripsi": deskripsiC.text,
-      });
-    } catch (e) {
-      log('ERROR :: $e');
-    }
-    setViewMode(HomeMode.ADMIN);
-    isUpdate.value = false;
-    isLoading.value = false;
   }
 }

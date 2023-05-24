@@ -8,6 +8,7 @@ import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_contr
 import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
 
 class OtpVerifikasiView extends GetView<OtpVerifikasiController> {
   const OtpVerifikasiView({super.key});
@@ -22,7 +23,7 @@ class OtpVerifikasiView extends GetView<OtpVerifikasiController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _backButton(),
+              CustomBackButton(),
               _header(),
               _fieldOtp(),
               _submitButton(context),
@@ -155,16 +156,6 @@ class OtpVerifikasiView extends GetView<OtpVerifikasiController> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _backButton() {
-    return InkWell(
-      onTap: () => Get.back(),
-      child: Icon(
-        Icons.arrow_back_ios,
-        size: 18,
       ),
     );
   }

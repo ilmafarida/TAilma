@@ -1,6 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/product/product_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/product/product_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_binding.dart';
@@ -10,6 +14,8 @@ import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_view.
 import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_view.dart';
 
+import '../modules/admin/sampah/sampah_binding.dart';
+import '../modules/admin/sampah/sampah_view.dart';
 import '../modules/dashboard/dashboard_binding.dart';
 import '../modules/dashboard/dashboard_view.dart';
 import '../modules/home/home_binding.dart';
@@ -116,6 +122,21 @@ class AppPages {
       name: _Paths.UBAH_ALAMAT,
       page: () => UbahAlamatView(),
       binding: UbahAlamatBinding(),
+    ),
+    GetPage(
+      name: _Paths.VERIFIKASI_AKUN,
+      page: () => VerifikasiAkunView(),
+      binding: VerifikasiAkunBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PRODUCT,
+      page: () => AdminProductView(),
+      binding: AdminProductBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_SAMPAH,
+      page: () => AdminSampahView(),
+      binding: AdminSampahBinding(),
     ),
   ];
 }

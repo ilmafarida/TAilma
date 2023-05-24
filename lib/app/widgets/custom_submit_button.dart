@@ -17,20 +17,25 @@ class CustomSubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: width,
-        height: height,
-        margin: EdgeInsets.only(top: 10),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Color(ListColor.colorButtonGreen),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          text,
-          style: ListTextStyle.textStyleGray.copyWith(color: Colors.white),
+    return Material(
+      borderRadius: BorderRadius.circular(8),
+      color: Color(ListColor.colorButtonGreen),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: width,
+          height: height,
+          // margin: EdgeInsets.only(top: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            text,
+            style: ListTextStyle.textStyleGray.copyWith(color: Colors.white),
+          ),
         ),
       ),
     );

@@ -17,6 +17,9 @@ abstract class Routes {
   static const PROFILE = _Paths.PROFILE;
   static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
   static const UBAH_ALAMAT = _Paths.UBAH_ALAMAT;
+  static const VERIFIKASI_AKUN = _Paths.VERIFIKASI_AKUN;
+  static const ADMIN_PRODUCT = _Paths.ADMIN_PRODUCT;
+  static const ADMIN_SAMPAH = _Paths.ADMIN_SAMPAH;
 }
 
 abstract class _Paths {
@@ -35,4 +38,7 @@ abstract class _Paths {
   static const PROFILE = '/profile';
   static const CHANGE_PASSWORD = '/change-password';
   static const UBAH_ALAMAT = '/ubah-alamat';
+  static const VERIFIKASI_AKUN = '/verifikasi-akun';
+  static const ADMIN_PRODUCT = '/admin-product';
+  static const ADMIN_SAMPAH = '/admin-sampah';
 }

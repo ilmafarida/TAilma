@@ -9,6 +9,8 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final Widget? icon;
+  final bool? isWithBorder;
+  final int? maxLines;
 
   const CustomTextField({
     super.key,
@@ -18,6 +20,8 @@ class CustomTextField extends StatelessWidget {
     this.isNumber = false,
     this.obscure = false,
     this.isPassword = false,
+    this.maxLines,
+    this.isWithBorder = true,
   });
 
   @override
@@ -28,7 +32,7 @@ class CustomTextField extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: Color(0xFFF7F8F9),
-        border: Border.all(color: Color(0xFF569F00)),
+        border: Border.all(color: isWithBorder! ? Color(0xFF569F00) : Colors.transparent),
       ),
       child: TextFormField(
         inputFormatters: isNumber!
@@ -43,6 +47,8 @@ class CustomTextField extends StatelessWidget {
           color: Colors.black,
         ),
         cursorColor: Colors.black,
+        maxLines: maxLines ?? 1,
+        showCursor: true,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
