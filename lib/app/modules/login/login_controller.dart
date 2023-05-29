@@ -29,6 +29,7 @@ class LoginController extends GetxController {
           email: emailC.text,
           password: passwordC.text,
         );
+        print('${userCredential.user?.uid}');
         DocumentSnapshot? snapshot = await FirebaseFirestore.instance.collection('user').doc(userCredential.user?.uid).get();
         if (snapshot.exists) {
           authC.userData = UserData.fromSnapshot(snapshot);
@@ -40,10 +41,13 @@ class LoginController extends GetxController {
             } else {
               Get.offAllNamed(Routes.WAITING);
             }
-          } else {
+          } else if (authC.userData.role == 'admin') {
+            await SharedPreference.setRoleUser(authC.userData.role!);
             Get.offAllNamed(Routes.DASHBOARD);
           }
-        } else {}
+        } else {
+          Get.offAllNamed(Routes.WELCOME);
+        }
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Email tidak terdaftar");

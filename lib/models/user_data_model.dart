@@ -33,17 +33,17 @@ class UserData {
 
   factory UserData.fromSnapshot(DocumentSnapshot json) {
     return UserData(
-      alamat: json["alamat"],
-      email: json["email"],
-      fullname: json["fullname"],
-      kecamatan: json["kecamatan"],
-      kelurahan: json["kelurahan"],
-      ktp: json["ktp"],
-      password: json["password"],
-      role: json["role"],
-      status: json["status"],
-      uid: json["uid"],
-      nohp: json["nohp"],
+      alamat: json["alamat"] ?? '',
+      email: json["email"] ?? '',
+      fullname: json["fullname"] ?? '',
+      kecamatan: json["kecamatan"] ?? '',
+      kelurahan: json["kelurahan"] ?? '',
+      ktp: json["ktp"] ?? '',
+      password: json["password"] ?? '',
+      role: json["role"] ?? '',
+      status: json["status"] ?? '',
+      uid: json["uid"] ?? '',
+      nohp: json["nohp"] ?? '',
     );
   }
 

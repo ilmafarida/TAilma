@@ -193,9 +193,12 @@ class SignupView extends GetView<SignupController> {
   }
 
   Widget _submitButton() {
-    return CustomSubmitButton(
-      onTap: () => controller.signUp(),
-      text: 'Registrasi',
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical:12),
+      child: CustomSubmitButton(
+        onTap: () => controller.signUp(),
+        text: 'Registrasi',
+      ),
     );
   }
 
@@ -379,6 +382,7 @@ class SignupView extends GetView<SignupController> {
                             fit: BoxFit.fitHeight,
                             height: 100,
                           ),
+                          SizedBox(height: 10),
                           CustomSubmitButton(
                             onTap: () => controller.showUpload(context),
                             text: 'Upload Ulang',

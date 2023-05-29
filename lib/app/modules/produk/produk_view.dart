@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_controller.dart';
+import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
@@ -31,10 +33,11 @@ class ProdukView extends GetView<ProdukController> {
               ),
               actions: <Widget>[
                 InkWell(
-                  onTap: () => {},
+                  onTap: () => Get.toNamed(Routes.KERANJANG),
                   child: Container(
+                    width: 80,
                     alignment: Alignment.center,
-                    margin: EdgeInsets.only(right: 30),
+                    // margin: EdgeInsets.only(right: 30),
                     child: Icon(
                       Icons.shopping_cart_outlined,
                     ),
@@ -87,7 +90,7 @@ class ProdukView extends GetView<ProdukController> {
                   children: [
                     CustomBackButton(onTap: () => controller.setViewMode(ProdukUserMode.LIST)),
                     StreamBuilder<DocumentSnapshot>(
-                        stream: controller.fetchDataDetail(),
+                        stream: controller.fetchDataDetail(controller.dataIndexEdit.value.toString()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
@@ -101,8 +104,8 @@ class ProdukView extends GetView<ProdukController> {
                             return Text('No data available');
                           }
                           final documents = snapshot.data!.data() as Map<String, dynamic>;
-                          print('::::::::::::$documents');
-                          print(':::::${controller.dataIndexEdit.value} $documents');
+                          print('DETAIL ::::::::::::$documents');
+                          print('DETAIL :::::${controller.dataIndexEdit.value} $documents');
                           Map<String, dynamic>? dataTambahan;
 
                           return Column(
@@ -145,35 +148,38 @@ class ProdukView extends GetView<ProdukController> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              documents['nama'],
-              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 32),
-            ),
-            Text.rich(
-              TextSpan(
-                text: 'Rp.',
-                style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                children: [
-                  TextSpan(
-                    text: '${documents['harga']}',
-                  ),
-                  TextSpan(text: ' / '),
-                  TextSpan(
-                    text: '${documents['poin']}',
-                    style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                    children: [
-                      TextSpan(
-                        text: ' poin',
-                      ),
-                    ],
-                  ),
-                ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                documents['nama'],
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 32),
+                maxLines: 2,
               ),
-            ),
-          ],
+              Text.rich(
+                TextSpan(
+                  text: 'Rp.',
+                  style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                  children: [
+                    TextSpan(
+                      text: '${documents['harga']}',
+                    ),
+                    TextSpan(text: ' / '),
+                    TextSpan(
+                      text: '${documents['poin']}',
+                      style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                      children: [
+                        TextSpan(
+                          text: ' poin',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         Expanded(
           child: Padding(
@@ -280,6 +286,7 @@ class ProdukView extends GetView<ProdukController> {
             print('::$i'),
             controller.setViewMode(ProdukUserMode.DETAIL),
             controller.dataDetail.value = data[i],
+            controller.dataIndexEdit.value = i,
             print('::: ${controller.dataDetail.value['nama']}'),
           },
           child: Container(

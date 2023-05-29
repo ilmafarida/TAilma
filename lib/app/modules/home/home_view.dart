@@ -337,14 +337,14 @@ class HomeView extends GetView<HomeController> {
         children: [
           _contentNavBar(icon: 'ic_home.png', title: 'Home', onTap: () => Get.offNamed(Routes.HOME)),
           _contentNavBar(icon: 'ic_produk.png', title: 'Produk', onTap: () => Get.toNamed(Routes.PRODUK)),
-          _contentNavBar(icon: 'ic_tukar.png', title: 'Tukar Sampah', onTap: () => print('tukar')),
-          _contentNavBar(icon: 'ic_riwayat.png', title: 'Riwayat', onTap: () => print('riwayat')),
+          _contentNavBar(icon: 'ic_tukar.png', title: 'Tukar Sampah', onTap: () => Get.toNamed(Routes.TUKARSAMPAH)),
+          _contentNavBar(icon: 'ic_riwayat.png', title: 'Riwayat', onTap: () => Get.toNamed(Routes.RIWAYAT)),
         ],
       ),
     );
   }
 
-  Widget _contentNavBar({String? icon, String? title, VoidCallback? onTap}) {
+  Widget _contentNavBar({String? icon, String? title, VoidCallback? onTap, bool? isSelected}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -357,6 +357,7 @@ class HomeView extends GetView<HomeController> {
               'assets/${icon!}',
               fit: BoxFit.contain, width: 30,
               height: 30,
+              // color: Color(ListColor.colorButtonGreen),
               // errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
             ),
             Text(

@@ -79,10 +79,7 @@ class DashboardView extends GetView<DashboardController> {
           ),
           Spacer(),
           IconButton(
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Get.offAllNamed(Routes.WELCOME);
-            },
+            onPressed: () => authC.logout(),
             // onPressed: () => authC.logout(),
             icon: Icon(Icons.logout),
           ),

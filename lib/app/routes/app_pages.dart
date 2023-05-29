@@ -5,8 +5,12 @@ import 'package:rumah_sampah_t_a/app/modules/admin/product/product_binding.dart'
 import 'package:rumah_sampah_t_a/app/modules/admin/product/product_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_binding.dart';
@@ -85,8 +89,8 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.TUKARSAMPAH,
-      page: () => TukarsampahView(),
-      binding: TukarsampahBinding(),
+      page: () => TukarSampahView(),
+      binding: TukarSampahBinding(),
     ),
     GetPage(
       name: _Paths.RIWAYAT,
@@ -137,6 +141,16 @@ class AppPages {
       name: _Paths.ADMIN_SAMPAH,
       page: () => AdminSampahView(),
       binding: AdminSampahBinding(),
+    ),
+    GetPage(
+      name: _Paths.KERANJANG,
+      page: () => KeranjangView(),
+      binding: KeranjangBinding(),
+    ),
+    GetPage(
+      name: _Paths.ANTRIAN,
+      page: () => AntrianView(),
+      binding: AntrianBinding(),
     ),
   ];
 }

@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 
 class CustomTextField extends StatelessWidget {
   final bool? isNumber;
   final bool? obscure;
   final bool? isPassword;
-  final TextEditingController controller;
-  final String hintText;
+  final TextEditingController? controller;
+  final String? hintText;
   final Widget? icon;
   final bool? isWithBorder;
   final int? maxLines;
+  final VoidCallback? onTap;
+  final String? title;
+  final String? value;
 
   const CustomTextField({
     super.key,
-    required this.controller,
-    required this.hintText,
+    this.controller,
+    this.hintText,
     this.icon,
     this.isNumber = false,
     this.obscure = false,
     this.isPassword = false,
     this.maxLines,
     this.isWithBorder = true,
+    this.onTap,
+    this.title,
+    this.value,
   });
 
   @override
@@ -34,32 +41,53 @@ class CustomTextField extends StatelessWidget {
         color: Color(0xFFF7F8F9),
         border: Border.all(color: isWithBorder! ? Color(0xFF569F00) : Colors.transparent),
       ),
-      child: TextFormField(
-        inputFormatters: isNumber!
-            ? [
-                LengthLimitingTextInputFormatter(12),
-                FilteringTextInputFormatter.digitsOnly,
-              ]
-            : [],
-        obscureText: isPassword! ? obscure! : false,
-        controller: controller,
-        style: TextStyle(
-          color: Colors.black,
-        ),
-        cursorColor: Colors.black,
-        maxLines: maxLines ?? 1,
-        showCursor: true,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hintText,
-          hintStyle: ListTextStyle.textStyleGray,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 17,
-          ),
-          suffixIcon: icon ?? icon,
-        ),
-      ),
+      child: onTap != null
+          ? GestureDetector(
+              onTap: onTap,
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 150,
+                      child: Text(
+                        value != "" ? value! : title!,
+                        style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, color: value != "" ? Colors.black : Colors.grey),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Spacer(),
+                    icon!
+                  ],
+                ),
+              ),
+            )
+          : TextFormField(
+              inputFormatters: isNumber!
+                  ? [
+                      LengthLimitingTextInputFormatter(12),
+                      FilteringTextInputFormatter.digitsOnly,
+                    ]
+                  : [],
+              obscureText: isPassword! ? obscure! : false,
+              controller: controller,
+              style: TextStyle(
+                color: Colors.black,
+              ),
+              cursorColor: Colors.black,
+              maxLines: maxLines ?? 1,
+              showCursor: true,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: hintText,
+                hintStyle: ListTextStyle.textStyleGray,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 17,
+                ),
+                suffixIcon: icon ?? icon,
+              ),
+            ),
     );
   }
 }

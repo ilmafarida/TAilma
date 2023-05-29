@@ -13,7 +13,6 @@ import 'package:rumah_sampah_t_a/app/widgets/upload_component.dart';
 enum HomeMode { USER, ADMIN, EDIT }
 
 class HomeController extends GetxController {
-  // var tabIndex = 0;
   var authC = Get.find<AuthController>();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   Rx<HomeMode> homeMode = HomeMode.USER.obs;
@@ -21,6 +20,8 @@ class HomeController extends GetxController {
   var deskripsiC = TextEditingController();
   var fileC = Rxn<File>();
   UploadComponent uploadComponent = UploadComponent();
+
+  var selectedTab = 0.obs;
 
   var isUpdate = false.obs;
   var isLoading = false.obs;

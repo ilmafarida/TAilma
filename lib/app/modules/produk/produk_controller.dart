@@ -43,8 +43,8 @@ class ProdukController extends GetxController {
     }
   }
 
-  Stream<DocumentSnapshot> fetchDataDetail() {
-    return FirebaseFirestore.instance.collection('produk').doc('${dataIndexEdit.value}').snapshots();
+  Stream<DocumentSnapshot> fetchDataDetail(String id) {
+    return FirebaseFirestore.instance.collection('produk').doc(id).snapshots();
   }
 
   Future<void> submitKeranjang([Map<String, dynamic>? dataTambahan]) async {
@@ -52,13 +52,13 @@ class ProdukController extends GetxController {
     // if (idKeranjangTerakhir == 0) {
     //   return;
     // }
-    print(':::  $idKeranjangTerakhir');
-    firestore.collection("user").doc(authC.currentUser!.uid).collection('keranjang').doc('$idKeranjangTerakhir').set({
+    print(':::  ${dataIndexEdit.value}');
+    firestore.collection("user").doc(authC.currentUser!.uid).collection('keranjang').doc('${dataIndexEdit.value}').set({
       "gambar": dataTambahan!['gambar'],
       "jenis": dataTambahan['nama'],
       "harga": dataTambahan['harga'],
       "poin": dataTambahan['poin'],
-      "jumlah": dataTambahan['jumlah'],
+      "jumlah": dataTambahan['jumlah'].toString(),
     });
   }
 

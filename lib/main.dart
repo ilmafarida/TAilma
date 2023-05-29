@@ -1,7 +1,10 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, deprecated_member_use
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/dashboard/dashboard_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/dashboard/dashboard_view.dart';
@@ -17,6 +20,10 @@ import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+  }
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await SharedPreference.init();
@@ -40,8 +47,6 @@ void main() async {
       home: StreamBuilder(
           stream: authC.streamAuthStatus,
           builder: (context, snapshot) {
-            print('::::$roleUser');
-            print('::::$idUser');
             if (snapshot.hasData) {
               if (roleUser == 'user') {
                 Get.put(HomeController());
@@ -59,6 +64,8 @@ void main() async {
           }),
     ),
   );
+  print('::::$roleUser');
+  print('::::$idUser');
   //   StreamBuilder(
   //     stream: authC
   //     builder: (context, snapshot) {

@@ -20,6 +20,8 @@ abstract class Routes {
   static const VERIFIKASI_AKUN = _Paths.VERIFIKASI_AKUN;
   static const ADMIN_PRODUCT = _Paths.ADMIN_PRODUCT;
   static const ADMIN_SAMPAH = _Paths.ADMIN_SAMPAH;
+  static const KERANJANG = _Paths.KERANJANG;
+  static const ANTRIAN = _Paths.ANTRIAN;
 }
 
 abstract class _Paths {
@@ -41,4 +43,6 @@ abstract class _Paths {
   static const VERIFIKASI_AKUN = '/verifikasi-akun';
   static const ADMIN_PRODUCT = '/admin-product';
   static const ADMIN_SAMPAH = '/admin-sampah';
+  static const KERANJANG = '/keranjang';
+  static const ANTRIAN = '/antrian';
 }

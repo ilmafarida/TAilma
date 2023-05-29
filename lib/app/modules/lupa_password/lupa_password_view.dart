@@ -28,7 +28,7 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
                     children: <Widget>[
                       _backButton(),
                       _header(),
-                      _emailField(),
+                      _noHpField(),
                       _submitButton(context),
                       Spacer(),
                       _footer(),
@@ -42,7 +42,7 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
 
   Widget _submitButton(context) {
     return InkWell(
-      onTap: () => controller.sendOtpCode(context),
+      onTap: () => controller.sendOtpCode(context,controller.noHpC.text),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 19),
@@ -63,7 +63,7 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
   Widget _header() {
     return Padding(
       padding: EdgeInsets.only(top: 50),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +77,7 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
             ),
             SizedBox(height: 15),
             Text(
-              'Jangan khawatir! Masukkan alamat email yang ditautkan dengan akun anda.',
+              'Jangan khawatir! Masukkan no telepon yang ditautkan dengan akun anda.',
               style: ListTextStyle.textStyleBlack.copyWith(
                 fontSize: 16,
                 height: 24 / 16,
@@ -99,8 +99,8 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
     );
   }
 
-  Widget _emailField() {
-    return _textField(controller: controller.emailC, hint: 'Masukkan Email');
+  Widget _noHpField() {
+    return _textField(controller: controller.noHpC, hint: 'Masukkan no HP');
   }
 
   Widget _textField({

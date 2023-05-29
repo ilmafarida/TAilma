@@ -1,139 +1,153 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
-import 'package:rumah_sampah_t_a/app/utils/shared_preference.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../routes/app_pages.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 
-class SignupController extends GetxController {
-  TextEditingController emailC = TextEditingController();
-  TextEditingController passwordC = TextEditingController();
-  TextEditingController fullnameC = TextEditingController();
-  TextEditingController kecamatanC = TextEditingController();
-  TextEditingController kelurahanC = TextEditingController();
-  TextEditingController alamatC = TextEditingController();
-  var noHpC = TextEditingController();
-  var fileKtp = Rxn<File>();
-  var isPasswordHidden = true.obs;
+enum AntrianUserMode { LIST, PAYMENT }
 
-  var listKecamatan = [
-    "Kartoharjo",
-    "Manguharjo",
-    "Taman",
-  ];
-  var listKelurahan = [
-    "Kanigoro",
-    "Kelun",
-    "Kartoharjo",
-    "Klegen",
-    "Oro-Oro Ombo",
-    "Pilangbango",
-    "Rejomulyo",
-    "Sukosari",
-    "Tawangrejo",
-    "Madiun Lor",
-    "Manguharjo",
-    "Nambangan Lor",
-    "Nambangan Kidul",
-    "Ngegong",
-    "Pangongangan",
-    "Patihan",
-    "Sogaten",
-    "Winongo",
-    "Banjarejo",
-    "Demangan",
-    "Josenan",
-    "Kejuron",
-    "Kuncen",
-    "Mojorejo",
-    "Manisrejo",
-    "Pandean",
-    "Taman"
-  ];
-
-  var loadingAPI = false.obs;
+class AntrianController extends GetxController {
+  Rx<AntrianUserMode> antrianUserMode = AntrianUserMode.LIST.obs;
+  var dataDetail = Rxn();
+  var dataTotalPoin = ''.obs;
+  var dataIndexEdit = 0.obs;
   var authC = Get.find<AuthController>();
-
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  LatLng centerMadiun = LatLng(-7.629039, 111.530110);
+  var fileSampah = Rxn<File>();
+
+  var noHpC = TextEditingController();
+  var alamatC = TextEditingController().obs;
+  var tanggalC = ''.obs;
+  var waktuC = ''.obs;
+  var informasiC = TextEditingController();
+
+  @override
+  void onInit() {
+    setViewMode(AntrianUserMode.LIST);
+    super.onInit();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+  }
 
   @override
   void onClose() {
     super.onClose();
   }
 
-  @override
-  void onInit() async {
-    super.onInit();
-    // fetchData();
+  void setViewMode(AntrianUserMode mode) {
+    antrianUserMode.value = mode;
   }
 
-  void signUp() async {
-    if (emailC.text.isNotEmpty && passwordC.text.isNotEmpty) {
-      try {
-        UserCredential userCredential = await authC.auth.createUserWithEmailAndPassword(
-          email: emailC.text,
-          password: passwordC.text,
-        );
-        if (userCredential.user != null) {
-          String? uid = userCredential.user?.uid;
-          firestore.collection("user").doc(uid).set({
-            "uid": uid,
-            "email": emailC.text,
-            "password": passwordC.text,
-            "fullname": fullnameC.text,
-            "kecamatan": kecamatanC.text,
-            "nohp": noHpC.text,
-            "kelurahan": kelurahanC.text,
-            "alamat": alamatC.text,
-            "ktp": '',
-            "status": '-1',
-            "role": 'user',
-          });
-          await _uploadFileToFirestore(uid!);
-        }
-
-        //print(userCredential);
-        await SharedPreference.setRoleUser(authC.userData.role!);
-
-        Get.offAllNamed(Routes.WAITING);
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text("Password lemah. Minimal 6 karakter")));
-        } else if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text("Email sudah digunakan")));
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("$e")));
-      }
-    } else if (emailC.text.isEmpty ||
-        passwordC.text.isEmpty ||
-        fullnameC.text.isEmpty ||
-        noHpC.text.isEmpty ||
-        kecamatanC.text.isEmpty ||
-        kelurahanC.text.isEmpty ||
-        alamatC.text.isEmpty ||
-        fileKtp.value == null) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Field harus diisi semua")));
-    } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Email dan password wajib diisi")));
+  Stream<QuerySnapshot<Map<String, dynamic>>?> fetchData() async* {
+    try {
+      yield* FirebaseFirestore.instance.collection('user').doc(authC.currentUser!.uid).collection('antrian').snapshots();
+    } catch (e) {
+      print('Error: $e');
     }
+  }
+
+  Stream<DocumentSnapshot> fetchDataDetail(String id) {
+    return FirebaseFirestore.instance.collection('antrian').doc(id).snapshots();
+  }
+
+  showDatePicker() async {
+    final DateTime? selected = await showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return DatePickerDialog(
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2024),
+          initialEntryMode: DatePickerEntryMode.calendarOnly,
+        );
+      },
+    );
+    if (selected != null) {
+      String formattedDate = DateFormat('dd-MM-yyyy').format(selected);
+      tanggalC.value = formattedDate;
+    }
+  }
+
+  showWaktuPicker() async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+      context: Get.context!,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (selectedTime != null) {
+      // Lakukan sesuatu dengan waktu yang dipilih
+      print('Waktu yang dipilih: ${selectedTime.format(Get.context!)}');
+      waktuC.value = selectedTime.format(Get.context!);
+    }
+  }
+
+  Future<Position> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Memeriksa apakah layanan lokasi diaktifkan
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Layanan lokasi tidak diaktifkan, lakukan penanganan yang sesuai
+      return Future.error('Layanan lokasi tidak diaktifkan');
+    }
+
+    // Memeriksa izin lokasi pengguna
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      // Izin lokasi ditolak, minta izin kepada pengguna
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Izin lokasi ditolak, lakukan penanganan yang sesuai
+        return Future.error('Izin lokasi ditolak');
+      }
+    }
+
+    // Mendapatkan posisi saat ini
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void getLatLong() async {
+    Position res = await getCurrentLocation();
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
+    if (placemarks.isNotEmpty) {
+      print(placemarks[0].street);
+      alamatC.value.text = placemarks[0].street!;
+    }
+
+    // Navigator.push(
+    //   Get.context!,
+    //   MaterialPageRoute(
+    //     builder: (context) => PlacePicker(
+    //       apiKey: 'AIzaSyCWNwj2M0PgFyuy83wrgNUKs5FXZbkNUdc',
+    //       onPlacePicked: (result) {
+    //         print(result);
+    //         Navigator.of(context).pop();
+    //       },
+    //       initialPosition: centerMadiun,
+    //       useCurrentLocation: true,
+    //       resizeToAvoidBottomInset: false, // only works in page mode, less flickery, remove if wrong offsets
+    //     ),
+    //   ),
+    // );
   }
 
   showUpload(BuildContext context) {
@@ -241,8 +255,8 @@ class SignupController extends GetxController {
   void getFromGallery() async {
     XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      fileKtp.value = File(pickedFile.path);
-      log(fileKtp.value!.path);
+      fileSampah.value = File(pickedFile.path);
+      log(fileSampah.value!.path);
     } else {
       // JIKA USER CANCEL UPLOAD
       return;
@@ -252,23 +266,23 @@ class SignupController extends GetxController {
   void getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      fileKtp.value = File(pickedFile.path);
-      log(fileKtp.value!.path);
+      fileSampah.value = File(pickedFile.path);
+      log(fileSampah.value!.path);
     } else {
       // JIKA USER CANCEL UPLOAD
       return;
     }
   }
 
-  Future<void> _uploadFileToFirestore(String uid) async {
-    String fileName = '${fullnameC.text}-${DateTime.now()}';
-    Reference storageReference = FirebaseStorage.instance.ref().child('fileKTP/$fileName');
-    UploadTask uploadTask = storageReference.putFile(fileKtp.value!);
+  Future<void> uploadFileToFirestore(String uid) async {
+    String fileName = '${authC.userData.fullname}-${DateTime.now()}';
+    Reference storageReference = FirebaseStorage.instance.ref().child('fileSampah/$fileName');
+    UploadTask uploadTask = storageReference.putFile(fileSampah.value!);
     TaskSnapshot storageSnapshot = await uploadTask.whenComplete(() {});
     String downloadUrl = await storageSnapshot.ref.getDownloadURL();
     log(downloadUrl);
     // Data telah berhasil diunggah ke Firestore
-    await firestore.collection('user').doc(uid).update({'ktp': downloadUrl});
+    await firestore.collection('user').doc(uid).collection('penukaran').doc(dataIndexEdit.value.toString()).update({'file': downloadUrl});
   }
 
   previewFile(BuildContext context) {
@@ -284,7 +298,7 @@ class SignupController extends GetxController {
                 width: width * 0.9,
                 height: height * 0.7,
                 child: Image.file(
-                  fileKtp.value!,
+                  fileSampah.value!,
                   fit: BoxFit.fill,
                 ),
               ),
@@ -312,60 +326,53 @@ class SignupController extends GetxController {
     );
   }
 
-  // Future<void> fetchData() async {
-  //   Future.wait([fetchDataKota(), fetchDataKabupaten()]).then((List responses) {
-  //     // Mengakses hasil permintaan API di sini
-  //     // listKecamatan = responses[0];
-  //     print('Response 1: ${responses[0]}');
-  //     print('Response 2: ${responses[1]}');
-  //     Map<String, dynamic> dataKota = jsonDecode(responses[0]);
-  //     Map<String, dynamic> dataKabupaten = jsonDecode(responses[1]);
-
-  //     List<Map<String, dynamic>> listKota = List<Map<String, dynamic>>.from(dataKota['kecamatan']);
-  //     List<Map<String, dynamic>> listKabupaten = List<Map<String, dynamic>>.from(dataKabupaten['kecamatan']);
-
-  //     List<String> listDariKota = listKota.map((kecamatan) => kecamatan['nama'].toString()).toList();
-  //     List<String> listDariKabupaten = listKabupaten.map((kecamatan) => kecamatan['nama'].toString()).toList();
-
-  //     // Menampilkan nilai "nama" dari setiap kecamatan
-  //     for (String dariKota in listDariKota) {
-  //       listKecamatan.add(dariKota);
-  //     }
-
-  //     for (String dariKabupaten in listDariKabupaten) {
-  //       listKecamatan.add(dariKabupaten);
-  //     }
-
-  //   }).catchError((error) {
-  //     // Tangani kesalahan jika ada
-  //     print('Error: $error');
-  //   });
-  // }
-
-  // Future<String> fetchDataKota() async {
-  //   var kotaMadiun = '3577';
-  //   var urlKota = 'https://dev.farizdotid.com/api/daerahindonesia/kecamatan?id_kota=$kotaMadiun';
-
-  //   var response = await http.get(Uri.parse(urlKota));
-
-  //   if (response.statusCode == 200) {
-  //     return response.body;
-  //   } else {
-  //     throw Exception('Failed to fetch data Kota Madiun');
-  //   }
-  // }
-
-  // Future<String> fetchDataKabupaten() async {
-  //   var kabMadiun = '3519';
-
-  //   var urlKab = 'https://dev.farizdotid.com/api/daerahindonesia/kecamatan?id_kota=$kabMadiun';
-
-  //   var response = await http.get(Uri.parse(urlKab));
-
-  //   if (response.statusCode == 200) {
-  //     return response.body;
-  //   } else {
-  //     throw Exception('Failed to fetch dari Kabupaten Madiun');
-  //   }
-  // }
+  deleteCart(int idx) {
+    showDialog(
+      context: Get.context!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color(ListColor.colorButtonGray),
+          insetPadding: EdgeInsets.symmetric(horizontal: 70),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: SizedBox(
+            height: 100,
+            width: 183,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Apakah kamu yakin\ningin menghapus?',
+                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, height: 19.5 / 15),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Get.back(),
+                      child: Text(
+                        'Tidak',
+                        style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian').doc('$idx').delete();
+                        Get.back();
+                      },
+                      child: Text(
+                        'Ya',
+                        style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
