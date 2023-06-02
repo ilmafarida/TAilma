@@ -42,7 +42,7 @@ class LoginController extends GetxController {
               Get.offAllNamed(Routes.WAITING);
             }
           } else if (authC.userData.role == 'admin') {
-            await SharedPreference.setRoleUser(authC.userData.role!);
+            await SharedPreference.setRoleUser('admin');
             Get.offAllNamed(Routes.DASHBOARD);
           }
         } else {

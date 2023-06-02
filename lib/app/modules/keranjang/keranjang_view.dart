@@ -6,6 +6,7 @@ import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_controller.dart
 import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_text_field.dart';
@@ -50,7 +51,7 @@ class KeranjangView extends GetView<KeranjangController> {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No data available'));
+                      return Center(child: Text('Belum ada data'));
                     }
                     final List<DocumentSnapshot> documents = snapshot.data!.docs;
                     int kaliHarga = 0;
@@ -129,42 +130,28 @@ class KeranjangView extends GetView<KeranjangController> {
                             return Center(child: CircularProgressIndicator());
                           }
                           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Center(child: Text('No data available'));
+                            return Center(child: Text('Belum ada data'));
                           }
                           final List<DocumentSnapshot<Map<String, dynamic>>> documents = snapshot.data!.docs;
                           var dataJson = documents.map((snapshot) => snapshot.data()).toList();
-                          print('PAYMENT ::::::::::::$dataJson');
-
-                          // print('PAYMENT :::::${controller.dataIndexEdit.value} $documents');
                           return Column(
                             children: [
                               SizedBox(height: 30),
-                              CustomTextField(controller: controller.noHpC, hintText: 'Masukkan No Hp'),
-                              Obx(() => CustomTextField(icon: GestureDetector(onTap: () => controller.getLatLong(), child: Icon(Icons.location_on_rounded, color: Colors.black)), hintText: 'Masukkan Alamat', title: 'Alamat', controller: controller.alamatC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.calendar_month), onTap: () => controller.showDatePicker(), title: 'Tanggal pengiriman', value: controller.tanggalC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu', value: controller.waktuC.value)),
-                              CustomTextField(hintText: 'Informasi', controller: controller.informasiC),
+                              CustomTextField(controller: controller.noHpC, hintText: 'Masukkan No Hp *'),
+                              Obx(() => CustomTextField(icon: GestureDetector(onTap: () => controller.getLatLong(), child: Icon(Icons.location_on_rounded, color: Colors.black)), hintText: 'Masukkan Alamat *', title: 'Alamat', controller: controller.alamatC.value)),
+                              Obx(() => CustomTextField(icon: Icon(Icons.calendar_month), onTap: () => controller.showDatePicker(), title: 'Tanggal pengiriman *', value: controller.tanggalC.value)),
+                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu *', value: controller.waktuC.value)),
+                              CustomTextField(hintText: 'Informasi *', controller: controller.informasiC),
                               _detailProduct(documents),
                               CustomSubmitButton(
                                 onTap: () async {
                                   if (controller.noHpC.text.isEmpty || controller.alamatC.value.text.isEmpty || controller.tanggalC.value == '' || controller.waktuC.value == '' || controller.informasiC.text.isEmpty) {
-                                    ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text("Isi semua field")));
+                                    Utils.showNotif(TypeNotif.ERROR, 'Data harus diisi');
                                   } else {
                                     try {
-                                      controller.firestore.collection("user").doc(controller.authC.currentUser!.uid).collection('pesanan').doc().set({
-                                        "nohp": controller.noHpC.text,
-                                        "tanggal": controller.tanggalC.value,
-                                        "jam": controller.waktuC.value,
-                                        "informasi": controller.informasiC.text,
-                                        "alamat": controller.alamatC.value.text,
-                                        "jenis": 'beli',
-                                        'status': '1',
-                                        "detail": FieldValue.arrayUnion(dataJson),
-                                        "total_poin": controller.dataTotalPoin.value,
-                                        "total_harga": controller.dataTotalHarga.value,
-                                      });
+                                      controller.submitPesanan(dataJson);
                                       Get.offNamed(Routes.RIWAYAT);
-                                      ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text("Pesanan berhasil diproses")));
+                                      Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
                                     } catch (e) {
                                       print('ERORR $e');
                                     }

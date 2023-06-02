@@ -14,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -28,12 +29,18 @@ class AntrianController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   LatLng centerMadiun = LatLng(-7.629039, 111.530110);
   var fileSampah = Rxn<File>();
+  var listMetodePembayaran = ['Poin', 'Tukar dengan Produk'];
+  var metode = ''.obs;
+  var textEditingC = <int>[].obs;
+  // var textEditingC = 0.obs;
+  var totalPoin = 0.obs;
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;
   var tanggalC = ''.obs;
   var waktuC = ''.obs;
   var informasiC = TextEditingController();
+  String? dateCreated;
 
   @override
   void onInit() {
@@ -58,6 +65,14 @@ class AntrianController extends GetxController {
   Stream<QuerySnapshot<Map<String, dynamic>>?> fetchData() async* {
     try {
       yield* FirebaseFirestore.instance.collection('user').doc(authC.currentUser!.uid).collection('antrian').snapshots();
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>?> fetchDataProduk() async* {
+    try {
+      yield* FirebaseFirestore.instance.collection('produk').snapshots();
     } catch (e) {
       print('Error: $e');
     }
@@ -89,12 +104,18 @@ class AntrianController extends GetxController {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: Get.context!,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
 
     if (selectedTime != null) {
       // Lakukan sesuatu dengan waktu yang dipilih
-      print('Waktu yang dipilih: ${selectedTime.format(Get.context!)}');
-      waktuC.value = selectedTime.format(Get.context!);
+      print('Waktu yang dipilih: ${selectedTime.hour}:${selectedTime.minute}');
+      waktuC.value = '${selectedTime.hour}:${selectedTime.minute}';
     }
   }
 
@@ -374,5 +395,44 @@ class AntrianController extends GetxController {
         );
       },
     );
+  }
+
+  void submitPesanan(List<Map<String, dynamic>?> dataJson) async {
+    DateFormat dateFormat = DateFormat('d-M-y', 'id_ID');
+    dateCreated = '${Utils.generateRandomString(3)}-${dateFormat.format(DateTime.now())}';
+    await firestore.collection("user").doc(authC.currentUser!.uid).collection('pesanan').doc(dateCreated).set({
+      "nohp": noHpC.text,
+      "tanggal": tanggalC.value,
+      "jam": waktuC.value,
+      "informasi": informasiC.text,
+      "alamat": alamatC.value.text,
+      "jenis": 'tukar',
+      'status': '1',
+      'metode': '',
+      'file-bukti': '',
+      "detail": FieldValue.arrayUnion(dataJson),
+      "total_poin": dataTotalPoin.value,
+      "total_harga": '',
+      'uid': dateCreated,
+    });
+
+    //MENGHAPUS ISI KERANJANG
+    CollectionReference collectionRef = firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian');
+    QuerySnapshot querySnapshot = await collectionRef.get();
+    for (var doc in querySnapshot.docs) {
+      doc.reference.delete();
+    }
+    await _uploadFileToFirestore(dateCreated!);
+  }
+
+  Future<void> _uploadFileToFirestore(String uid) async {
+    String fileName = '${authC.userData.fullname}-${DateTime.now()}';
+    Reference storageReference = FirebaseStorage.instance.ref().child('file-bukti-pembayaran/$fileName');
+    UploadTask uploadTask = storageReference.putFile(fileSampah.value!);
+    TaskSnapshot storageSnapshot = await uploadTask.whenComplete(() {});
+    String downloadUrl = await storageSnapshot.ref.getDownloadURL();
+    log(downloadUrl);
+    // Data telah berhasil diunggah ke Firestore
+    await firestore.collection('user').doc(authC.currentUser!.uid).collection('pesanan').doc(uid).update({'file-bukti': downloadUrl});
   }
 }

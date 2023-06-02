@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/dashboard/dashboard_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/dashboard/dashboard_view.dart';
@@ -23,6 +24,7 @@ void main() async {
   if (Platform.isAndroid) {
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
   }
+  await initializeDateFormatting('id_ID');
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

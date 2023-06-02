@@ -60,7 +60,7 @@ class AdminSampahView extends GetView<AdminSampahController> {
                               }
 
                               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                return Text('No data available');
+                                return Text('Belum ada data');
                               }
                               // Memproses snapshot dan menampilkan data
                               final List<DocumentSnapshot> documents = snapshot.data!.docs;
@@ -117,6 +117,7 @@ class AdminSampahView extends GetView<AdminSampahController> {
                           _field(controller: controller.jenisC, hint: 'Jenis Sampah'),
                           _field(controller: controller.syaratC, hint: 'Syarat', maxLinex: 7),
                           _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
+                          _field(controller: controller.satuanC, hint: 'Satuan'),
                           _fieldFoto(),
                           Padding(
                             padding: EdgeInsets.only(top: 40),
@@ -146,7 +147,7 @@ class AdminSampahView extends GetView<AdminSampahController> {
                             }
 
                             if (!snapshot.hasData || !snapshot.data!.exists) {
-                              return Text('No data available');
+                              return Text('Belum ada data');
                             }
                             // Memproses snapshot dan menampilkan data
                             final documents = snapshot.data!.data() as Map<String, dynamic>;

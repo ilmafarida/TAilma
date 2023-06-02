@@ -12,6 +12,8 @@ class OtpVerifikasiController extends GetxController {
     TextEditingController(),
     TextEditingController(),
     TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
   ].obs;
 
   RxList<FocusNode> otpFocusNode = [
@@ -19,8 +21,10 @@ class OtpVerifikasiController extends GetxController {
     FocusNode(),
     FocusNode(),
     FocusNode(),
+    FocusNode(),
+    FocusNode(),
   ].obs;
-  int otpLength = 4;
+  int otpLength = 6;
   var errorOtp = false.obs;
   EmailOTP? myAuth;
 
@@ -38,7 +42,7 @@ class OtpVerifikasiController extends GetxController {
 
   void submitOtp(BuildContext context) async {
     try {
-      if (await myAuth!.verifyOTP(otp: otpController[0].text + otpController[1].text + otpController[2].text + otpController[3].text) == true) {
+      if (await myAuth!.verifyOTP(otp: otpController[0].text + otpController[1].text + otpController[2].text + otpController[3].text + otpController[4].text + otpController[5].text) == true) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("OTP is verified"),
         ));

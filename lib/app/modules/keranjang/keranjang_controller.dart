@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -63,7 +64,6 @@ class KeranjangController extends GetxController {
     return FirebaseFirestore.instance.collection('keranjang').doc(id).snapshots();
   }
 
-
   showDatePicker() async {
     final DateTime? selected = await showDialog(
       context: Get.context!,
@@ -86,12 +86,18 @@ class KeranjangController extends GetxController {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: Get.context!,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
 
     if (selectedTime != null) {
       // Lakukan sesuatu dengan waktu yang dipilih
-      print('Waktu yang dipilih: ${selectedTime.format(Get.context!)}');
-      waktuC.value = selectedTime.format(Get.context!);
+      print('Waktu yang dipilih: ${selectedTime.hour}:${selectedTime.minute}');
+      waktuC.value = '${selectedTime.hour}:${selectedTime.minute}';
     }
   }
 
@@ -147,24 +153,31 @@ class KeranjangController extends GetxController {
     // );
   }
 
-  Future<int> getIdKeranjangTerakhir() async {
-    int? nextId = 0;
-    try {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      String collectionName = 'user'; // Nama koleksi yang ingin Anda dapatkan ID-nya
+  void submitPesanan(List<Map<String, dynamic>?> dataJson) async {
+    DateFormat dateFormat = DateFormat('d-M-y', 'id_ID');
+    var dateCreated = '${Utils.generateRandomString(3)}-${dateFormat.format(DateTime.now())}';
 
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).doc(authC.currentUser!.uid).collection('pembelian').orderBy(FieldPath.documentId, descending: true).limit(1).get();
-
-      String lastDocumentId = querySnapshot.docs.first.id;
-
-      nextId = int.parse(lastDocumentId) + 1;
-
-      print('Next ID: $nextId');
-    } catch (e) {
-      log('EERROR :$e');
+    firestore.collection("user").doc(authC.currentUser!.uid).collection('pesanan').doc(dateCreated).set({
+      "nohp": noHpC.text,
+      "tanggal": tanggalC.value,
+      "jam": waktuC.value,
+      "informasi": informasiC.text,
+      "alamat": alamatC.value.text,
+      "jenis": 'beli',
+      'status': '1',
+      'metode': '',
+      'file-bukti': '',
+      "detail": FieldValue.arrayUnion(dataJson),
+      "total_poin": dataTotalPoin.value,
+      "total_harga": dataTotalHarga.value,
+      'uid': dateCreated,
+    });
+    //MENGHAPUS ISI KERANJANG
+    CollectionReference collectionRef = firestore.collection('user').doc(authC.currentUser!.uid).collection('keranjang');
+    QuerySnapshot querySnapshot = await collectionRef.get();
+    for (var doc in querySnapshot.docs) {
+      doc.reference.delete();
     }
-    print('Next ID: $nextId');
-    return nextId!;
   }
 
   deleteCart(int idx) {
@@ -199,8 +212,12 @@ class KeranjangController extends GetxController {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        firestore.collection('user').doc(authC.currentUser!.uid).collection('keranjang').doc('$idx').delete();
-                        Get.back();
+                        try {
+                          firestore.collection('user').doc(authC.currentUser!.uid).collection('keranjang').doc('$idx').delete();
+                          Get.back();
+                        } catch (e) {
+                          print(e);
+                        }
                       },
                       child: Text(
                         'Ya',

@@ -61,7 +61,7 @@ class AdminProductView extends GetView<AdminProductController> {
                               }
 
                               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                return Text('No data available');
+                                return Text('Belum ada data');
                               }
                               // Memproses snapshot dan menampilkan data
                               final List<DocumentSnapshot> documents = snapshot.data!.docs;
@@ -149,7 +149,7 @@ class AdminProductView extends GetView<AdminProductController> {
                             }
 
                             if (!snapshot.hasData || !snapshot.data!.exists) {
-                              return Text('No data available');
+                              return Text('Belum ada data');
                             }
                             // Memproses snapshot dan menampilkan data
                             final documents = snapshot.data!.data() as Map<String, dynamic>;

@@ -45,7 +45,7 @@ class HomeView extends GetView<HomeController> {
                                         return Column(
                                           children: [
                                             _header(),
-                                            _cardProfile(),
+                                            _cardProfile(data),
                                             _cardQuote(data),
                                             _cardFoto(data),
                                           ],
@@ -344,7 +344,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _contentNavBar({String? icon, String? title, VoidCallback? onTap, bool? isSelected}) {
+  Widget _contentNavBar({String? icon, String? title, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -370,7 +370,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _cardProfile() {
+  Widget _cardProfile(dynamic data) {
     return Container(
       margin: EdgeInsets.only(top: 10),
       padding: EdgeInsets.all(10),
@@ -418,7 +418,7 @@ class HomeView extends GetView<HomeController> {
           ),
           RichText(
             text: TextSpan(
-              text: '5',
+              text: controller.authC.userData.sampah,
               style: ListTextStyle.textStyleWhite.copyWith(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
@@ -450,7 +450,7 @@ class HomeView extends GetView<HomeController> {
             style: ListTextStyle.textStyleWhite,
           ),
           Text(
-            '1000',
+            controller.authC.userData.poin.toString(),
             style: ListTextStyle.textStyleWhite.copyWith(
               fontSize: 32,
               fontWeight: FontWeight.w900,

@@ -15,6 +15,8 @@ class UserData {
   String? role;
   String? status;
   String? uid;
+  String? poin;
+  String? sampah;
   String? nohp;
 
   UserData({
@@ -28,6 +30,8 @@ class UserData {
     this.role,
     this.status,
     this.uid,
+    this.sampah,
+    this.poin,
     this.nohp,
   });
 
@@ -43,6 +47,8 @@ class UserData {
       role: json["role"] ?? '',
       status: json["status"] ?? '',
       uid: json["uid"] ?? '',
+      poin: json["poin"] ?? '',
+      sampah: json["sampah"] ?? '',
       nohp: json["nohp"] ?? '',
     );
   }

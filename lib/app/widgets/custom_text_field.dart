@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final String? title;
   final String? value;
+  final String? validator;
 
   const CustomTextField({
     super.key,
@@ -29,6 +30,7 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.title,
     this.value,
+    this.validator,
   });
 
   @override
@@ -63,6 +65,7 @@ class CustomTextField extends StatelessWidget {
               ),
             )
           : TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               inputFormatters: isNumber!
                   ? [
                       LengthLimitingTextInputFormatter(12),
@@ -87,6 +90,11 @@ class CustomTextField extends StatelessWidget {
                 ),
                 suffixIcon: icon ?? icon,
               ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return validator;
+                }
+              },
             ),
     );
   }

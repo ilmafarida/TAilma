@@ -21,6 +21,7 @@ class AdminSampahController extends GetxController {
   var jenisC = TextEditingController();
   var poinC = TextEditingController();
   var syaratC = TextEditingController();
+  var satuanC = TextEditingController();
   var file = Rxn<File>();
   UploadComponent uploadComponent = UploadComponent();
 
@@ -78,6 +79,7 @@ class AdminSampahController extends GetxController {
           'syarat': syaratC.text,
           'jenis': jenisC.text,
           'poin': poinC.text,
+          'satuan':satuanC.text,
           'gambar': '',
         });
         if (isUpload.value) {

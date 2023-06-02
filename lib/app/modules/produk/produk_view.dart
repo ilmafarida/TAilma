@@ -60,7 +60,7 @@ class ProdukView extends GetView<ProdukController> {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Text('No data available');
+                      return Text('Belum ada data');
                     }
                     final List<DocumentSnapshot> documents = snapshot.data!.docs;
                     // final data = documents[i].data() as Map<String, dynamic>; // [MENGAMBIL SEMUA DATA]
@@ -101,7 +101,7 @@ class ProdukView extends GetView<ProdukController> {
                           }
 
                           if (!snapshot.hasData || !snapshot.data!.exists) {
-                            return Text('No data available');
+                            return Text('Belum ada data');
                           }
                           final documents = snapshot.data!.data() as Map<String, dynamic>;
                           print('DETAIL ::::::::::::$documents');

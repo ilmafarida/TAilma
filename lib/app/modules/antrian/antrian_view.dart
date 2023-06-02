@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_controller.dart';
+import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_text_field.dart';
@@ -50,7 +52,7 @@ class AntrianView extends GetView<AntrianController> {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No data available'));
+                      return Center(child: Text('Belum ada data'));
                     }
                     final List<DocumentSnapshot> documents = snapshot.data!.docs;
                     int kaliPoin = 0;
@@ -93,7 +95,7 @@ class AntrianView extends GetView<AntrianController> {
               child: Scaffold(
             appBar: AppBar(
               title: Text(
-                'Pemesanan',
+                'Penukaran',
                 style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
               ),
               centerTitle: true,
@@ -126,35 +128,73 @@ class AntrianView extends GetView<AntrianController> {
                             return Center(child: CircularProgressIndicator());
                           }
                           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Center(child: Text('No data available'));
+                            return Center(child: Text('Belum ada data'));
                           }
-                          final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                          final List<DocumentSnapshot<Map<String, dynamic>>> documents = snapshot.data!.docs;
+                          var dataJson = documents.map((snapshot) => snapshot.data()).toList();
                           return Column(
                             children: [
                               SizedBox(height: 30),
-                              CustomTextField(controller: controller.noHpC, hintText: 'Masukkan No Hp'),
-                              Obx(() => CustomTextField(icon: GestureDetector(onTap: () => controller.getLatLong(), child: Icon(Icons.location_on_rounded, color: Colors.black)), hintText: 'Masukkan Alamat', title: 'Alamat', controller: controller.alamatC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.calendar_month), onTap: () => controller.showDatePicker(), title: 'Tanggal pengiriman', value: controller.tanggalC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu', value: controller.waktuC.value)),
-                              CustomTextField(hintText: 'Informasi', controller: controller.informasiC),
+                              CustomTextField(controller: controller.noHpC, hintText: 'Masukkan No Hp *'),
+                              Obx(() => CustomTextField(icon: GestureDetector(onTap: () => controller.getLatLong(), child: Icon(Icons.location_on_rounded, color: Colors.black)), hintText: 'Masukkan Alamat *', title: 'Alamat', controller: controller.alamatC.value)),
+                              Obx(() => CustomTextField(icon: Icon(Icons.calendar_month), onTap: () => controller.showDatePicker(), title: 'Tanggal pengiriman *', value: controller.tanggalC.value)),
+                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu *', value: controller.waktuC.value)),
+                              CustomTextField(hintText: 'Informasi *', controller: controller.informasiC),
                               _uploadKTP(context),
                               _detailProduct(documents),
-                              CustomSubmitButton(
-                                onTap: () async {
-                                  print(':::  ${controller.dataIndexEdit.value}');
-                                  // controller.firestore.collection("user").doc(controller.authC.currentUser!.uid).collection('pesanan').doc('${controller.dataIndexEdit.value}').set({
-                                  //   "gambar": '',
-                                  //   // "nama": documents['nama'],
-                                  //   // "harga": documents['harga'],
-                                  //   // "poin": documents['poin'],
-                                  //   // "jumlah": documents['jumlah'],
-                                  //   "jenis": "tukar",
-                                  //   "status": '1',
-                                  // });
-                                  // await controller.uploadFileToFirestore(controller.authC.currentUser!.uid);
-                                },
-                                text: 'Beli',
-                                width: 100,
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(86, 159, 0, 0.3),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Metode Penukaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                                    _radioButtonContent(title: controller.listMetodePembayaran[0]),
+                                    _radioButtonContent(title: controller.listMetodePembayaran[1]),
+                                  ],
+                                ),
+                              ),
+                              Obx(() {
+                                if (controller.metode.value == "Tukar dengan Produk") {
+                                  return Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: _tukarPoinDengan(documents),
+                                  );
+                                }
+                                return SizedBox.shrink();
+                              }),
+                              Padding(
+                                padding: EdgeInsets.only(top: 8.0),
+                                child: CustomSubmitButton(
+                                  onTap: () async {
+                                    print(':::  ${controller.dataIndexEdit.value}');
+                                    if (controller.noHpC.text.isEmpty || controller.alamatC.value.text.isEmpty || controller.tanggalC.value == "" || controller.waktuC.value == "" || controller.informasiC.value.text.isEmpty || controller.fileSampah.value == null) {
+                                      Utils.showNotif(TypeNotif.ERROR, 'Data harus diisi');
+                                      return;
+                                    } else {
+                                      controller.submitPesanan(dataJson);
+                                      Get.offNamed(Routes.RIWAYAT);
+                                      Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
+                                    }
+                                    // controller.firestore.collection("user").doc(controller.authC.currentUser!.uid).collection('pesanan').doc('${controller.dataIndexEdit.value}').set({
+                                    //   "gambar": '',
+                                    //   // "nama": documents['nama'],
+                                    //   // "harga": documents['harga'],
+                                    //   // "poin": documents['poin'],
+                                    //   // "jumlah": documents['jumlah'],
+                                    //   "jenis": "tukar",
+                                    //   "status": '1',
+                                    // });
+                                    // await controller.uploadFileToFirestore(controller.authC.currentUser!.uid);
+                                  },
+                                  text: 'Selesai',
+                                  width: 100,
+                                ),
                               ),
                             ],
                           );
@@ -169,7 +209,7 @@ class AntrianView extends GetView<AntrianController> {
     );
   }
 
-  Padding _detailProduct(List<DocumentSnapshot<Object?>> documents) {
+  Widget _detailProduct(List<DocumentSnapshot<Object?>> documents) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 30),
       child: Column(
@@ -241,6 +281,143 @@ class AntrianView extends GetView<AntrianController> {
         ],
       ),
     );
+  }
+
+  Widget _tukarPoinDengan(List<DocumentSnapshot<Object?>> documents) {
+    return StreamBuilder(
+        stream: controller.fetchDataProduk(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Text('Belum ada data');
+          }
+          final List<DocumentSnapshot> documents = snapshot.data!.docs;
+          var indexTrue = documents.where((element) => int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!)).toList();
+          controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
+          var totalPerkalian = 0.obs;
+          print('TEXTEDITING :${controller.textEditingC}');
+
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tukar poin dengan :',
+                  style: ListTextStyle.textStyleBlack.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: indexTrue.length,
+                        itemBuilder: (context, index) {
+                          // totalPerkalian = cont
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 8.0),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      // documents[index]['nama'] + " (${documents[index]['poin']})",
+                                      indexTrue[index]['nama'] + " (${indexTrue[index]['poin']})",
+                                      maxLines: 2,
+                                      style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                    ),
+                                    Spacer(),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        // color: indexTrue == index ? Color(ListColor.colorButtonGreen) : Colors.grey.shade600,
+                                        color: Color(ListColor.colorButtonGreen),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              // if (indexTrue == index) {
+                                              // if (controller.textEditingC[index] != 0 && controller.textEditingC[index] > 1) {
+                                              //   controller.textEditingC.where((e) => e[])
+                                              // }
+                                              // print(' KALi : ${totalPerkalian.value}');
+                                              // }
+                                              if (controller.textEditingC[index] == 0) {
+                                                return;
+                                              }
+                                              if (index >= 0 && index < controller.textEditingC.length) {
+                                                controller.textEditingC[index] = controller.textEditingC[index] - 1;
+                                              }
+                                              totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
+                                              print('TEXTEDITING :${controller.textEditingC}');
+                                            },
+                                            child: Icon(Icons.minimize_rounded, color: Colors.white),
+                                          ),
+                                          Obx(() => Text(
+                                                '${controller.textEditingC[index]}',
+                                                style: TextStyle(color: Colors.white),
+                                              )),
+                                          InkWell(
+                                            onTap: () {
+                                              // // if (indexTrue == index) {
+                                              // controller.textEditingC[index] + 1;
+                                              // // }
+                                              // totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
+                                              // print('KALi : ${totalPerkalian.value}');
+                                              if (index >= 0 && index < controller.textEditingC.length) {
+                                                controller.textEditingC[index] = controller.textEditingC[index] + 1;
+                                              }
+                                              totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
+                                              print('TEXTEDITING :${controller.textEditingC}');
+                                            },
+                                            child: Icon(Icons.add, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Obx(() {
+                        return Row(
+                          children: [
+                            Text('Total poin : ', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                            Text(
+                              '${(int.parse(controller.authC.userData.poin!) - totalPerkalian.value)}  poin',
+                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                            ),
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   Widget _uploadKTP(BuildContext context) {
@@ -451,5 +628,37 @@ class AntrianView extends GetView<AntrianController> {
         ],
       ),
     );
+  }
+
+  Widget _radioButtonContent({@required String? title}) {
+    return Obx(() => RadioListTile(
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          title: Text(title!, style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+          value: title,
+          toggleable: true,
+          activeColor: Colors.black,
+          groupValue: controller.metode.value,
+          onChanged: (value) {
+            if (value != null) {
+              controller.metode.value = value.toString();
+              print(controller.metode.value);
+              if (value == "Poin") {
+                // if (int.parse(controller.dataTotalPoin.value) > int.parse(controller.authC.userData.poin!)) {
+                //   ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+                //     content: Text("Poin tidak cukup. Poin kamu : ${controller.authC.userData.poin}"),
+                //     backgroundColor: Colors.red,
+                //     showCloseIcon: true,
+                //   ));
+                //   controller.metode.value = "";
+                // }
+                var tambah = int.parse(controller.authC.userData.poin!) + int.parse(controller.dataTotalPoin.value);
+                print('${controller.authC.userData.poin!} + ${controller.dataTotalPoin.value} = $tambah');
+              }
+            } else {
+              controller.metode.value = "";
+            }
+          },
+        ));
   }
 }

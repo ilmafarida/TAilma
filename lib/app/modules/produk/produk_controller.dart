@@ -48,10 +48,6 @@ class ProdukController extends GetxController {
   }
 
   Future<void> submitKeranjang([Map<String, dynamic>? dataTambahan]) async {
-    int idKeranjangTerakhir = await getIdKeranjangTerakhir();
-    // if (idKeranjangTerakhir == 0) {
-    //   return;
-    // }
     print(':::  ${dataIndexEdit.value}');
     firestore.collection("user").doc(authC.currentUser!.uid).collection('keranjang').doc('${dataIndexEdit.value}').set({
       "gambar": dataTambahan!['gambar'],
@@ -59,26 +55,26 @@ class ProdukController extends GetxController {
       "harga": dataTambahan['harga'],
       "poin": dataTambahan['poin'],
       "jumlah": dataTambahan['jumlah'].toString(),
-    });
+    }).then((value) => setViewMode(ProdukUserMode.LIST));
   }
 
-  Future<int> getIdKeranjangTerakhir() async {
-    int? nextId = 0;
-    try {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      String collectionName = 'user'; // Nama koleksi yang ingin Anda dapatkan ID-nya
+  // Future<int> getIdKeranjangTerakhir() async {
+  //   int? nextId = 0;
+  //   try {
+  //     FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //     String collectionName = 'user'; // Nama koleksi yang ingin Anda dapatkan ID-nya
 
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).doc(authC.currentUser!.uid).collection('keranjang').orderBy(FieldPath.documentId, descending: true).limit(1).get();
+  //     QuerySnapshot querySnapshot = await firestore.collection(collectionName).doc(authC.currentUser!.uid).collection('keranjang').orderBy(FieldPath.documentId, descending: true).limit(1).get();
 
-      String lastDocumentId = querySnapshot.docs.first.id;
+  //     String lastDocumentId = querySnapshot.docs.first.id;
 
-      nextId = int.parse(lastDocumentId) + 1;
+  //     nextId = int.parse(lastDocumentId) + 1;
 
-      print('Next ID: $nextId');
-    } catch (e) {
-      log('EERROR :$e');
-    }
-    print('Next ID: $nextId');
-    return nextId!;
-  }
+  //     print('Next ID: $nextId');
+  //   } catch (e) {
+  //     log('EERROR :$e');
+  //   }
+  //   print('Next ID: $nextId');
+  //   return nextId!;
+  // }
 }

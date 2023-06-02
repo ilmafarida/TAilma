@@ -59,7 +59,7 @@ class TukarSampahView extends GetView<TukarSampahController> {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Text('No data available');
+                      return Text('Belum ada data');
                     }
                     final List<DocumentSnapshot> documents = snapshot.data!.docs;
                     // final data = documents[i].data() as Map<String, dynamic>; // [MENGAMBIL SEMUA DATA]
@@ -111,7 +111,7 @@ class TukarSampahView extends GetView<TukarSampahController> {
                           }
 
                           if (!snapshot.hasData || !snapshot.data!.exists) {
-                            return Text('No data available');
+                            return Text('Belum ada data');
                           }
                           final documents = snapshot.data!.data() as Map<String, dynamic>;
                           print('DETAIL ::::::::::::$documents');
@@ -193,23 +193,18 @@ class TukarSampahView extends GetView<TukarSampahController> {
     );
   }
 
-  Row _upperContent(Map<String, dynamic> documents) {
+  Widget _upperContent(Map<String, dynamic> documents) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Perkiraan Berat', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 16, fontWeight: FontWeight.w400)),
             Text(
-              'Perkiraan Berat',
-              style: ListTextStyle.textStyleBlack.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(
-              width: 200,
-              child: Text(
-                documents['jenis'],
-                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 22),
-                maxLines: 2,
-              ),
+              documents['jenis'],
+              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 22),
+              maxLines: 2,
             ),
           ],
         ),
@@ -248,7 +243,7 @@ class TukarSampahView extends GetView<TukarSampahController> {
                 ),
               ),
               Obx(() => Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 5),
                     child: Text.rich(
                       TextSpan(
                         text: '${controller.jumlahTukarSampah} ',

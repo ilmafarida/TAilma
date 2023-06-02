@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 
 class WaitingController extends GetxController {
   //TODO: Implement WaitingController
+  var authC = Get.find<AuthController>();
 
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
@@ -19,5 +20,7 @@ class WaitingController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
+void onCancel(){
+  authC.logout();
+}
 }

@@ -46,7 +46,7 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
                           }
 
                           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Text('No data available');
+                            return Text('Belum ada data');
                           }
                           // Memproses snapshot dan menampilkan data
                           final List<DocumentSnapshot> documents = snapshot.data!.docs;
@@ -66,34 +66,36 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
                   )
                 ] else ...[
                   Expanded(
-                    child: Column(
-                      children: [
-                        _field(title: 'Nama', value: controller.dataEdit.value['fullname']),
-                        _field(title: 'Email', value: controller.dataEdit.value['email']),
-                        _field(title: 'Kecamatan', value: controller.dataEdit.value['kecamatan']),
-                        _field(title: 'Kelurahan', value: controller.dataEdit.value['kelurahan']),
-                        _field(title: 'Alamat', value: controller.dataEdit.value['alamat']),
-                        _fieldKtp(controller.dataEdit.value['ktp']),
-                        Padding(
-                          padding: EdgeInsets.only(top: 80),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              CustomSubmitButton(
-                                onTap: () => controller.prosesVerifikasi(status: -1),
-                                text: 'Unverifikasi',
-                                width: 110,
-                              ),
-                              CustomSubmitButton(
-                                onTap: () => controller.prosesVerifikasi(status: 1),
-                                text: 'Verifikasi',
-                                width: 110,
-                              )
-                            ],
-                          ),
-                        )
-                      ],
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _field(title: 'Nama', value: controller.dataEdit.value['fullname']),
+                          _field(title: 'Email', value: controller.dataEdit.value['email']),
+                          _field(title: 'Kecamatan', value: controller.dataEdit.value['kecamatan']),
+                          _field(title: 'Kelurahan', value: controller.dataEdit.value['kelurahan']),
+                          _field(title: 'Alamat', value: controller.dataEdit.value['alamat']),
+                          _fieldKtp(controller.dataEdit.value['ktp']),
+                          Padding(
+                            padding: EdgeInsets.only(top: 80),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                CustomSubmitButton(
+                                  onTap: () => controller.prosesVerifikasi(status: -1),
+                                  text: 'Unverifikasi',
+                                  width: 110,
+                                ),
+                                CustomSubmitButton(
+                                  onTap: () => controller.prosesVerifikasi(status: 1),
+                                  text: 'Verifikasi',
+                                  width: 110,
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ]

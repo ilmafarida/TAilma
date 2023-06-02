@@ -103,6 +103,8 @@ class SignupController extends GetxController {
             "kelurahan": kelurahanC.text,
             "alamat": alamatC.text,
             "ktp": '',
+            "poin": "",
+            "sampah": "",
             "status": '-1',
             "role": 'user',
           });
@@ -122,14 +124,7 @@ class SignupController extends GetxController {
       } catch (e) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("$e")));
       }
-    } else if (emailC.text.isEmpty ||
-        passwordC.text.isEmpty ||
-        fullnameC.text.isEmpty ||
-        noHpC.text.isEmpty ||
-        kecamatanC.text.isEmpty ||
-        kelurahanC.text.isEmpty ||
-        alamatC.text.isEmpty ||
-        fileKtp.value == null) {
+    } else if (emailC.text.isEmpty || passwordC.text.isEmpty || fullnameC.text.isEmpty || noHpC.text.isEmpty || kecamatanC.text.isEmpty || kelurahanC.text.isEmpty || alamatC.text.isEmpty || fileKtp.value == null) {
       ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Field harus diisi semua")));
     } else {
       ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Email dan password wajib diisi")));
