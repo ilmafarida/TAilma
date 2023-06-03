@@ -13,7 +13,7 @@ abstract class Routes {
   static const RIWAYAT = _Paths.RIWAYAT;
   static const WAITING = _Paths.WAITING;
   static const LUPA_PASSWORD = _Paths.LUPA_PASSWORD;
-  static const OTP_VERIFIKASI = _Paths.OTP_VERIFIKASI;
+  static const GANTI_PASSWORD = _Paths.GANTI_PASSWORD;
   static const PROFILE = _Paths.PROFILE;
   static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
   static const UBAH_ALAMAT = _Paths.UBAH_ALAMAT;
@@ -22,6 +22,8 @@ abstract class Routes {
   static const ADMIN_SAMPAH = _Paths.ADMIN_SAMPAH;
   static const KERANJANG = _Paths.KERANJANG;
   static const ANTRIAN = _Paths.ANTRIAN;
+  static const PESANAN = _Paths.PESANAN;
+  static const PENUKARAN = _Paths.PENUKARAN;
 }
 
 abstract class _Paths {
@@ -36,7 +38,7 @@ abstract class _Paths {
   static const RIWAYAT = '/riwayat';
   static const WAITING = '/waiting';
   static const LUPA_PASSWORD = '/lupa-password';
-  static const OTP_VERIFIKASI = '/otp-verifikasi';
+  static const GANTI_PASSWORD = '/ganti-password';
   static const PROFILE = '/profile';
   static const CHANGE_PASSWORD = '/change-password';
   static const UBAH_ALAMAT = '/ubah-alamat';
@@ -45,4 +47,6 @@ abstract class _Paths {
   static const ADMIN_SAMPAH = '/admin-sampah';
   static const KERANJANG = '/keranjang';
   static const ANTRIAN = '/antrian';
+  static const PESANAN = '/pesanan';
+  static const PENUKARAN = '/penukaran';
 }

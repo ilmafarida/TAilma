@@ -112,7 +112,7 @@ class SignupController extends GetxController {
         }
 
         //print(userCredential);
-        await SharedPreference.setRoleUser(authC.userData.role!);
+        // await SharedPreference.setRoleUser(authC.userData.role!);
 
         Get.offAllNamed(Routes.WAITING);
       } on FirebaseAuthException catch (e) {
@@ -128,119 +128,6 @@ class SignupController extends GetxController {
       ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Field harus diisi semua")));
     } else {
       ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Email dan password wajib diisi")));
-    }
-  }
-
-  showUpload(BuildContext context) {
-    showModalBottomSheet(
-        isScrollControlled: true,
-        enableDrag: true,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
-        backgroundColor: Colors.white,
-        context: context,
-        builder: (context) {
-          FocusManager.instance.primaryFocus?.unfocus();
-          FocusScope.of(context).unfocus();
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                  margin: EdgeInsets.only(top: 8, bottom: 18),
-                  child: Container(
-                    width: 94,
-                    height: 5,
-                    decoration: BoxDecoration(color: Color(ListColor.colorButtonGreen), borderRadius: BorderRadius.all(Radius.circular(90))),
-                  )),
-              Container(
-                margin: EdgeInsets.only(bottom: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 64,
-                          width: 64,
-                          decoration: BoxDecoration(
-                            color: Color(ListColor.colorButtonGreen),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Material(
-                            borderRadius: BorderRadius.circular(50),
-                            color: Colors.transparent,
-                            child: InkWell(
-                              customBorder: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              onTap: () {
-                                Get.back();
-                                getFromCamera();
-                              },
-                              child: Container(padding: EdgeInsets.all(20), child: Icon(Icons.camera, color: Colors.white)),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          "Ambil Foto",
-                          style: ListTextStyle.textStyleGray.copyWith(color: Colors.black),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 84),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 64,
-                          width: 64,
-                          decoration: BoxDecoration(
-                            color: Color(ListColor.colorButtonGreen),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Material(
-                            borderRadius: BorderRadius.circular(50),
-                            color: Colors.transparent,
-                            child: InkWell(
-                              customBorder: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              onTap: () {
-                                Get.back();
-                                getFromGallery();
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(20),
-                                child: Icon(Icons.file_present_rounded, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          "Upload File",
-                          style: ListTextStyle.textStyleGray.copyWith(color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
-          );
-        });
-  }
-
-  void getFromGallery() async {
-    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      fileKtp.value = File(pickedFile.path);
-      log(fileKtp.value!.path);
-    } else {
-      // JIKA USER CANCEL UPLOAD
-      return;
     }
   }
 

@@ -477,7 +477,7 @@ class AntrianView extends GetView<AntrianController> {
                         fit: BoxFit.contain,
                       ),
                       Text(
-                        'Upload KTP',
+                        'Upload Foto Sampahmu',
                         style: TextStyle(
                           color: controller.fileSampah.value != null ? Colors.white : Color(ListColor.colorTextGray),
                           fontFamily: 'Urbanist',

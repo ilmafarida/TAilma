@@ -150,8 +150,8 @@ class AntrianController extends GetxController {
 
     List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
     if (placemarks.isNotEmpty) {
-      print(placemarks[0].street);
-      alamatC.value.text = placemarks[0].street!;
+      print(placemarks[0].thoroughfare);
+      alamatC.value.text = placemarks[0].thoroughfare!;
     }
 
     // Navigator.push(
@@ -408,7 +408,8 @@ class AntrianController extends GetxController {
       "alamat": alamatC.value.text,
       "jenis": 'tukar',
       'status': '1',
-      'metode': '',
+      'metode': metode.value,
+      'tukar-dengan': '',
       'file-bukti': '',
       "detail": FieldValue.arrayUnion(dataJson),
       "total_poin": dataTotalPoin.value,

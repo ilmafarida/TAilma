@@ -82,7 +82,7 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 CustomSubmitButton(
-                                  onTap: () => controller.prosesVerifikasi(status: -1),
+                                  onTap: () => controller.prosesVerifikasi(status: 0),
                                   text: 'Unverifikasi',
                                   width: 110,
                                 ),

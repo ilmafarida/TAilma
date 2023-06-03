@@ -65,7 +65,6 @@ class AdminProductView extends GetView<AdminProductController> {
                               }
                               // Memproses snapshot dan menampilkan data
                               final List<DocumentSnapshot> documents = snapshot.data!.docs;
-                              controller.dataIndexEdit.value = documents.length;
                               return GridView.builder(
                                 shrinkWrap: true,
                                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -85,7 +84,7 @@ class AdminProductView extends GetView<AdminProductController> {
                                           borderRadius: BorderRadius.circular(18),
                                         ),
                                         onTap: () {
-                                          controller.dataIndexEdit.value = i;
+                                          controller.dataIndexEdit.value = documents[i]['uid'];
                                           controller.dataEdit.value = documents[i];
                                           controller.setViewMode(ProductMode.EDIT);
                                         },
@@ -124,7 +123,7 @@ class AdminProductView extends GetView<AdminProductController> {
                           Padding(
                             padding: EdgeInsets.only(top: 40),
                             child: CustomSubmitButton(
-                              onTap: () => controller.prosesSubmit(status: 0, uid: controller.dataIndexEdit.value),
+                              onTap: () => controller.prosesSubmit(status: 0, uid:controller.dataIndexEdit.value),
                               text: 'Simpan',
                               width: 110,
                             ),

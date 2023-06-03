@@ -10,6 +10,7 @@ import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:path/path.dart' as base;
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/upload_component.dart';
 
 enum ProductMode { VIEW, EDIT, CREATE }
@@ -28,7 +29,7 @@ class AdminProductController extends GetxController {
 
   Stream<QuerySnapshot>? stream;
   var dataEdit = Rxn();
-  var dataIndexEdit = 0.obs;
+  var dataIndexEdit = ''.obs;
 
   var isUpload = false.obs;
 
@@ -59,10 +60,11 @@ class AdminProductController extends GetxController {
   }
 
   Stream<DocumentSnapshot> fetchDataDetail() {
-    return FirebaseFirestore.instance.collection('produk').doc('${dataIndexEdit.value}').snapshots();
+    return FirebaseFirestore.instance.collection('produk').doc(dataIndexEdit.value).snapshots();
   }
 
-  Future<void> prosesSubmit({int? status, int? uid}) async {
+  Future<void> prosesSubmit({int? status, String? uid}) async {
+    String idProduk = 'PRD-${Utils.generateRandomString(2)}';
     print('UID: $uid');
     setViewMode(ProductMode.VIEW);
     if (status == -1) {
@@ -74,14 +76,14 @@ class AdminProductController extends GetxController {
         log('ERROR : $e');
       }
     } else if (status == 0) {
-      uid! + 1;
       try {
-        await firestore.collection('produk').doc('$uid').set({
+        await firestore.collection('produk').doc(idProduk).set({
           'deskripsi': deskripsiC.text,
           'nama': namaC.text,
           'poin': poinC.text,
           'harga': hargaC.text,
           'satuan': satuanC.text,
+          'uid': idProduk,
           'gambar': '',
         });
         if (isUpload.value) {
@@ -90,12 +92,12 @@ class AdminProductController extends GetxController {
             field: 'gambar',
             path: 'file-produk',
             firestore: firestore,
-            uid: '$uid',
+            uid: idProduk,
             file: file.value,
           );
         }
 
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Ubah berhasil")));
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Tambah berhasil")));
         // setViewMode(ProductMode.VIEW);
       } catch (e) {
         log('$e');
@@ -108,11 +110,11 @@ class AdminProductController extends GetxController {
             field: 'gambar',
             path: 'file-produk',
             firestore: firestore,
-            uid: '${dataIndexEdit.value}',
+            uid: dataIndexEdit.value,
             file: file.value,
           );
         }
-        await firestore.collection('produk').doc('$uid').update({
+        await firestore.collection('produk').doc(dataIndexEdit.value).update({
           'deskripsi': deskripsiC.text,
           'nama': namaC.text,
           'poin': poinC.text,
@@ -120,7 +122,7 @@ class AdminProductController extends GetxController {
           'harga': hargaC.text,
         });
 
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Ubah berhasil")));
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Edit berhasil")));
         // setViewMode(ProductMode.VIEW);
       } catch (e) {
         log('$e');

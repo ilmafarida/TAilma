@@ -3,29 +3,26 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart';
-import 'package:rumah_sampah_t_a/app/modules/riwayat/riwayat_controller.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
-import 'package:rumah_sampah_t_a/app/widgets/custom_text_field.dart';
 
-class RiwayatView extends GetView<RiwayatController> {
+class PesananView extends GetView<PesananController> {
   @override
   Widget build(BuildContext context) {
     return Material(
       child: Obx(() {
-        if (controller.riwayatUserMode.value == RiwayatUserMode.LIST) {
+        if (controller.riwayatUserMode.value == PesananUserMode.LIST) {
           return DefaultTabController(
-            length: 5,
+            length: 3,
             initialIndex: 0,
             child: Scaffold(
               backgroundColor: Colors.white,
               appBar: AppBar(
                 title: Text(
-                  'Riwayat',
+                  'Pesanan',
                   style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
                 ),
                 centerTitle: true,
@@ -60,9 +57,7 @@ class RiwayatView extends GetView<RiwayatController> {
                       onTap: (value) => controller.tabC.value = value + 1,
                       tabs: [
                         _tabContent('Antrian'),
-                        _tabContent('Pembayaran'),
                         _tabContent('Proses'),
-                        _tabContent('Ditolak'),
                         _tabContent('Selesai'),
                       ],
                     ),
@@ -72,9 +67,7 @@ class RiwayatView extends GetView<RiwayatController> {
               body: TabBarView(
                 children: [
                   buildTabContent(1),
-                  buildTabContent(2),
                   buildTabContent(3),
-                  buildTabContent(4),
                   buildTabContent(5),
                 ],
               ),
@@ -82,25 +75,26 @@ class RiwayatView extends GetView<RiwayatController> {
           );
         } else {
           return SafeArea(
-              child: Scaffold(
-            appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              leading: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => controller.setViewMode(RiwayatUserMode.LIST),
-                  child: Icon(Icons.arrow_back_ios_outlined),
+            child: Scaffold(
+              appBar: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                leading: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => controller.setViewMode(PesananUserMode.LIST),
+                    child: Icon(Icons.arrow_back_ios_outlined),
+                  ),
                 ),
               ),
+              backgroundColor: Colors.white,
+              body: SingleChildScrollView(
+                padding: EdgeInsets.all(20),
+                child: _detailContent(controller.tabC.value),
+              ),
             ),
-            backgroundColor: Colors.white,
-            body: SingleChildScrollView(
-              padding: EdgeInsets.all(20),
-              child: _detailContent(controller.tabC.value),
-            ),
-          ));
+          );
         }
       }),
     );
@@ -502,85 +496,97 @@ class RiwayatView extends GetView<RiwayatController> {
   }
 
   Widget buildTabContent(int tabNumber) {
-    return StreamBuilder(
-      stream: getStreamForTab(tabNumber),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          // Menampilkan data dari stream di dalam konten tab
-          final List<DocumentSnapshot<Map<String, dynamic>>> documents = snapshot.data!.docs;
-          return Padding(
-            padding: EdgeInsets.all(20),
-            child: ListView.separated(
-                separatorBuilder: (context, index) => SizedBox(height: 10),
-                itemCount: documents.length,
-                itemBuilder: (context, i) {
-                  return Material(
-                    borderRadius: BorderRadius.circular(10),
-                    child: InkWell(
-                      onTap: () {
-                        var dataJson = documents[i].data();
-                        controller.dataDetail = dataJson;
-                        print(controller.tabC.value);
-                        controller.setViewMode(RiwayatUserMode.PAYMENT);
-                      },
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              documents[i]['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
-                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Total harga : ${documents[i]['total_harga']} / ${documents[i]['total_poin']} poin',
-                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-          );
-        } else if (snapshot.hasError) {
-          // Menampilkan pesan jika terjadi error pada stream
-          return Center(
-            child: Text('Error: ${snapshot.error}'),
-          );
-        } else {
-          // Menampilkan loading jika data belum tersedia
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('user').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
         }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.data!.docs.isEmpty) {
+          // Tidak ada dokumen "pesanan" yang ditemukan
+          return SizedBox.shrink();
+        }
+
+        return Padding(
+          padding: EdgeInsets.all(10),
+          child: ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              DocumentSnapshot userDoc = snapshot.data!.docs[index];
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').snapshots(),
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
+                  print(tabNumber);
+                  if (orderSnapshot.hasError) {
+                    return Text('Error: ${orderSnapshot.error}');
+                  }
+                  if (orderSnapshot.connectionState == ConnectionState.waiting) {
+                    // return Center(child: CircularProgressIndicator());
+                    return SizedBox();
+                  }
+                  if (orderSnapshot.data!.docs.isEmpty) {
+                    // Tidak ada dokumen "pesanan" yang ditemukan
+                    return SizedBox.shrink();
+                  }
+                  // Proses data pesanan yang ditemukan dengan status 1
+                  return ListView.builder(
+                    itemCount: orderSnapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot orderDoc = orderSnapshot.data!.docs[index];
+                      print('ORDER:${orderDoc.id}');
+                      Map? data = orderDoc.data() as Map?;
+                      // Lakukan apa pun yang ingin Anda lakukan dengan pesanan yang memiliki status '[]
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 16),
+                        child: Material(
+                          elevation: 1,
+                          borderRadius: BorderRadius.circular(10),
+                          child: InkWell(
+                            onTap: () {
+                              controller.dataDetail = data as Map<String, dynamic>;
+                              print(controller.dataDetail);
+                              controller.setViewMode(PesananUserMode.PAYMENT);
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data!['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
+                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'Total harga : ${data['total_harga']} / ${data['total_poin']} poin',
+                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        );
       },
     );
-  }
-
-  Stream<dynamic> getStreamForTab(int tabNumber) {
-    // Mengembalikan stream yang sesuai berdasarkan tabNumber
-    // Ganti dengan implementasi Anda sendiri
-    // Misalnya, mengambil stream dari Firebase Firestore atau Firebase Realtime Database
-    if (tabNumber == 1) {
-      return FirebaseFirestore.instance.collection('user').doc(controller.authC.currentUser!.uid).collection('pesanan').where('status', isEqualTo: '1').snapshots();
-    }
-    if (tabNumber == 2) {
-      return FirebaseFirestore.instance.collection('user').doc(controller.authC.currentUser!.uid).collection('pesanan').where('status', isEqualTo: '2').snapshots();
-    }
-    if (tabNumber == 3) {
-      return FirebaseFirestore.instance.collection('user').doc(controller.authC.currentUser!.uid).collection('pesanan').where('status', isEqualTo: '3').snapshots();
-    }
-    if (tabNumber == 4) {
-      return FirebaseFirestore.instance.collection('user').doc(controller.authC.currentUser!.uid).collection('pesanan').where('status', isEqualTo: '4').snapshots();
-    }
-    return FirebaseFirestore.instance.collection('user').doc(controller.authC.currentUser!.uid).collection('pesanan').where('status', isEqualTo: '5').snapshots();
   }
 
   Widget _detailProduct() {

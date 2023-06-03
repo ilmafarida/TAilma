@@ -4,14 +4,39 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
+
+enum TypeOtpMode { SEND, VERIFY }
 
 class LupaPasswordController extends GetxController {
   var authC = Get.find<AuthController>();
   var isPasswordHidden = true.obs;
   var codeOtp = RxnString();
   TextEditingController noHpC = TextEditingController(text: '+62');
+  var typeOtp = TypeOtpMode.SEND.obs;
 
   var loading = false.obs;
+  RxList<TextEditingController> otpController = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+  ].obs;
+
+  RxList<FocusNode> otpFocusNode = [
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
+  ].obs;
+  int otpLength = 6;
+  var errorOtp = false.obs;
+
+  var idVerif = ''.obs;
 
   @override
   void onInit() {
@@ -24,57 +49,50 @@ class LupaPasswordController extends GetxController {
     super.onClose();
   }
 
-  void sendOtpCode(BuildContext context, String? phoneNumber) async {
-    if (noHpC.text.isNotEmpty) {
+  Future<void> verifyPhoneNumber(String? numberPhone) async {
+    print(idVerif.value);
+    // await FirebaseAuth.instance.verifyPhoneNumber(
+    //   phoneNumber: '+44 7123 123 456',
+    //   verificationCompleted: (PhoneAuthCredential credential) {},
+    //   verificationFailed: (FirebaseAuthException e) {},
+    //   codeSent: (String verificationId, int? resendToken) {},
+    //   codeAutoRetrievalTimeout: (String verificationId) {},
+    // );
+
+    await authC.auth.verifyPhoneNumber(
+      phoneNumber: numberPhone,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await authC.auth.signInWithCredential(credential);
+        print('Verifikasi otomatis berhasil');
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print('Verifikasi otomatis gagal: ${e.message}');
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        print('Kode verifikasi terkirim ke nomor telepon');
+        idVerif.value = verificationId;
+        typeOtp.value = TypeOtpMode.VERIFY;
+        Utils.showNotif(TypeNotif.SUKSES, 'Berhasil mengirim kode ke$numberPhone');
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        idVerif.value = verificationId;
+      },
+    );
+  }
+
+  Future<void> verifyCode() async {
+    if (otpController.length == 6) {
+      String code = otpController[0].text + otpController[1].text + otpController[2].text + otpController[3].text + otpController[4].text + otpController[5].text;
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: idVerif.value, smsCode: code);
+
       try {
-        await authC.auth.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          verificationCompleted: (PhoneAuthCredential credential) async {
-            // Proses otentikasi selesai secara otomatis (misalnya dengan verifikasi nomor telepon Google)
-            // credential dapat digunakan untuk masuk jika otentikasi selesai.
-            // contoh:
-            // await FirebaseAuth.instance.signInWithCredential(credential);
-          },
-          verificationFailed: (FirebaseAuthException e) {
-            // Kesalahan saat mengirim kode OTP
-            print('Kesalahan: ${e.message}');
-          
-          },
-          codeSent: (String verificationId, [int? forceResendingToken]) {
-            // Kode OTP terkirim ke nomor telepon yang diberikan
-            // Simpan verificationId untuk digunakan saat memverifikasi kode OTP
-            print('Kode OTP terkirim $phoneNumber');
-            String smsCode = ""; // Kode OTP yang akan dimasukkan oleh pengguna
-            // ...
-            // OTP telah dikirim ke alamat No Hp pengguna
-            Get.toNamed(Routes.OTP_VERIFIKASI);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Berhasil mengirim OTP ke ${noHpC.text}')));
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            // Waktu habis untuk mengambil kode OTP secara otomatis
-            // Gunakan verificationId yang tersimpan untuk memverifikasi kode OTP secara manual
-            // contoh:
-            // String smsCode = '';
-            // PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
-            // await FirebaseAuth.instance.signInWithCredential(credential);
-          },
-        );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          // Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "No Hp tidak terdaftar");
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No Hp tidak terdaftar')));
-        }
-        if (e.code == 'invalid-No Hp') {
-          // Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "No Hp tidak terdaftar");
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No Hp tidak valid')));
-        }
+        await authC.auth.signInWithCredential(credential);
+        Get.offNamed(Routes.GANTI_PASSWORD);
+        print('Verifikasi kode berhasil');
       } catch (e) {
-        print("error {$e}");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error pada aplikasi kami')));
-        // Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Kesalahan pada aplikasi kami");
+        print('Verifikasi kode gagal: $e');
+        Utils.showNotif(TypeNotif.ERROR, 'Kode salah');
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No Hp harus diisi')));
     }
   }
 }

@@ -362,7 +362,7 @@ class SignupView extends GetView<SignupController> {
     return Align(
       alignment: Alignment.center,
       child: InkWell(
-        onTap: () => controller.fileKtp.value == null ? controller.showUpload(context) : controller.previewFile(context),
+        onTap: () => controller.fileKtp.value == null ? controller.getFromCamera() : controller.previewFile(context),
         child: Obx(() {
           return controller.fileKtp.value != null
               ? Column(
@@ -384,7 +384,7 @@ class SignupView extends GetView<SignupController> {
                           ),
                           SizedBox(height: 10),
                           CustomSubmitButton(
-                            onTap: () => controller.showUpload(context),
+                            onTap: () => controller.getFromCamera(),
                             text: 'Upload Ulang',
                             height: 40,
                             width: 100,

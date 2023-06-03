@@ -124,9 +124,7 @@ class LoginView extends GetView<LoginController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Belum punya akun? ", style: TextStyle(color: Color(0xFF24282C), fontFamily: 'Urbanist', fontSize: 13, fontWeight: FontWeight.bold)),
-                    TextButton(
-                        onPressed: () => Get.toNamed(Routes.SIGNUP),
-                        child: Text("Registrasi Sekarang!", style: TextStyle(color: Color(0xFF569F00), fontFamily: 'Urbanist', fontSize: 13, fontWeight: FontWeight.bold)))
+                    TextButton(onPressed: () => Get.toNamed(Routes.SIGNUP), child: Text("Registrasi Sekarang!", style: TextStyle(color: Color(0xFF569F00), fontFamily: 'Urbanist', fontSize: 13, fontWeight: FontWeight.bold)))
                   ],
                 )
               ],

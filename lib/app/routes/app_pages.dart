@@ -1,6 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/penukaran/penukaran_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/penukaran/penukaran_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/product/product_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/product/product_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_binding.dart';
@@ -9,12 +13,12 @@ import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/ganti_password/ganti_password_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_view.dart';
 import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/otp_verifikasi/otp_verifikasi_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/ganti_password/ganti_password_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_binding.dart';
 import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_view.dart';
 
@@ -108,9 +112,9 @@ class AppPages {
       binding: LupaPasswordBinding(),
     ),
     GetPage(
-      name: _Paths.OTP_VERIFIKASI,
-      page: () => OtpVerifikasiView(),
-      binding: OtpVerifikasiBinding(),
+      name: _Paths.GANTI_PASSWORD,
+      page: () => GantiPasswordView(),
+      binding: GantiPasswordBinding(),
     ),
     GetPage(
       name: _Paths.PROFILE,
@@ -151,6 +155,16 @@ class AppPages {
       name: _Paths.ANTRIAN,
       page: () => AntrianView(),
       binding: AntrianBinding(),
+    ),
+    GetPage(
+      name: _Paths.PESANAN,
+      page: () => PesananView(),
+      binding: PesananBinding(),
+    ),
+    GetPage(
+      name: _Paths.PENUKARAN,
+      page: () => PenukaranView(),
+      binding: PenukaranBinding(),
     ),
   ];
 }

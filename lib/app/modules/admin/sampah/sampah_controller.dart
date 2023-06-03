@@ -10,6 +10,7 @@ import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:path/path.dart' as base;
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/upload_component.dart';
 
 enum SampahMode { VIEW, EDIT, CREATE }
@@ -27,7 +28,7 @@ class AdminSampahController extends GetxController {
 
   Stream<QuerySnapshot>? stream;
   var dataEdit = Rxn();
-  var dataIndexEdit = 0.obs;
+  var dataIndexEdit = ''.obs;
 
   var isUpload = false.obs;
 
@@ -61,7 +62,9 @@ class AdminSampahController extends GetxController {
     return FirebaseFirestore.instance.collection('sampah').doc('${dataIndexEdit.value}').snapshots();
   }
 
-  Future<void> prosesSubmit({int? status, int? uid}) async {
+  Future<void> prosesSubmit({int? status, String? uid}) async {
+    String idProduk = 'SPH-${Utils.generateRandomString(2)}';
+
     print('UID: $uid');
     setViewMode(SampahMode.VIEW);
     if (status == -1) {
@@ -73,13 +76,13 @@ class AdminSampahController extends GetxController {
         log('ERROR : $e');
       }
     } else if (status == 0) {
-      uid! + 1;
       try {
-        await firestore.collection('sampah').doc('$uid').set({
+        await firestore.collection('sampah').doc(idProduk).set({
           'syarat': syaratC.text,
           'jenis': jenisC.text,
           'poin': poinC.text,
-          'satuan':satuanC.text,
+          'satuan': satuanC.text,
+          'uid': idProduk,
           'gambar': '',
         });
         if (isUpload.value) {
@@ -88,7 +91,7 @@ class AdminSampahController extends GetxController {
             field: 'gambar',
             path: 'file-sampah',
             firestore: firestore,
-            uid: '$uid',
+            uid: idProduk,
             file: file.value,
           );
         }
@@ -106,11 +109,11 @@ class AdminSampahController extends GetxController {
             field: 'gambar',
             path: 'file-sampah',
             firestore: firestore,
-            uid: '${dataIndexEdit.value}',
+            uid: dataIndexEdit.value,
             file: file.value,
           );
         }
-        await firestore.collection('sampah').doc('$uid').update({
+        await firestore.collection('sampah').doc(dataIndexEdit.value).update({
           'syarat': syaratC.text,
           'jenis': jenisC.text,
           'poin': poinC.text,

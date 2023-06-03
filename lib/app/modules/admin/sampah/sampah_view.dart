@@ -64,7 +64,6 @@ class AdminSampahView extends GetView<AdminSampahController> {
                               }
                               // Memproses snapshot dan menampilkan data
                               final List<DocumentSnapshot> documents = snapshot.data!.docs;
-                              controller.dataIndexEdit.value = documents.length;
                               return GridView.builder(
                                 shrinkWrap: true,
                                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -84,7 +83,7 @@ class AdminSampahView extends GetView<AdminSampahController> {
                                           borderRadius: BorderRadius.circular(18),
                                         ),
                                         onTap: () {
-                                          controller.dataIndexEdit.value = i;
+                                          controller.dataIndexEdit.value = documents[i]['uid'];
                                           controller.dataEdit.value = documents[i];
                                           controller.setViewMode(SampahMode.EDIT);
                                         },

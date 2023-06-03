@@ -73,7 +73,7 @@ class VerifikasiAkunController extends GetxController {
   Future<void> prosesVerifikasi({int? status}) async {
     setViewMode(ViewMode.VIEW);
     await firestore.collection('user').doc(dataEdit.value['uid']).update({'status': status.toString()});
-    if (status == -1) {
+    if (status == 0) {
       ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Berhasil melakukan unverifikasi")));
       print(':::${dataEdit.value['status']}');
     } else {
