@@ -24,13 +24,14 @@ class AntrianController extends GetxController {
   Rx<AntrianUserMode> antrianUserMode = AntrianUserMode.LIST.obs;
   var dataDetail = Rxn();
   var dataTotalPoin = ''.obs;
-  var dataIndexEdit = 0.obs;
+  var dataIndexEdit = ''.obs;
   var authC = Get.find<AuthController>();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   LatLng centerMadiun = LatLng(-7.629039, 111.530110);
   var fileSampah = Rxn<File>();
   var listMetodePembayaran = ['Poin', 'Tukar dengan Produk'];
   var metode = ''.obs;
+  var detailTukarPoin = <Map<String,dynamic>>[];
   var textEditingC = <int>[].obs;
   // var textEditingC = 0.obs;
   var totalPoin = 0.obs;
@@ -347,7 +348,7 @@ class AntrianController extends GetxController {
     );
   }
 
-  deleteCart(int idx) {
+  deleteCart(String idx) {
     showDialog(
       context: Get.context!,
       builder: (BuildContext context) {
@@ -379,7 +380,7 @@ class AntrianController extends GetxController {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian').doc('$idx').delete();
+                        firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian').doc(idx).delete();
                         Get.back();
                       },
                       child: Text(
@@ -415,6 +416,7 @@ class AntrianController extends GetxController {
       "total_poin": dataTotalPoin.value,
       "total_harga": '',
       'uid': dateCreated,
+      'tukar_dengan':detailTukarPoin,
     });
 
     //MENGHAPUS ISI KERANJANG

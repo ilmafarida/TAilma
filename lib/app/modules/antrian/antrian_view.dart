@@ -172,7 +172,7 @@ class AntrianView extends GetView<AntrianController> {
                                 padding: EdgeInsets.only(top: 8.0),
                                 child: CustomSubmitButton(
                                   onTap: () async {
-                                    print(':::  ${controller.dataIndexEdit.value}');
+                                    // print(':::  ${controller.dataIndexEdit.value}');
                                     if (controller.noHpC.text.isEmpty || controller.alamatC.value.text.isEmpty || controller.tanggalC.value == "" || controller.waktuC.value == "" || controller.informasiC.value.text.isEmpty || controller.fileSampah.value == null) {
                                       Utils.showNotif(TypeNotif.ERROR, 'Data harus diisi');
                                       return;
@@ -181,16 +181,6 @@ class AntrianView extends GetView<AntrianController> {
                                       Get.offNamed(Routes.RIWAYAT);
                                       Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
                                     }
-                                    // controller.firestore.collection("user").doc(controller.authC.currentUser!.uid).collection('pesanan').doc('${controller.dataIndexEdit.value}').set({
-                                    //   "gambar": '',
-                                    //   // "nama": documents['nama'],
-                                    //   // "harga": documents['harga'],
-                                    //   // "poin": documents['poin'],
-                                    //   // "jumlah": documents['jumlah'],
-                                    //   "jenis": "tukar",
-                                    //   "status": '1',
-                                    // });
-                                    // await controller.uploadFileToFirestore(controller.authC.currentUser!.uid);
                                   },
                                   text: 'Selesai',
                                   width: 100,
@@ -302,8 +292,6 @@ class AntrianView extends GetView<AntrianController> {
           var indexTrue = documents.where((element) => int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!)).toList();
           controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
           var totalPerkalian = 0.obs;
-          print('TEXTEDITING :${controller.textEditingC}');
-
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 30),
             child: Column(
@@ -329,7 +317,6 @@ class AntrianView extends GetView<AntrianController> {
                         shrinkWrap: true,
                         itemCount: indexTrue.length,
                         itemBuilder: (context, index) {
-                          // totalPerkalian = cont
                           return Padding(
                             padding: EdgeInsets.only(bottom: 8.0),
                             child: Column(
@@ -337,7 +324,6 @@ class AntrianView extends GetView<AntrianController> {
                                 Row(
                                   children: [
                                     Text(
-                                      // documents[index]['nama'] + " (${documents[index]['poin']})",
                                       indexTrue[index]['nama'] + " (${indexTrue[index]['poin']})",
                                       maxLines: 2,
                                       style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
@@ -353,39 +339,49 @@ class AntrianView extends GetView<AntrianController> {
                                         children: [
                                           InkWell(
                                             onTap: () {
-                                              // if (indexTrue == index) {
-                                              // if (controller.textEditingC[index] != 0 && controller.textEditingC[index] > 1) {
-                                              //   controller.textEditingC.where((e) => e[])
-                                              // }
-                                              // print(' KALi : ${totalPerkalian.value}');
-                                              // }
                                               if (controller.textEditingC[index] == 0) {
                                                 return;
                                               }
                                               if (index >= 0 && index < controller.textEditingC.length) {
                                                 controller.textEditingC[index] = controller.textEditingC[index] - 1;
+                                                totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
                                               }
-                                              totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
-                                              print('TEXTEDITING :${controller.textEditingC}');
+
+                                              print('TEXTEDITING :${totalPerkalian.value}');
                                             },
-                                            child: Icon(Icons.minimize_rounded, color: Colors.white),
+                                            child: Icon(
+                                              Icons.minimize_rounded,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
                                           ),
-                                          Obx(() => Text(
-                                                '${controller.textEditingC[index]}',
-                                                style: TextStyle(color: Colors.white),
-                                              )),
+                                          Obx(() {
+                                            return Text('${controller.textEditingC[index]}', style: TextStyle(color: Colors.white));
+                                          }),
                                           InkWell(
                                             onTap: () {
-                                              // // if (indexTrue == index) {
-                                              // controller.textEditingC[index] + 1;
-                                              // // }
-                                              // totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
-                                              // print('KALi : ${totalPerkalian.value}');
                                               if (index >= 0 && index < controller.textEditingC.length) {
                                                 controller.textEditingC[index] = controller.textEditingC[index] + 1;
                                               }
                                               totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
-                                              print('TEXTEDITING :${controller.textEditingC}');
+                                              if (controller.textEditingC[index] != 0) {
+                                                if (controller.detailTukarPoin.any((element) => element['product']['uid'] == indexTrue[index]['uid'])) {
+                                                  controller.detailTukarPoin[index]['jumlah'] = controller.textEditingC[index];
+                                                } else {
+                                                  controller.detailTukarPoin.add({
+                                                    'product': {
+                                                      'uid': indexTrue[index]['uid'],
+                                                      'nama': indexTrue[index]['nama'],
+                                                      'poin': indexTrue[index]['poin'],
+                                                    },
+                                                    'jumlah': controller.textEditingC[index]
+                                                  });
+                                                }
+
+                                                print(controller.detailTukarPoin);
+                                              }
+
+                                              print('TEXTEDITING :${controller.totalPoin.value}');
                                             },
                                             child: Icon(Icons.add, color: Colors.white),
                                           ),
@@ -400,17 +396,15 @@ class AntrianView extends GetView<AntrianController> {
                         },
                       ),
                       SizedBox(height: 20),
-                      Obx(() {
-                        return Row(
-                          children: [
-                            Text('Total poin : ', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                            Text(
-                              '${(int.parse(controller.authC.userData.poin!) - totalPerkalian.value)}  poin',
-                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                            ),
-                          ],
-                        );
-                      }),
+                      Row(
+                        children: [
+                          Text('Sisa poin : ', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                          Text(
+                            '${(int.parse(controller.dataTotalPoin.value))}',
+                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -524,6 +518,7 @@ class AntrianView extends GetView<AntrianController> {
   }
 
   Widget _listContent(int i, List<DocumentSnapshot<Object?>> data) {
+    print(data[i]['uid']);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 16),
       child: Row(
@@ -552,7 +547,7 @@ class AntrianView extends GetView<AntrianController> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 InkWell(
-                  onTap: () => controller.deleteCart(i),
+                  onTap: () => controller.deleteCart(data[i]['uid']),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.transparent,
@@ -581,24 +576,30 @@ class AntrianView extends GetView<AntrianController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: () {
-                            if (data[i]['jumlah'] == '1' || data[i]['jumlah'] == '0') {
-                              return;
-                            } else {
-                              controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('antrian').doc('$i').update(
-                                {
-                                  'jumlah': (int.parse(data[i]['jumlah']) - 1).toString(),
-                                },
-                              );
-                            }
-                          },
-                          child: Icon(
-                            Icons.minimize_sharp,
-                            // size: 16,
-                            color: controller.dataDetail.value == 1 ? Colors.grey : Colors.white,
-                          ),
-                        ),
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              if (data[i]['jumlah'] == '1' || data[i]['jumlah'] == '0') {
+                                return;
+                              } else {
+                                controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('antrian').doc(data[i]['uid']).update(
+                                  {
+                                    'jumlah': (int.parse(data[i]['jumlah']) - 1).toString(),
+                                  },
+                                );
+                              }
+                            },
+                            child: SizedBox(
+                              width: 20,
+                              child: Text(
+                                '-',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: controller.dataDetail.value == 1 ? Colors.grey : Colors.white,
+                                ),
+                              ),
+                            )),
                         Text(
                           data[i]['jumlah'],
                           style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white),
@@ -606,7 +607,7 @@ class AntrianView extends GetView<AntrianController> {
                         InkWell(
                           borderRadius: BorderRadius.circular(20),
                           onTap: () {
-                            controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('antrian').doc('$i').update(
+                            controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('antrian').doc(data[i]['uid']).update(
                               {
                                 'jumlah': (int.parse(data[i]['jumlah']) + 1).toString(),
                               },

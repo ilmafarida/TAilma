@@ -117,7 +117,6 @@ class AdminProductView extends GetView<AdminProductController> {
                           _field(controller: controller.namaC, hint: 'Nama Produk'),
                           _field(controller: controller.hargaC, hint: 'Harga', isNumber: true),
                           _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
-                          _field(controller: controller.satuanC, hint: 'Satuan'),
                           _field(controller: controller.deskripsiC, hint: 'Deskripsi', maxLinex: 6),
                           _fieldFoto(),
                           Padding(

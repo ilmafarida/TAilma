@@ -286,7 +286,7 @@ class ProdukView extends GetView<ProdukController> {
             print('::$i'),
             controller.setViewMode(ProdukUserMode.DETAIL),
             controller.dataDetail.value = data[i],
-            controller.dataIndexEdit.value = i,
+            controller.dataIndexEdit.value = data[i]['uid'],
             print('::: ${controller.dataDetail.value['nama']}'),
           },
           child: Container(
@@ -298,18 +298,19 @@ class ProdukView extends GetView<ProdukController> {
               ),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CachedNetworkImage(
                   imageUrl: '${data[i]['gambar']}',
                   height: 72,
                   width: 100,
+                  fit: BoxFit.fitWidth,
                 ),
-                SizedBox(height: 10),
+                SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(width: 20),
                       Text(
                         '${data[i]['nama']}',
                         maxLines: 2,

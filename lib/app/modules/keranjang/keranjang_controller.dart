@@ -180,7 +180,7 @@ class KeranjangController extends GetxController {
     }
   }
 
-  deleteCart(int idx) {
+  deleteCart(String uid) {
     showDialog(
       context: Get.context!,
       builder: (BuildContext context) {
@@ -213,7 +213,7 @@ class KeranjangController extends GetxController {
                     GestureDetector(
                       onTap: () async {
                         try {
-                          firestore.collection('user').doc(authC.currentUser!.uid).collection('keranjang').doc('$idx').delete();
+                          firestore.collection('user').doc(authC.currentUser!.uid).collection('keranjang').doc(uid).delete();
                           Get.back();
                         } catch (e) {
                           print(e);

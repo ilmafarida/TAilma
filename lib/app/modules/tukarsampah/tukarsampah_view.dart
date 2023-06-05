@@ -125,12 +125,14 @@ class TukarSampahView extends GetView<TukarSampahController> {
                               _upperContent(documents),
                               SizedBox(height: 40),
                               _bodyContent(documents),
+                              SizedBox(height: 20),
                               Align(
                                 alignment: Alignment.bottomCenter,
                                 child: CustomSubmitButton(
                                   onTap: () async {
                                     dataTambahan = documents;
                                     dataTambahan!['jumlah'] = controller.jumlahTukarSampah.value;
+                                    controller.dataIndexEdit.value = dataTambahan!['uid'];
                                     print('$dataTambahan');
                                     await controller.submitKeranjang(dataTambahan);
                                     Get.toNamed(Routes.ANTRIAN);
@@ -185,7 +187,7 @@ class TukarSampahView extends GetView<TukarSampahController> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            documents['poin'] + ' poin' + ' / ' + documents['satuan'],
+            documents['poin'] + ' poin' + ' / ' + 'kg',
             style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
           ),
         )
@@ -250,7 +252,7 @@ class TukarSampahView extends GetView<TukarSampahController> {
                         style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                         children: [
                           TextSpan(
-                            text: documents['satuan'],
+                            text: 'kg',
                             style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ],
@@ -295,6 +297,7 @@ class TukarSampahView extends GetView<TukarSampahController> {
   }
 
   Widget _listContent(int i, List<DocumentSnapshot<Object?>> data) {
+    // print(data[i]);
     return Padding(
       padding: EdgeInsets.only(bottom: 10),
       child: Container(
@@ -333,10 +336,10 @@ class TukarSampahView extends GetView<TukarSampahController> {
                     alignment: Alignment.bottomRight,
                     child: CustomSubmitButton(
                       onTap: () {
-                        print('::$i');
+                        // print('::${data[i]['uid']}');
                         controller.setViewMode(TukarSampahViewMode.DETAIL);
                         controller.dataDetail.value = data[i];
-                        controller.dataIndexEdit.value = i;
+                        controller.dataIndexEdit.value = data[i]['uid'];
                         print('::: ${controller.dataDetail.value['jenis']}');
                       },
                       text: 'Pilih',

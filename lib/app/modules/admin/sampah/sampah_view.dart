@@ -116,7 +116,6 @@ class AdminSampahView extends GetView<AdminSampahController> {
                           _field(controller: controller.jenisC, hint: 'Jenis Sampah'),
                           _field(controller: controller.syaratC, hint: 'Syarat', maxLinex: 7),
                           _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
-                          _field(controller: controller.satuanC, hint: 'Satuan'),
                           _fieldFoto(),
                           Padding(
                             padding: EdgeInsets.only(top: 40),

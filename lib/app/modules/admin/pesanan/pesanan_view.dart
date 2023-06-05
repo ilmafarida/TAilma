@@ -101,6 +101,7 @@ class PesananView extends GetView<PesananController> {
   }
 
   Widget _detailContent(int tab) {
+    print(controller.dataDetail);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

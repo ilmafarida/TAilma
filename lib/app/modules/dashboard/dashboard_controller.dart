@@ -4,12 +4,14 @@ import 'package:get/get.dart';
 
 class DashboardController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
-  var jumlahPesanan = 0.obs;
-  var jumlahPenukaran = 0.obs;
+  var jumlahPesanan = Rxn();
+  var jumlahPenukaran = Rxn();
 
   @override
   void onInit() {
-    // buildOrderCountWidget();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      buildOrderCountWidget();
+    });
     super.onInit();
   }
 

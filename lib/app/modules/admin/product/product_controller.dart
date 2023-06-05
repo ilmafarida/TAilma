@@ -22,7 +22,6 @@ class AdminProductController extends GetxController {
   var namaC = TextEditingController();
   var hargaC = TextEditingController();
   var poinC = TextEditingController();
-  var satuanC = TextEditingController();
   var deskripsiC = TextEditingController();
   var file = Rxn<File>();
   UploadComponent uploadComponent = UploadComponent();
@@ -82,7 +81,6 @@ class AdminProductController extends GetxController {
           'nama': namaC.text,
           'poin': poinC.text,
           'harga': hargaC.text,
-          'satuan': satuanC.text,
           'uid': idProduk,
           'gambar': '',
         });
@@ -118,7 +116,6 @@ class AdminProductController extends GetxController {
           'deskripsi': deskripsiC.text,
           'nama': namaC.text,
           'poin': poinC.text,
-          'satuan': satuanC.text,
           'harga': hargaC.text,
         });
 

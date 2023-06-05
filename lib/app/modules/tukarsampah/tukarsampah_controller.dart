@@ -9,7 +9,7 @@ enum TukarSampahViewMode { LIST, DETAIL }
 class TukarSampahController extends GetxController {
   Rx<TukarSampahViewMode> tukarSampahViewMode = TukarSampahViewMode.LIST.obs;
   var dataDetail = Rxn();
-  var dataIndexEdit = 0.obs;
+  var dataIndexEdit = ''.obs;
   var jumlahTukarSampah = 1.obs;
   var authC = Get.find<AuthController>();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -50,33 +50,14 @@ class TukarSampahController extends GetxController {
   Future<void> submitKeranjang([Map<String, dynamic>? dataTambahan]) async {
     print(':::  ${dataIndexEdit.value}');
     try {
-      firestore.collection("user").doc(authC.currentUser!.uid).collection('antrian').doc('${dataIndexEdit.value}').set({
+      firestore.collection("user").doc(authC.currentUser!.uid).collection('antrian').doc(dataIndexEdit.value).set({
         "jenis": dataTambahan!['jenis'],
         "poin": dataTambahan['poin'],
         "jumlah": dataTambahan['jumlah'].toString(),
+        "uid": dataIndexEdit.value,
       });
     } catch (e) {
       print('ERRORD :$e');
     }
-  }
-
-  Future<int> getIdKeranjangTerakhir() async {
-    int? nextId = 0;
-    try {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      String collectionName = 'user'; // Nama koleksi yang ingin Anda dapatkan ID-nya
-
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).doc(authC.currentUser!.uid).collection('keranjang').orderBy(FieldPath.documentId, descending: true).limit(1).get();
-
-      String lastDocumentId = querySnapshot.docs.first.id;
-
-      nextId = int.parse(lastDocumentId) + 1;
-
-      print('Next ID: $nextId');
-    } catch (e) {
-      log('EERROR :$e');
-    }
-    print('Next ID: $nextId');
-    return nextId!;
   }
 }

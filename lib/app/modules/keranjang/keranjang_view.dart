@@ -360,7 +360,7 @@ class KeranjangView extends GetView<KeranjangController> {
               children: [
                 InkWell(
                   onTap: () => {
-                    controller.deleteCart(i),
+                    controller.deleteCart('${data[i]['uid']}'),
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -395,7 +395,7 @@ class KeranjangView extends GetView<KeranjangController> {
                             if (data[i]['jumlah'] == '1' || data[i]['jumlah'] == '0') {
                               return;
                             } else {
-                              controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('keranjang').doc('$i').update(
+                              controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('keranjang').doc(data[i]['uid']).update(
                                 {
                                   'jumlah': (int.parse(data[i]['jumlah']) - 1).toString(),
                                 },
@@ -415,7 +415,7 @@ class KeranjangView extends GetView<KeranjangController> {
                         InkWell(
                           borderRadius: BorderRadius.circular(20),
                           onTap: () {
-                            controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('keranjang').doc('$i').update(
+                            controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('keranjang').doc(data[i]['uid']).update(
                               {
                                 'jumlah': (int.parse(data[i]['jumlah']) + 1).toString(),
                               },
