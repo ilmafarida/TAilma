@@ -17,28 +17,146 @@ class DashboardView extends GetView<DashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          alignment: Alignment.center,
-          color: Color(ListColor.colorBackground),
-          child: Obx(() {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _header(),
-                _button(text: 'Verifikasi Akun', onTap: () => Get.toNamed(Routes.VERIFIKASI_AKUN)),
-                _button(text: 'Post Dashboard', onTap: () => Get.toNamed(Routes.HOME)),
-                _button(text: 'Produk', onTap: () => Get.toNamed(Routes.ADMIN_PRODUCT)),
-                _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH)),
-                controller.buildOrderCountWidget(),
-                _button(text: 'Pesanan', onTap: () => Get.toNamed(Routes.PESANAN), isWithNotif: true, notifCount: controller.jumlahPesanan.value),
-                _button(text: 'Penukaran Sampah', onTap: () => Get.toNamed(Routes.PENUKARAN), isWithNotif: true, notifCount: controller.jumlahPenukaran.value),
-              ],
-            );
-          }),
+      body: RefreshIndicator(
+        onRefresh: () => controller.onRefresh(),
+        child: SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.center,
+            color: Color(ListColor.colorBackground),
+            child: Obx(() {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _header(),
+                  _cardProfile(controller.authC.userData),
+                  _button(text: 'Verifikasi Akun', onTap: () => Get.toNamed(Routes.VERIFIKASI_AKUN)),
+                  _button(text: 'Post Dashboard', onTap: () => Get.toNamed(Routes.HOME)),
+                  _button(text: 'Produk', onTap: () => Get.toNamed(Routes.ADMIN_PRODUCT)),
+                  _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH)),
+                  _button(text: 'Pesanan', onTap: () => Get.toNamed(Routes.PESANAN), isWithNotif: true, notifCount: controller.jumlahPesanan.value),
+                  _button(text: 'Penukaran Sampah', onTap: () => Get.toNamed(Routes.PENUKARAN), isWithNotif: true, notifCount: controller.jumlahPenukaran.value),
+                ],
+              );
+            }),
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _cardProfile(dynamic data) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: EdgeInsets.all(10),
+      height: 132,
+      decoration: BoxDecoration(
+        color: Color(0xFFEAEAEA),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // DATA
+          _headerCard(),
+          // CARD HIJAU
+          Spacer(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _contentLeft(),
+              _contentRight(),
+            ],
+          ),
+          // QUOTE
+        ],
+      ),
+    );
+  }
+
+  Widget _headerCard() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Halo Admin,',
+              style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            Text(
+              'Yuk Kelola Data Sampah!',
+              style: ListTextStyle.textStyleBlack.copyWith(
+                fontSize: 13,
+                color: Color(ListColor.colorButtonGreen),
+              ),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+
+  Widget _contentLeft() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(ListColor.colorButtonGreen),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      width: 138.89,
+      height: 63,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Sampah Masuk',
+            style: ListTextStyle.textStyleWhite,
+          ),
+          RichText(
+            text: TextSpan(
+              text: '${controller.jumlahSampah.value}',
+              style: ListTextStyle.textStyleWhite.copyWith(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+              ),
+              children: [
+                TextSpan(text: '/kg', style: ListTextStyle.textStyleWhite),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _contentRight() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(ListColor.colorButtonGreen),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      width: 138.89,
+      height: 63,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Produk Terjual',
+            style: ListTextStyle.textStyleWhite,
+          ),
+          Text(
+            '${controller.jumlahProduk.value}',
+            style: ListTextStyle.textStyleWhite.copyWith(
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -68,7 +186,7 @@ class DashboardView extends GetView<DashboardController> {
             ),
           ),
         ),
-        if (isWithNotif)
+        if (isWithNotif && notifCount != null)
           Positioned(
             right: 0,
             top: 0,
@@ -85,7 +203,7 @@ class DashboardView extends GetView<DashboardController> {
   Widget _header() {
     return Container(
       width: Get.width,
-      margin: EdgeInsets.fromLTRB(37, 35, 15, 44),
+      margin: EdgeInsets.fromLTRB(37, 35, 15, 20),
       child: Row(
         children: [
           Text(

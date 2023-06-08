@@ -34,7 +34,7 @@ class AntrianController extends GetxController {
   var detailTukarPoin = <Map<String,dynamic>>[];
   var textEditingC = <int>[].obs;
   // var textEditingC = 0.obs;
-  var totalPoin = 0.obs;
+  var sisaPoin = 0.obs;
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;

@@ -292,6 +292,7 @@ class AntrianView extends GetView<AntrianController> {
           var indexTrue = documents.where((element) => int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!)).toList();
           controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
           var totalPerkalian = 0.obs;
+
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 30),
             child: Column(
@@ -340,14 +341,21 @@ class AntrianView extends GetView<AntrianController> {
                                           InkWell(
                                             onTap: () {
                                               if (controller.textEditingC[index] == 0) {
+                                                controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
                                                 return;
                                               }
                                               if (index >= 0 && index < controller.textEditingC.length) {
                                                 controller.textEditingC[index] = controller.textEditingC[index] - 1;
                                                 totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
+                                                if (controller.textEditingC[index] == 0) {
+                                                  controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
+                                                }
                                               }
+                                              var hasilTambah = controller.sisaPoin.value + totalPerkalian.value;
 
-                                              print('TEXTEDITING :${totalPerkalian.value}');
+                                              print('CALC :$hasilTambah');
+                                              controller.sisaPoin.value = hasilTambah;
+                                              print('SISAPOIN :${controller.sisaPoin.value}');
                                             },
                                             child: Icon(
                                               Icons.minimize_rounded,
@@ -360,10 +368,14 @@ class AntrianView extends GetView<AntrianController> {
                                           }),
                                           InkWell(
                                             onTap: () {
+                                              if (totalPerkalian.value > controller.sisaPoin.value) {
+                                                return;
+                                              }
+                                              controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
                                               if (index >= 0 && index < controller.textEditingC.length) {
                                                 controller.textEditingC[index] = controller.textEditingC[index] + 1;
+                                                totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
                                               }
-                                              totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
                                               if (controller.textEditingC[index] != 0) {
                                                 if (controller.detailTukarPoin.any((element) => element['product']['uid'] == indexTrue[index]['uid'])) {
                                                   controller.detailTukarPoin[index]['jumlah'] = controller.textEditingC[index];
@@ -377,11 +389,11 @@ class AntrianView extends GetView<AntrianController> {
                                                     'jumlah': controller.textEditingC[index]
                                                   });
                                                 }
-
-                                                print(controller.detailTukarPoin);
+                                                print('TEXTEDITING :${totalPerkalian.value}');
                                               }
+                                              controller.sisaPoin.value -= totalPerkalian.value;
 
-                                              print('TEXTEDITING :${controller.totalPoin.value}');
+                                              print('SISAPOIN :${controller.sisaPoin.value}');
                                             },
                                             child: Icon(Icons.add, color: Colors.white),
                                           ),
@@ -396,15 +408,17 @@ class AntrianView extends GetView<AntrianController> {
                         },
                       ),
                       SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Text('Sisa poin : ', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                          Text(
-                            '${(int.parse(controller.dataTotalPoin.value))}',
-                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                          ),
-                        ],
-                      ),
+                      Obx(() {
+                        return Row(
+                          children: [
+                            Text('Sisa poin : ', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                            Text(
+                              '${controller.sisaPoin.value}',
+                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                            ),
+                          ],
+                        );
+                      }),
                     ],
                   ),
                 ),
@@ -655,6 +669,8 @@ class AntrianView extends GetView<AntrianController> {
                 // }
                 var tambah = int.parse(controller.authC.userData.poin!) + int.parse(controller.dataTotalPoin.value);
                 print('${controller.authC.userData.poin!} + ${controller.dataTotalPoin.value} = $tambah');
+              } else {
+                controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
               }
             } else {
               controller.metode.value = "";

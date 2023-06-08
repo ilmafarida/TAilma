@@ -1,64 +1,155 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 
 class DashboardController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
+  var authC = AuthController();
   var jumlahPesanan = Rxn();
   var jumlahPenukaran = Rxn();
+  var jumlahSampah = RxInt(0);
+  var jumlahProduk = RxInt(0);
+  List<QueryDocumentSnapshot> pesananDocuments = [];
+  List<QueryDocumentSnapshot> antrianDocuments = [];
 
   @override
-  void onInit() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      buildOrderCountWidget();
-    });
+  void onInit() async {
+    handleData();
     super.onInit();
   }
 
-  StreamBuilder<QuerySnapshot<Map<String, dynamic>>> buildOrderCountWidget() {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _firestore.collection('user').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-        if (snapshot.hasError) {
-          return SizedBox.shrink();
+  handleData() async {
+    pesananDocuments.clear();
+    antrianDocuments.clear();
+    await getDataPesanan().then((List<QueryDocumentSnapshot> documents) {
+      // Meng-handle data di sini
+      for (var document in documents) {
+        // Akses data di dalam dokumen
+        Map<String, dynamic>? data = document.data() as Map<String, dynamic>;
+        // Lakukan sesuatu dengan data tersebut
+      }
+      // print(pesananDocuments);
+    }).catchError((error) {
+      // Meng-handle error jika terjadi
+      print('Error PEsanan: $error');
+    });
+    await getDataAntrian().then((List<QueryDocumentSnapshot> documents) {
+      // Meng-handle data di sini
+      for (var document in documents) {
+        // Akses data di dalam dokumen
+        Map<String, dynamic>? data = document.data() as Map<String, dynamic>;
+        // Lakukan sesuatu dengan data tersebut
+      }
+      // print(antrianDocuments);
+    }).catchError((error) {
+      // Meng-handle error jika terjadi
+      print('Error Antrian: $error');
+    });
+    await getDataSampah().then((List<QueryDocumentSnapshot> documents) {
+      // Meng-handle data di sini
+      for (var document in documents) {
+        // Akses data di dalam dokumen
+        Map<String, dynamic>? data = document.data() as Map<String, dynamic>;
+        // print('DATA : $data');
+        List<Map<String, dynamic>> detailData = List<Map<String, dynamic>>.from(data['detail']);
+        // Perulangan untuk mengakses nilai dari kunci 'jumlah'
+        for (var detail in detailData) {
+          int jumlah = int.parse(detail['jumlah']);
+          jumlahSampah.value += jumlah;
         }
+        // print('JUMLAH KG :${jumlahSampah.value}');
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return SizedBox.shrink();
+        // Lakukan sesuatu dengan data tersebut
+      }
+      // print('DATA: $documents');
+    }).catchError((error) {
+      // Meng-handle error jika terjadi
+      print('Error Sampah: $error');
+    });
+    await getDataProdukTerjual().then((List<QueryDocumentSnapshot> documents) {
+      // Meng-handle data di sini
+      for (var document in documents) {
+        // Akses data di dalam dokumen
+        Map<String, dynamic>? data = document.data() as Map<String, dynamic>;
+        print('DATA : $data');
+        List<Map<String, dynamic>> detailData = List<Map<String, dynamic>>.from(data['detail']);
+        // Perulangan untuk mengakses nilai dari kunci 'jumlah'
+        for (var detail in detailData) {
+          int jumlah = int.parse(detail['jumlah']);
+          jumlahSampah.value += jumlah;
         }
+        print('JUMLAH  :${jumlahSampah.value}');
 
-        calculateOrderCounts(snapshot.data!.docs);
-
-        return SizedBox.shrink();
-      },
-    );
+        // Lakukan sesuatu dengan data tersebut
+      }
+      // print('DATA: $documents');
+    }).catchError((error) {
+      // Meng-handle error jika terjadi
+      print('Error Sampah: $error');
+    });
   }
 
-  void calculateOrderCounts(List<QueryDocumentSnapshot<Map<String, dynamic>>> userDocs) {
-    int tukarCount = 0;
-    int beliCount = 0;
+  Future<List<QueryDocumentSnapshot>> getDataPesanan() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('user').get();
+    List<QueryDocumentSnapshot> documents = querySnapshot.docs;
 
-    for (var userDoc in userDocs) {
-      Stream<QuerySnapshot<Map<String, dynamic>>> antrianStream = _firestore.collection('user').doc(userDoc.id).collection('pesanan').where('jenis', isEqualTo: 'tukar').where('status', isEqualTo: '1').snapshots();
-      Stream<QuerySnapshot<Map<String, dynamic>>> pesananStream = _firestore.collection('user').doc(userDoc.id).collection('pesanan').where('jenis', isEqualTo: 'beli').where('status', isEqualTo: '1').snapshots();
-      antrianStream.listen(
-        (QuerySnapshot<Map<String, dynamic>> antrianSnapshot) {
-          tukarCount += antrianSnapshot.docs.length;
-          jumlahPenukaran.value = tukarCount;
-        },
-        onDone: () {
-          if (jumlahPenukaran.value != tukarCount) jumlahPenukaran.value = tukarCount;
-        },
-      );
-      pesananStream.listen(
-        (QuerySnapshot<Map<String, dynamic>> pesananSnapshot) {
-          beliCount += pesananSnapshot.docs.length;
-          jumlahPesanan.value = beliCount;
-        },
-        onDone: () {
-          if (jumlahPesanan.value != beliCount) jumlahPesanan.value = beliCount;
-        },
-      );
+    for (var document in documents) {
+      QuerySnapshot pesananQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'beli').get();
+      pesananDocuments.addAll(pesananQuerySnapshot.docs);
     }
+    jumlahPesanan.value = pesananDocuments.length;
+    return pesananDocuments;
+  }
+
+  Future<List<QueryDocumentSnapshot>> getDataAntrian() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('user').get();
+    List<QueryDocumentSnapshot> documents = querySnapshot.docs;
+
+    for (var document in documents) {
+      QuerySnapshot antrianQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'tukar').get();
+      antrianDocuments.addAll(antrianQuerySnapshot.docs);
+    }
+    jumlahPenukaran.value = antrianDocuments.length;
+    return antrianDocuments;
+  }
+
+  Future<List<QueryDocumentSnapshot>> getDataSampah() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('user').get();
+    List<QueryDocumentSnapshot> documents = querySnapshot.docs;
+    List<QueryDocumentSnapshot> sampahDocument = [];
+    for (var document in documents) {
+      QuerySnapshot antrianQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'tukar').where('status', isEqualTo: '5').get();
+      sampahDocument.addAll(antrianQuerySnapshot.docs);
+    }
+    // print(sampahDocument);
+    return sampahDocument;
+  }
+
+  Future<List<QueryDocumentSnapshot>> getDataProdukTerjual() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('user').get();
+    List<QueryDocumentSnapshot> documents = querySnapshot.docs;
+    List<QueryDocumentSnapshot> produkDocument = [];
+    for (var document in documents) {
+      QuerySnapshot produkQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'beli').where('status', isEqualTo: '5').get();
+      produkDocument.addAll(produkQuerySnapshot.docs);
+    }
+    print(produkDocument);
+    return produkDocument;
+  }
+
+  Future<void> onRefresh() {
+    // Lakukan operasi refresh yang diperlukan, seperti mengambil ulang data dari Firestore
+    // atau melakukan tindakan lain yang sesuai dengan kebutuhan Anda
+
+    // Contoh: mengambil ulang data dengan memanggil metode getData()
+    return handleData().then((_) {
+      // Refresh berhasil, tidak perlu mengembalikan nilai
+    }).catchError((error) {
+      // Meng-handle error jika terjadi
+      print('Error: $error');
+    });
   }
 }
