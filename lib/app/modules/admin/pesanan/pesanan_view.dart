@@ -4,10 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
+import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 
 class PesananView extends GetView<PesananController> {
   @override
@@ -102,6 +104,7 @@ class PesananView extends GetView<PesananController> {
 
   Widget _detailContent(int tab) {
     print(controller.dataDetail);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -113,11 +116,12 @@ class PesananView extends GetView<PesananController> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _dataCard(title: 'Tanggal Pengiriman', value: controller.dataDetail!['tanggal']),
               _dataCard(title: 'Waktu', value: controller.dataDetail!['jam']),
-              _dataCard(title: 'Alamat', value: controller.dataDetail!['alamat']),
+              _dataCard(title: 'Alamat', value: controller.dataDetail!['alamat'], isMap: true),
               _dataCard(title: 'Informasi', value: controller.dataDetail!['informasi']),
             ],
           ),
@@ -473,23 +477,42 @@ class PesananView extends GetView<PesananController> {
     );
   }
 
-  Widget _dataCard({@required String? title, @required String? value}) {
+  Widget _dataCard({@required String? title, @required String? value, bool isMap = false}) {
     return Row(
       children: [
         SizedBox(
           width: 150,
           child: Text(
             title!,
+            maxLines: 2,
             style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
           ),
         ),
         Text(':'),
         SizedBox(width: 10),
         Expanded(
-          child: Text(
-            value!,
-            style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-            maxLines: 6,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Text(
+                  value!,
+                  style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                  maxLines: 6,
+                ),
+              ),
+              if (isMap)
+                GestureDetector(
+                  onTap: () => Get.to(() => GeoMapPage(
+                        latitude: (controller.dataDetail!['latlong'] as LatLng).latitude,
+                        longitude: (controller.dataDetail!['latlong'] as LatLng).longitude,
+                      )),
+                  child: Icon(
+                    Icons.location_on,
+                    color: Colors.black,
+                  ),
+                )
+            ],
           ),
         ),
       ],

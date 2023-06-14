@@ -21,6 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
+  flutter_map: ^4.0.0
   flutter_native_splash: ^2.2.19
   flutter_svg: ^2.0.5
   geocoding: ^2.1.0
@@ -32,9 +33,12 @@ dependencies:
   image_picker: ^0.8.7+5
   intl: ^0.17.0
   json_serializable: ^6.6.2
+  latlong2: ^0.8.2
+  location: ^4.4.0
   path: ^1.8.2
   searchable_paginated_dropdown: ^1.2.0
   shared_preferences: ^2.1.1
+  trust_location: ^2.0.13
   url_launcher: ^6.1.11
 
 dev_dependencies:

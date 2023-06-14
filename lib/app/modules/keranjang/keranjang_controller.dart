@@ -24,7 +24,7 @@ class KeranjangController extends GetxController {
   var dataIndexEdit = 0.obs;
   var authC = Get.find<AuthController>();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  LatLng centerMadiun = LatLng(-7.629039, 111.530110);
+  var latLong = LatLng(-7.629039, 111.530110).obs;
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;
@@ -130,6 +130,9 @@ class KeranjangController extends GetxController {
   void getLatLong() async {
     Position res = await getCurrentLocation();
 
+    latLong.value = LatLng(res.latitude, res.longitude);
+    print(latLong.value);
+
     List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
     if (placemarks.isNotEmpty) {
       print(placemarks[0].street);
@@ -145,7 +148,7 @@ class KeranjangController extends GetxController {
     //         print(result);
     //         Navigator.of(context).pop();
     //       },
-    //       initialPosition: centerMadiun,
+    //       initialPosition: latLong.value ,
     //       useCurrentLocation: true,
     //       resizeToAvoidBottomInset: false, // only works in page mode, less flickery, remove if wrong offsets
     //     ),
@@ -167,6 +170,7 @@ class KeranjangController extends GetxController {
       'status': '1',
       'metode': '',
       'file-bukti': '',
+      'latlong': '${latLong.value.latitude},${latLong.value.longitude}',
       "detail": FieldValue.arrayUnion(dataJson),
       "total_poin": dataTotalPoin.value,
       "total_harga": dataTotalHarga.value,

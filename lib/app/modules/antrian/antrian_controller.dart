@@ -27,14 +27,14 @@ class AntrianController extends GetxController {
   var dataIndexEdit = ''.obs;
   var authC = Get.find<AuthController>();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  LatLng centerMadiun = LatLng(-7.629039, 111.530110);
   var fileSampah = Rxn<File>();
   var listMetodePembayaran = ['Poin', 'Tukar dengan Produk'];
   var metode = ''.obs;
-  var detailTukarPoin = <Map<String,dynamic>>[];
+  var detailTukarPoin = <Map<String, dynamic>>[];
   var textEditingC = <int>[].obs;
   // var textEditingC = 0.obs;
   var sisaPoin = 0.obs;
+  var latLong = LatLng(-7.629039, 111.530110).obs;
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;
@@ -148,10 +148,12 @@ class AntrianController extends GetxController {
 
   void getLatLong() async {
     Position res = await getCurrentLocation();
-
+    latLong.value = LatLng(res.latitude, res.longitude);
+    print(latLong.value);
     List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
     if (placemarks.isNotEmpty) {
       print(placemarks[0].thoroughfare);
+
       alamatC.value.text = placemarks[0].thoroughfare!;
     }
 
@@ -409,6 +411,7 @@ class AntrianController extends GetxController {
       "alamat": alamatC.value.text,
       "jenis": 'tukar',
       'status': '1',
+      'latlong': '${latLong.value.latitude},${latLong.value.longitude}',
       'metode': metode.value,
       'tukar-dengan': '',
       'file-bukti': '',
@@ -416,7 +419,7 @@ class AntrianController extends GetxController {
       "total_poin": dataTotalPoin.value,
       "total_harga": '',
       'uid': dateCreated,
-      'tukar_dengan':detailTukarPoin,
+      'tukar_dengan': detailTukarPoin,
     });
 
     //MENGHAPUS ISI KERANJANG

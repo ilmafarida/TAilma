@@ -26,7 +26,7 @@ class PesananController extends GetxController {
   var authC = Get.find<AuthController>();
   var metode = ''.obs;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  LatLng centerMadiun = LatLng(-7.629039, 111.530110);
+  LatLng latLng = LatLng(-7.629039, 111.530110);
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;
