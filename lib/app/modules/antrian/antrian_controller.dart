@@ -15,6 +15,7 @@ import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
+import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -120,58 +121,12 @@ class AntrianController extends GetxController {
     }
   }
 
-  Future<Position> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Memeriksa apakah layanan lokasi diaktifkan
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Layanan lokasi tidak diaktifkan, lakukan penanganan yang sesuai
-      return Future.error('Layanan lokasi tidak diaktifkan');
-    }
-
-    // Memeriksa izin lokasi pengguna
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      // Izin lokasi ditolak, minta izin kepada pengguna
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Izin lokasi ditolak, lakukan penanganan yang sesuai
-        return Future.error('Izin lokasi ditolak');
-      }
-    }
-
-    // Mendapatkan posisi saat ini
-    return await Geolocator.getCurrentPosition();
-  }
-
   void getLatLong() async {
-    Position res = await getCurrentLocation();
-    latLong.value = LatLng(res.latitude, res.longitude);
-    print(latLong.value);
-    List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
-    if (placemarks.isNotEmpty) {
-      print(placemarks[0].thoroughfare);
-
-      alamatC.value.text = placemarks[0].thoroughfare!;
+    var res = await Get.to(() => DisplayMaps());
+    if (res != null) {
+      latLong.value = LatLng(res['lat'], res['long']);
+      alamatC.value.text = res['alamat'];
     }
-
-    // Navigator.push(
-    //   Get.context!,
-    //   MaterialPageRoute(
-    //     builder: (context) => PlacePicker(
-    //       apiKey: 'AIzaSyCWNwj2M0PgFyuy83wrgNUKs5FXZbkNUdc',
-    //       onPlacePicked: (result) {
-    //         print(result);
-    //         Navigator.of(context).pop();
-    //       },
-    //       initialPosition: centerMadiun,
-    //       useCurrentLocation: true,
-    //       resizeToAvoidBottomInset: false, // only works in page mode, less flickery, remove if wrong offsets
-    //     ),
-    //   ),
-    // );
   }
 
   void tambahItem(Map<String, dynamic> produk, int jumlah) {

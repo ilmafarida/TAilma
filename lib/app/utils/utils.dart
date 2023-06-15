@@ -2,11 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 
 enum TypeNotif { SUKSES, ERROR }
 
 class Utils {
+  LatLng centerMadiun = LatLng(-7.629039, 111.530110);
+
   static String generateRandomString(int len) {
     var r = Random();
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

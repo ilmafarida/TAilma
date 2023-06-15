@@ -4,9 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
+import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 
 import 'penukaran_controller.dart';
 
@@ -117,9 +120,10 @@ class PenukaranView extends GetView<PenukaranController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _dataCard(title: 'Nama', value: controller.dataDetail!['nama']),
               _dataCard(title: 'Tanggal Pengiriman', value: controller.dataDetail!['tanggal']),
               _dataCard(title: 'Waktu', value: controller.dataDetail!['jam']),
-              _dataCard(title: 'Alamat', value: controller.dataDetail!['alamat']),
+              _dataCard(title: 'Alamat', value: controller.dataDetail!['alamat'], isMap: true),
               _dataCard(title: 'Informasi', value: controller.dataDetail!['informasi']),
             ],
           ),
@@ -130,11 +134,6 @@ class PenukaranView extends GetView<PenukaranController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-              SizedBox(height: 10),
-              Text(
-                '${controller.dataDetail!['metode']}',
-                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
-              ),
               SizedBox(height: 10),
               Align(
                 alignment: Alignment.center,
@@ -210,7 +209,36 @@ class PenukaranView extends GetView<PenukaranController> {
                   ),
               ],
             ),
-          )
+          ),
+        if (tab == 1 || tab == 2)
+          Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CustomSubmitButton(
+                  onTap: () => controller.openDialogReject(),
+                  text: 'Tolak',
+                  width: 100,
+                  height: 35,
+                ),
+                CustomSubmitButton(
+                  onTap: () async {
+                    print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
+                    await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).collection('pesanan').doc('${controller.dataDetail!['uid']}').update({
+                      'status': tab == 1 ? '2' : '5',
+                    });
+                    controller.setViewMode(PenukaranUserMode.LIST);
+                    Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
+                  },
+                  text: tab == 1 ? 'Terima' : 'Selesai',
+                  width: 100,
+                  height: 35,
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -365,23 +393,49 @@ class PenukaranView extends GetView<PenukaranController> {
     );
   }
 
-  Widget _dataCard({@required String? title, @required String? value}) {
+  Widget _dataCard({@required String? title, @required String? value, bool isMap = false}) {
     return Row(
       children: [
         SizedBox(
           width: 150,
           child: Text(
             title!,
+            maxLines: 2,
             style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
           ),
         ),
         Text(':'),
         SizedBox(width: 10),
         Expanded(
-          child: Text(
-            value!,
-            style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-            maxLines: 6,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Text(
+                  value!,
+                  style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                  maxLines: 6,
+                ),
+              ),
+              if (isMap)
+                GestureDetector(
+                  onTap: () {
+                    // print(controller.dataDetail!['latlong']);
+                    List<String> coordinates = controller.dataDetail!['latlong'].split(',');
+                    Get.to(() {
+                      return DisplayMaps(
+                        isAdmin: true,
+                        latitude: double.parse(coordinates[0]),
+                        longitude: double.parse(coordinates[1]),
+                      );
+                    });
+                  },
+                  child: Icon(
+                    Icons.location_on,
+                    color: Colors.black,
+                  ),
+                )
+            ],
           ),
         ),
       ],
@@ -445,6 +499,7 @@ class PenukaranView extends GetView<PenukaranController> {
                               controller.dataDetail = data as Map<String, dynamic>;
                               controller.dataIndexEdit.value = userDoc.id;
                               controller.setViewMode(PenukaranUserMode.PAYMENT);
+                              controller.dataDetail!.addAll({'nama': '${(userDoc.data() as Map<String, dynamic>)['fullname']}'});
                             },
                             borderRadius: BorderRadius.circular(10),
                             child: Container(

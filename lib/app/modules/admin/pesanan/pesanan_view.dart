@@ -119,6 +119,7 @@ class PesananView extends GetView<PesananController> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _dataCard(title: 'Nama', value: controller.dataDetail!['nama']),
               _dataCard(title: 'Tanggal Pengiriman', value: controller.dataDetail!['tanggal']),
               _dataCard(title: 'Waktu', value: controller.dataDetail!['jam']),
               _dataCard(title: 'Alamat', value: controller.dataDetail!['alamat'], isMap: true),
@@ -530,10 +531,13 @@ class PesananView extends GetView<PesananController> {
               ),
               if (isMap)
                 GestureDetector(
-                  onTap: () => Get.to(() => GeoMapPage(
-                        latitude: (controller.dataDetail!['latlong'] as LatLng).latitude,
-                        longitude: (controller.dataDetail!['latlong'] as LatLng).longitude,
-                      )),
+                  onTap: () {
+                    print(controller.dataDetail!['latlong']);
+                    // DisplayMaps.openMaps(
+                    //   latitude: (controller.dataDetail!['latlong'] as LatLng).latitude,
+                    //   longitude: (controller.dataDetail!['latlong'] as LatLng).longitude,
+                    // );
+                  },
                   child: Icon(
                     Icons.location_on,
                     color: Colors.black,
@@ -603,6 +607,7 @@ class PesananView extends GetView<PesananController> {
                               controller.dataDetail = data as Map<String, dynamic>;
                               controller.dataIndexEdit.value = userDoc.id;
                               controller.setViewMode(PesananUserMode.PAYMENT);
+                              controller.dataDetail!.addAll({'nama': '${(userDoc.data() as Map<String, dynamic>)['fullname']}'});
                             },
                             borderRadius: BorderRadius.circular(10),
                             child: Container(

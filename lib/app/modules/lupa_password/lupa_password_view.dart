@@ -21,36 +21,22 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
       body: Obx(() {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(16),
-            child: controller.loading.value
-                ? Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  )
-                : (controller.typeOtp.value == TypeOtpMode.SEND)
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          _backButton(),
-                          _header(),
-                          _noHpField(),
-                          CustomSubmitButton(onTap: () async => await controller.verifyPhoneNumber(controller.noHpC.text), text: 'Kirim'),
-                          Spacer(),
-                          _footer(),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          CustomBackButton(),
-                          _headerOtp(),
-                          _fieldOtp(),
-                          SizedBox(height: 10),
-                          CustomSubmitButton(onTap: () => controller.verifyCode(), text: 'Verifikasi'),
-                          Spacer(),
-                          _footerOtp(),
-                        ],
-                      ),
-          ),
+              padding: EdgeInsets.all(16),
+              child: controller.loading.value
+                  ? Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _backButton(),
+                        _header(),
+                        _emailField(),
+                        CustomSubmitButton(onTap: () async => await controller.sendLinkToEmail(controller.emailC.text), text: 'Kirim'),
+                        Spacer(),
+                        _footer(),
+                      ],
+                    )),
         );
       }),
     );
@@ -221,26 +207,6 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
     );
   }
 
-  Widget _submitButton(context) {
-    return InkWell(
-      onTap: () => controller.verifyPhoneNumber(controller.noHpC.text),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 19),
-        margin: EdgeInsets.only(top: 10),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Color(ListColor.colorButtonGreen),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          "Kirim Kode",
-          style: ListTextStyle.textStyleGray.copyWith(color: Colors.white),
-        ),
-      ),
-    );
-  }
-
   Widget _header() {
     return Padding(
       padding: EdgeInsets.only(top: 50),
@@ -258,7 +224,7 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
             ),
             SizedBox(height: 15),
             Text(
-              'Jangan khawatir! Masukkan no telepon yang ditautkan dengan akun anda.',
+              'Jangan khawatir! Masukkan email yang ditautkan dengan akun anda.',
               style: ListTextStyle.textStyleBlack.copyWith(
                 fontSize: 16,
                 height: 24 / 16,
@@ -280,8 +246,8 @@ class LupaPasswordView extends GetView<LupaPasswordController> {
     );
   }
 
-  Widget _noHpField() {
-    return _textFieldNumber(controller: controller.noHpC, hint: 'Masukkan no HP');
+  Widget _emailField() {
+    return _textFieldNumber(controller: controller.emailC, hint: 'Masukkan email Anda');
   }
 
   Widget _textFieldNumber({

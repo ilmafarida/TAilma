@@ -11,6 +11,7 @@ import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
+import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -128,32 +129,11 @@ class KeranjangController extends GetxController {
   }
 
   void getLatLong() async {
-    Position res = await getCurrentLocation();
-
-    latLong.value = LatLng(res.latitude, res.longitude);
-    print(latLong.value);
-
-    List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
-    if (placemarks.isNotEmpty) {
-      print(placemarks[0].street);
-      alamatC.value.text = placemarks[0].street!;
+    var res = await Get.to(() => DisplayMaps());
+    if (res != null) {
+      latLong.value = LatLng(res['lat'], res['long']);
+      alamatC.value.text = res['alamat'];
     }
-
-    // Navigator.push(
-    //   Get.context!,
-    //   MaterialPageRoute(
-    //     builder: (context) => PlacePicker(
-    //       apiKey: 'AIzaSyCWNwj2M0PgFyuy83wrgNUKs5FXZbkNUdc',
-    //       onPlacePicked: (result) {
-    //         print(result);
-    //         Navigator.of(context).pop();
-    //       },
-    //       initialPosition: latLong.value ,
-    //       useCurrentLocation: true,
-    //       resizeToAvoidBottomInset: false, // only works in page mode, less flickery, remove if wrong offsets
-    //     ),
-    //   ),
-    // );
   }
 
   void submitPesanan(List<Map<String, dynamic>?> dataJson) async {
