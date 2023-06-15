@@ -97,7 +97,7 @@ class DashboardController extends GetxController {
     List<QueryDocumentSnapshot> documents = querySnapshot.docs;
 
     for (var document in documents) {
-      QuerySnapshot pesananQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'beli').get();
+      QuerySnapshot pesananQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'beli').where('status',isGreaterThanOrEqualTo: '1').get();
       pesananDocuments.addAll(pesananQuerySnapshot.docs);
     }
     jumlahPesanan.value = pesananDocuments.length;

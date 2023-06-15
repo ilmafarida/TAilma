@@ -18,7 +18,7 @@ enum PenukaranUserMode { LIST, PAYMENT }
 class PenukaranController extends GetxController {
   Rx<PenukaranUserMode> riwayatUserMode = PenukaranUserMode.LIST.obs;
   Map<String, dynamic>? dataDetail;
-  var dataIndexEdit = 0.obs;
+  var dataIndexEdit = ''.obs;
   var tabC = 1.obs;
   var tabList = ['Antrian', 'Proses', 'Selesai'];
   var listMetodePembayaran = ['Poin', 'Transfer', 'Bayar Ditempat'];

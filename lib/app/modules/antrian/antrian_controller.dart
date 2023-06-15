@@ -31,9 +31,9 @@ class AntrianController extends GetxController {
   var listMetodePembayaran = ['Poin', 'Tukar dengan Produk'];
   var metode = ''.obs;
   var detailTukarPoin = <Map<String, dynamic>>[];
-  var textEditingC = <int>[].obs;
+  // var textEditingC = <int>[].obs;
   // var textEditingC = 0.obs;
-  var sisaPoin = 0.obs;
+  var sisaPoin = RxNum(0);
   var latLong = LatLng(-7.629039, 111.530110).obs;
 
   var noHpC = TextEditingController();
@@ -172,6 +172,36 @@ class AntrianController extends GetxController {
     //     ),
     //   ),
     // );
+  }
+
+  void tambahItem(Map<String, dynamic> produk, int jumlah) {
+    num totalPoin;
+    totalPoin = num.parse(produk['poin']) * (produk['jumlah'].value + jumlah);
+    if (totalPoin <= sisaPoin.value) {
+      produk['jumlah'].value += jumlah;
+      print(totalPoin);
+      sisaPoin.value -= totalPoin;
+      print(sisaPoin.value);
+      detailTukarPoin.add(produk);
+      print('Berhasil menambahkan $jumlah ${produk['nama']}');
+      totalPoin = 0;
+      print(detailTukarPoin);
+    } else {
+      print('Batas poin telah terlampaui. Tidak dapat menambahkan lebih banyak ${produk['nama']}');
+    }
+  }
+
+  void kurangiItem(Map<String, dynamic> produk, int jumlah) {
+    if (produk['jumlah'].value >= jumlah) {
+      produk['jumlah'].value -= jumlah;
+      print('Berhasil mengurangi $jumlah ${produk['nama']}');
+      sisaPoin.value += num.parse(produk['poin']);
+      if (produk['jumlah'].value == 0) {
+        detailTukarPoin.remove(produk);
+      }
+    } else {
+      print('Jumlah ${produk['nama']} tidak mencukupi untuk dikurangi sebanyak $jumlah');
+    }
   }
 
   showUpload(BuildContext context) {
@@ -441,4 +471,13 @@ class AntrianController extends GetxController {
     // Data telah berhasil diunggah ke Firestore
     await firestore.collection('user').doc(authC.currentUser!.uid).collection('pesanan').doc(uid).update({'file-bukti': downloadUrl});
   }
+
+  // Fungsi untuk menghitung total poin
+  // int calculateTotalPoints() {
+  //   int total = 0;
+  //   for (var product in products) {
+  //     total += product.points * product.quantity;
+  //   }
+  //   return total;
+  // }
 }

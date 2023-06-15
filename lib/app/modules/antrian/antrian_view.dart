@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_controller.dart';
 import 'package:rumah_sampah_t_a/app/routes/app_pages.dart';
@@ -290,8 +291,28 @@ class AntrianView extends GetView<AntrianController> {
           }
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
           var indexTrue = documents.where((element) => int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!)).toList();
-          controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
+          // controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
+          List<Map<String, dynamic>> dataList = [];
+
+          for (var documentSnapshot in indexTrue) {
+            // Periksa apakah data ada sebelumnya atau belum
+            if (documentSnapshot.data() != null) {
+              Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+
+              if (data != null) {
+                data['jumlah'] = 0.obs; // Isi dengan nilai yang sesuai untuk 'jumlah'
+                dataList.add(data);
+              }
+            } else {
+              // Data tidak ada, tambahkan data baru dengan kunci 'jumlah'
+              dataList.add({'jumlah': 0.obs});
+            }
+          }
+
           var totalPerkalian = 0.obs;
+          // for (var doc in indexTrue) {
+          //   print(doc.data().toString());
+          // }
 
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 30),
@@ -316,7 +337,7 @@ class AntrianView extends GetView<AntrianController> {
                     children: [
                       ListView.builder(
                         shrinkWrap: true,
-                        itemCount: indexTrue.length,
+                        itemCount: dataList.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: EdgeInsets.only(bottom: 8.0),
@@ -325,7 +346,7 @@ class AntrianView extends GetView<AntrianController> {
                                 Row(
                                   children: [
                                     Text(
-                                      indexTrue[index]['nama'] + " (${indexTrue[index]['poin']})",
+                                      dataList[index]['nama'] + " (${dataList[index]['poin']})",
                                       maxLines: 2,
                                       style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
                                     ),
@@ -333,29 +354,46 @@ class AntrianView extends GetView<AntrianController> {
                                     Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        // color: indexTrue == index ? Color(ListColor.colorButtonGreen) : Colors.grey.shade600,
+                                        // color: dataList == index ? Color(ListColor.colorButtonGreen) : Colors.grey.shade600,
                                         color: Color(ListColor.colorButtonGreen),
                                       ),
                                       child: Row(
                                         children: [
                                           InkWell(
                                             onTap: () {
-                                              if (controller.textEditingC[index] == 0) {
-                                                controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
-                                                return;
-                                              }
-                                              if (index >= 0 && index < controller.textEditingC.length) {
-                                                controller.textEditingC[index] = controller.textEditingC[index] - 1;
-                                                totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
-                                                if (controller.textEditingC[index] == 0) {
-                                                  controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
-                                                }
-                                              }
-                                              var hasilTambah = controller.sisaPoin.value + totalPerkalian.value;
+                                              controller.kurangiItem(dataList[index], 1);
+                                              print(dataList[index]);
 
-                                              print('CALC :$hasilTambah');
-                                              controller.sisaPoin.value = hasilTambah;
-                                              print('SISAPOIN :${controller.sisaPoin.value}');
+                                              // num totalPoin = 0;
+                                              // if (dataList[index]['jumlah'].value >= 1) {
+                                              //   dataList[index].update('jumlah', (value) => (value - 1));
+
+                                              //   totalPoin = int.parse(dataList[index]['poin']) * ((dataList[index]['jumlah'].value) - 1);
+
+                                              //   controller.sisaPoin.value += totalPoin;
+
+                                              //   print('Berhasil Mengurangi 1 ${dataList[index]['nama']}');
+                                              // } else {
+                                              //   print('Batas poin telah terlampaui. Tidak dapat menambahkan lebih banyak ${dataList[index]['nama']}');
+                                              // }
+                                              // print(dataList[index]['jumlah'].value);
+
+                                              // if (controller.textEditingC[index] == 0) {
+                                              //   controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
+                                              //   return;
+                                              // }
+                                              // if (index >= 0 && index < controller.textEditingC.length) {
+                                              //   controller.textEditingC[index] = controller.textEditingC[index] - 1;
+                                              //   totalPerkalian.value = controller.textEditingC[index] * int.parse(dataList[index]['poin']);
+                                              //   if (controller.textEditingC[index] == 0) {
+                                              //     controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
+                                              //   }
+                                              // }
+                                              // var hasilTambah = controller.sisaPoin.value + totalPerkalian.value;
+
+                                              // print('CALC :$hasilTambah');
+                                              // controller.sisaPoin.value = hasilTambah;
+                                              // print('SISAPOIN :${controller.sisaPoin.value}');
                                             },
                                             child: Icon(
                                               Icons.minimize_rounded,
@@ -363,37 +401,48 @@ class AntrianView extends GetView<AntrianController> {
                                               size: 20,
                                             ),
                                           ),
-                                          Obx(() {
-                                            return Text('${controller.textEditingC[index]}', style: TextStyle(color: Colors.white));
-                                          }),
+                                          Obx(() => Text('${dataList[index]['jumlah'].value}', style: TextStyle(color: Colors.white))),
                                           InkWell(
                                             onTap: () {
-                                              if (totalPerkalian.value > controller.sisaPoin.value) {
-                                                return;
-                                              }
-                                              controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
-                                              if (index >= 0 && index < controller.textEditingC.length) {
-                                                controller.textEditingC[index] = controller.textEditingC[index] + 1;
-                                                totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
-                                              }
-                                              if (controller.textEditingC[index] != 0) {
-                                                if (controller.detailTukarPoin.any((element) => element['product']['uid'] == indexTrue[index]['uid'])) {
-                                                  controller.detailTukarPoin[index]['jumlah'] = controller.textEditingC[index];
-                                                } else {
-                                                  controller.detailTukarPoin.add({
-                                                    'product': {
-                                                      'uid': indexTrue[index]['uid'],
-                                                      'nama': indexTrue[index]['nama'],
-                                                      'poin': indexTrue[index]['poin'],
-                                                    },
-                                                    'jumlah': controller.textEditingC[index]
-                                                  });
-                                                }
-                                                print('TEXTEDITING :${totalPerkalian.value}');
-                                              }
-                                              controller.sisaPoin.value -= totalPerkalian.value;
+                                              // num totalPoin = 0;
+                                              controller.tambahItem(dataList[index], 1);
+                                              print(dataList[index]);
+                                              // if (totalPoin <= controller.sisaPoin.value) {
+                                              //   // int.parse(dataList[index]['jumlah']) + 1;
+                                              //   dataList[index].update('jumlah', (value) => (value + 1));
+                                              //   totalPoin = int.parse(dataList[index]['poin']) * ((dataList[index]['jumlah'].value) + 1);
+                                              //   controller.sisaPoin.value -= totalPoin;
+                                              //   print('Berhasil MEnambah 1 ${dataList[index]['nama']} || TOTAL KALI : $totalPoin');
+                                              // } else {
+                                              //   print('Batas poin telah terlampaui. Tidak dapat menambahkan lebih banyak ${dataList[index]['nama']}');
+                                              // }
 
-                                              print('SISAPOIN :${controller.sisaPoin.value}');
+                                              // if (totalPerkalian.value > controller.sisaPoin.value) {
+                                              //   return;
+                                              // }
+                                              // controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
+                                              // if (index >= 0 && index < controller.textEditingC.length) {
+                                              //   controller.textEditingC[index] = controller.textEditingC[index] + 1;
+                                              //   totalPerkalian.value = controller.textEditingC[index] * int.parse(indexTrue[index]['poin']);
+                                              // }
+                                              // if (controller.textEditingC[index] != 0) {
+                                              //   if (controller.detailTukarPoin.any((element) => element['product']['uid'] == indexTrue[index]['uid'])) {
+                                              //     controller.detailTukarPoin[index]['jumlah'] = controller.textEditingC[index];
+                                              //   } else {
+                                              //     controller.detailTukarPoin.add({
+                                              //       'product': {
+                                              //         'uid': indexTrue[index]['uid'],
+                                              //         'nama': indexTrue[index]['nama'],
+                                              //         'poin': indexTrue[index]['poin'],
+                                              //       },
+                                              //       'jumlah': controller.textEditingC[index]
+                                              //     });
+                                              //   }
+                                              //   print('TEXTEDITING :${totalPerkalian.value}');
+                                              // }
+                                              // controller.sisaPoin.value -= totalPerkalian.value;
+
+                                              // print('SISAPOIN :${controller.sisaPoin.value}');
                                             },
                                             child: Icon(Icons.add, color: Colors.white),
                                           ),
@@ -532,7 +581,7 @@ class AntrianView extends GetView<AntrianController> {
   }
 
   Widget _listContent(int i, List<DocumentSnapshot<Object?>> data) {
-    print(data[i]['uid']);
+    // print(data[i]['uid']);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 16),
       child: Row(
@@ -657,7 +706,7 @@ class AntrianView extends GetView<AntrianController> {
           onChanged: (value) {
             if (value != null) {
               controller.metode.value = value.toString();
-              print(controller.metode.value);
+              // print(controller.metode.value);
               if (value == "Poin") {
                 // if (int.parse(controller.dataTotalPoin.value) > int.parse(controller.authC.userData.poin!)) {
                 //   ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(

@@ -328,7 +328,7 @@ class RiwayatView extends GetView<RiwayatController> {
     );
   }
 
-  Widget _radioButtonContent({@required String? title, bool? isSubtitle = false}) {
+  Widget _radioButtonContent({@required String? title, bool isSubtitle = false}) {
     return RadioListTile(
       contentPadding: EdgeInsets.zero,
       dense: true,
@@ -356,7 +356,7 @@ class RiwayatView extends GetView<RiwayatController> {
         }
       },
       subtitle: controller.metode.value == "Transfer"
-          ? isSubtitle!
+          ? isSubtitle
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -401,7 +401,6 @@ class RiwayatView extends GetView<RiwayatController> {
     if (type == 1) {
       controller.fileBuktiPembayaran.value = File(controller.dataDetail!['file-bukti']);
     }
-    print(controller.fileBuktiPembayaran.value!.path);
     return Align(
       alignment: type == 1 ? Alignment.center : Alignment.topLeft,
       child: InkWell(
@@ -421,11 +420,18 @@ class RiwayatView extends GetView<RiwayatController> {
                   ),
                   child: Column(
                     children: [
-                      Image.file(
-                        controller.fileBuktiPembayaran.value!,
-                        fit: BoxFit.fitHeight,
-                        height: 100,
-                      ),
+                      if (type == 1)
+                        CachedNetworkImage(
+                          imageUrl: controller.dataDetail!['file-bukti'],
+                          fit: BoxFit.fitHeight,
+                          height: 100,
+                        )
+                      else
+                        Image.file(
+                          controller.fileBuktiPembayaran.value!,
+                          fit: BoxFit.fitHeight,
+                          height: 100,
+                        ),
                       if (type == 1)
                         SizedBox.shrink()
                       else ...[

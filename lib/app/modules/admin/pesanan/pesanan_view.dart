@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 
@@ -103,8 +104,7 @@ class PesananView extends GetView<PesananController> {
   }
 
   Widget _detailContent(int tab) {
-    print(controller.dataDetail);
-
+    print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,24 +140,6 @@ class PesananView extends GetView<PesananController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                  _radioButtonContent(title: controller.listMetodePembayaran[0]),
-                  _radioButtonContent(title: controller.listMetodePembayaran[1], isSubtitle: true),
-                  _radioButtonContent(title: controller.listMetodePembayaran[2]),
-                ],
-              ),
-            )
-          else if (tab == 3 || tab == 5)
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(86, 159, 0, 0.3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
                   SizedBox(height: 10),
                   Text(
                     '${controller.dataDetail!['metode']}',
@@ -167,6 +149,45 @@ class PesananView extends GetView<PesananController> {
                 ],
               ),
             )
+          else if (tab == 3)
+            if (controller.dataDetail!['status'] == '4')
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(86, 159, 0, 0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
+                    SizedBox(height: 10),
+                    Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+                  ],
+                ),
+              )
+            else
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(86, 159, 0, 0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                    SizedBox(height: 10),
+                    Text(
+                      '${controller.dataDetail!['metode']}',
+                      style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                    ),
+                    if (controller.dataDetail!['metode'] == 'Transfer') _uploadKTP(Get.context!, 1) else SizedBox.shrink(),
+                  ],
+                ),
+              )
           else if (tab == 4)
             Container(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -184,34 +205,33 @@ class PesananView extends GetView<PesananController> {
                 ],
               ),
             ),
-          if (tab == 2)
+          if (tab == 1 || tab == 2)
             Padding(
               padding: EdgeInsets.only(top: 20),
-              child: Align(
-                alignment: Alignment.center,
-                child: CustomSubmitButton(
-                  onTap: () {
-                    if (controller.metode.value == "") {
-                      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-                        content: Text("Pilih metode pembayaran"),
-                        backgroundColor: Colors.red,
-                        showCloseIcon: true,
-                      ));
-                      return;
-                    }
-                    if (controller.metode.value == "Transfer" && controller.fileBuktiPembayaran.value == null) {
-                      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-                        content: Text("Bukti pembayaran harus diupload"),
-                        backgroundColor: Colors.red,
-                        showCloseIcon: true,
-                      ));
-                      return;
-                    }
-                    controller.bayarPesanan();
-                  },
-                  text: 'Bayar',
-                  width: 130,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomSubmitButton(
+                    onTap: () => controller.openDialogReject(),
+                    text: 'Tolak',
+                    width: 100,
+                    height: 35,
+                  ),
+                  CustomSubmitButton(
+                    onTap: () async {
+                      print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
+                      await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).collection('pesanan').doc('${controller.dataDetail!['uid']}').update({
+                        'status': tab == 1 ? '2' : '5',
+                      });
+                      controller.setViewMode(PesananUserMode.LIST);
+                      Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
+                    },
+                    text: tab == 1 ? 'Terima' : 'Selesai',
+                    width: 100,
+                    height: 35,
+                  ),
+                ],
               ),
             ),
         ] else ...[
@@ -400,7 +420,7 @@ class PesananView extends GetView<PesananController> {
     if (type == 1) {
       controller.fileBuktiPembayaran.value = File(controller.dataDetail!['file-bukti']);
     }
-    print(controller.fileBuktiPembayaran.value!.path);
+
     return Align(
       alignment: type == 1 ? Alignment.center : Alignment.topLeft,
       child: InkWell(
@@ -420,11 +440,18 @@ class PesananView extends GetView<PesananController> {
                   ),
                   child: Column(
                     children: [
-                      Image.file(
-                        controller.fileBuktiPembayaran.value!,
-                        fit: BoxFit.fitHeight,
-                        height: 100,
-                      ),
+                      if (type == 1)
+                        CachedNetworkImage(
+                          imageUrl: controller.dataDetail!['file-bukti'],
+                          fit: BoxFit.fitHeight,
+                          height: 100,
+                        )
+                      else
+                        Image.file(
+                          controller.fileBuktiPembayaran.value!,
+                          fit: BoxFit.fitHeight,
+                          height: 100,
+                        ),
                       if (type == 1)
                         SizedBox.shrink()
                       else ...[
@@ -544,7 +571,7 @@ class PesananView extends GetView<PesananController> {
               return StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
-                  print(tabNumber);
+                  // print(tabNumber);
                   if (orderSnapshot.hasError) {
                     return Text('Error: ${orderSnapshot.error}');
                   }
@@ -563,7 +590,7 @@ class PesananView extends GetView<PesananController> {
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       DocumentSnapshot orderDoc = orderSnapshot.data!.docs[index];
-                      print('ORDER:${orderDoc.id}');
+                      // print('ORDER:${orderDoc.id}');
                       Map? data = orderDoc.data() as Map?;
                       // Lakukan apa pun yang ingin Anda lakukan dengan pesanan yang memiliki status '[]
                       return Padding(
@@ -574,7 +601,7 @@ class PesananView extends GetView<PesananController> {
                           child: InkWell(
                             onTap: () {
                               controller.dataDetail = data as Map<String, dynamic>;
-                              print(controller.dataDetail);
+                              controller.dataIndexEdit.value = userDoc.id;
                               controller.setViewMode(PesananUserMode.PAYMENT);
                             },
                             borderRadius: BorderRadius.circular(10),

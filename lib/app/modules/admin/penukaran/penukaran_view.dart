@@ -102,6 +102,8 @@ class PenukaranView extends GetView<PenukaranController> {
   }
 
   Widget _detailContent(int tab) {
+    print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -123,153 +125,67 @@ class PenukaranView extends GetView<PenukaranController> {
           ),
         ),
         _detailProduct(),
-        if (controller.dataDetail!['jenis'] == "beli") ...[
-          if (tab == 2)
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(86, 159, 0, 0.3),
-                borderRadius: BorderRadius.circular(10),
+        if (tab == 1 || tab == 2)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+              SizedBox(height: 10),
+              Text(
+                '${controller.dataDetail!['metode']}',
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                  _radioButtonContent(title: controller.listMetodePembayaran[0]),
-                  _radioButtonContent(title: controller.listMetodePembayaran[1], isSubtitle: true),
-                  _radioButtonContent(title: controller.listMetodePembayaran[2]),
-                ],
-              ),
-            )
-          else if (tab == 3 || tab == 5)
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(86, 159, 0, 0.3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                  SizedBox(height: 10),
-                  Text(
-                    '${controller.dataDetail!['metode']}',
-                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
-                  ),
-                  if (controller.dataDetail!['metode'] == 'Transfer') _uploadKTP(Get.context!, 1) else SizedBox.shrink(),
-                ],
-              ),
-            )
-          else if (tab == 4)
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(86, 159, 0, 0.3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
-                  SizedBox(height: 10),
-                  Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
-                ],
-              ),
-            ),
-          if (tab == 2)
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Align(
+              SizedBox(height: 10),
+              Align(
                 alignment: Alignment.center,
-                child: CustomSubmitButton(
-                  onTap: () {
-                    if (controller.metode.value == "") {
-                      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-                        content: Text("Pilih metode pembayaran"),
-                        backgroundColor: Colors.red,
-                        showCloseIcon: true,
-                      ));
-                      return;
-                    }
-                    if (controller.metode.value == "Transfer" && controller.fileBuktiPembayaran.value == null) {
-                      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-                        content: Text("Bukti pembayaran harus diupload"),
-                        backgroundColor: Colors.red,
-                        showCloseIcon: true,
-                      ));
-                      return;
-                    }
-                    controller.bayarPenukaran();
-                  },
-                  text: 'Bayar',
-                  width: 130,
+                child: GestureDetector(
+                  onTap: () => controller.previewFile(Get.context!, 1),
+                  child: CachedNetworkImage(
+                    imageUrl: '${controller.dataDetail!['file-bukti']}',
+                    height: 100,
+                  ),
                 ),
               ),
+              SizedBox(height: 20),
+            ],
+          ),
+        if (tab == 1 || tab == 2)
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(86, 159, 0, 0.3),
+              borderRadius: BorderRadius.circular(10),
             ),
-        ] else ...[
-          if (tab == 1 || tab == 2)
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                SizedBox(height: 10),
+                Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                SizedBox(height: 4),
                 Text(
                   '${controller.dataDetail!['metode']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.center,
-                  child: GestureDetector(
-                    onTap: () => controller.previewFile(Get.context!, 1),
-                    child: CachedNetworkImage(
-                      imageUrl: '${controller.dataDetail!['file-bukti']}',
-                      height: 100,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-              ],
-            ),
-          if (tab == 1 || tab == 2)
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(86, 159, 0, 0.3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text(
-                    '${controller.dataDetail!['metode']}',
-                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
+                if (controller.dataDetail!['metode'] == 'Tukar dengan Produk')
                   Column(
                     children: [
                       ListView.builder(
                         shrinkWrap: true,
-                        itemCount: (controller.dataDetail!['detail'] as List).length,
+                        itemCount: (controller.dataDetail!['tukar_dengan'] as List).length,
                         itemBuilder: (context, i) {
+                          print(controller.dataDetail!['tukar_dengan'][i]['product']);
                           return Column(
                             children: [
                               Row(
                                 children: [
                                   Text(
-                                    controller.dataDetail!['detail'][i]['jenis'] + "  |  " + controller.dataDetail!['detail'][i]['jumlah'],
+                                    controller.dataDetail!['tukar_dengan'][i]['product']['nama'] + "  |  " + '${controller.dataDetail!['tukar_dengan'][i]['jumlah']}',
                                     style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
                                   ),
                                   Spacer(),
                                   Text(
-                                    (controller.dataDetail!['jenis'] == "beli") ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}' : '${controller.dataDetail!['detail'][i]['poin']}',
+                                    '${controller.dataDetail!['tukar_dengan'][i]['product']['poin']}',
                                     style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
                                   ),
                                 ],
@@ -285,40 +201,16 @@ class PenukaranView extends GetView<PenukaranController> {
                           style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
                         ),
                         Spacer(),
-                        if (controller.dataDetail!['jenis'] == "beli")
-                          Text.rich(
-                            TextSpan(
-                              text: 'Rp.',
-                              style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                              children: [
-                                TextSpan(
-                                  text: controller.dataDetail!['total_harga'],
-                                ),
-                                TextSpan(text: ' / '),
-                                TextSpan(
-                                  text: controller.dataDetail!['total_poin'],
-                                  style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                                  children: [
-                                    TextSpan(
-                                      text: ' poin',
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          Text(
-                            '${controller.dataDetail!['total_poin']} Poin',
-                            style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                          ),
+                        Text(
+                          '${controller.dataDetail!['total_poin']} Poin',
+                          style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                        ),
                       ])
                     ],
                   ),
-                ],
-              ),
-            )
-        ]
+              ],
+            ),
+          )
       ],
     );
   }
@@ -540,7 +432,7 @@ class PenukaranView extends GetView<PenukaranController> {
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       DocumentSnapshot orderDoc = orderSnapshot.data!.docs[index];
-                      print('ORDER:${orderDoc.id}');
+                      // print('ORDER:${orderDoc.id}');
                       Map? data = orderDoc.data() as Map?;
                       // Lakukan apa pun yang ingin Anda lakukan dengan pesanan yang memiliki status '[]
                       return Padding(
@@ -551,7 +443,7 @@ class PenukaranView extends GetView<PenukaranController> {
                           child: InkWell(
                             onTap: () {
                               controller.dataDetail = data as Map<String, dynamic>;
-                              print(controller.dataDetail);
+                              controller.dataIndexEdit.value = userDoc.id;
                               controller.setViewMode(PenukaranUserMode.PAYMENT);
                             },
                             borderRadius: BorderRadius.circular(10),
@@ -570,7 +462,7 @@ class PenukaranView extends GetView<PenukaranController> {
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    'Total harga : ${data['total_harga']} / ${data['total_poin']} poin',
+                                    'Total poin : ${data['total_poin']} poin',
                                     style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                                   ),
                                 ],

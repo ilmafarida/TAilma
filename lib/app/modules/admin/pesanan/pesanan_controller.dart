@@ -18,7 +18,7 @@ enum PesananUserMode { LIST, PAYMENT }
 class PesananController extends GetxController {
   Rx<PesananUserMode> riwayatUserMode = PesananUserMode.LIST.obs;
   Map<String, dynamic>? dataDetail;
-  var dataIndexEdit = 0.obs;
+  var dataIndexEdit = ''.obs;
   var tabC = 1.obs;
   var tabList = ['Antrian', 'Proses', 'Selesai'];
   var listMetodePembayaran = ['Poin', 'Transfer', 'Bayar Ditempat'];
@@ -27,12 +27,14 @@ class PesananController extends GetxController {
   var metode = ''.obs;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   LatLng latLng = LatLng(-7.629039, 111.530110);
+  var formKey = Key('form');
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;
   var tanggalC = ''.obs;
   var waktuC = ''.obs;
   var informasiC = TextEditingController();
+  var alasanC = TextEditingController();
 
   @override
   void onInit() {
@@ -267,5 +269,81 @@ class PesananController extends GetxController {
       Utils.showNotif(TypeNotif.ERROR, '$e');
       print(e);
     }
+  }
+
+  openDialogReject() {
+    print('ID : ${dataIndexEdit.value} |||| $dataDetail');
+    showDialog(
+      context: Get.context!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color(0xFFEAEAEA),
+          insetPadding: EdgeInsets.symmetric(horizontal: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: Container(
+            constraints: BoxConstraints(
+              minHeight: 150,
+              minWidth: Get.width,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Alasan penolakan :',
+                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, height: 19.5 / 15),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+                Form(
+                  key: formKey,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Color(ListColor.colorButtonGreen)),
+                      color: Colors.white,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextFormField(
+                      textInputAction: TextInputAction.done,
+                      controller: alasanC,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                GestureDetector(
+                  onTap: () async {
+                    if (alasanC.text.isEmpty) {
+                      Utils.showNotif(TypeNotif.ERROR, 'Alasan harus diisi !');
+                      return;
+                    }
+                    await firestore.collection('user').doc(dataIndexEdit.value).collection('pesanan').doc('${dataDetail!['uid']}').update({
+                      'status': '4',
+                      'alasan': alasanC.text,
+                    });
+                    Get.back();
+                    setViewMode(PesananUserMode.LIST);
+                    alasanC.clear();
+                    Utils.showNotif(TypeNotif.SUKSES, 'Berhasil ditolak');
+                  },
+                  child: Text(
+                    'Selesai',
+                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
