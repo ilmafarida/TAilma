@@ -22,32 +22,10 @@ class DashboardController extends GetxController {
   }
 
   handleData() async {
+    jumlahSampah.value = 0;
+    jumlahProduk.value = 0;
     pesananDocuments.clear();
     antrianDocuments.clear();
-    await getDataPesanan().then((List<QueryDocumentSnapshot> documents) {
-      // Meng-handle data di sini
-      for (var document in documents) {
-        // Akses data di dalam dokumen
-        Map<String, dynamic>? data = document.data() as Map<String, dynamic>;
-        // Lakukan sesuatu dengan data tersebut
-      }
-      // print(pesananDocuments);
-    }).catchError((error) {
-      // Meng-handle error jika terjadi
-      print('Error PEsanan: $error');
-    });
-    await getDataAntrian().then((List<QueryDocumentSnapshot> documents) {
-      // Meng-handle data di sini
-      for (var document in documents) {
-        // Akses data di dalam dokumen
-        Map<String, dynamic>? data = document.data() as Map<String, dynamic>;
-        // Lakukan sesuatu dengan data tersebut
-      }
-      // print(antrianDocuments);
-    }).catchError((error) {
-      // Meng-handle error jika terjadi
-      print('Error Antrian: $error');
-    });
     await getDataSampah().then((List<QueryDocumentSnapshot> documents) {
       // Meng-handle data di sini
       for (var document in documents) {
@@ -60,7 +38,7 @@ class DashboardController extends GetxController {
           int jumlah = int.parse(detail['jumlah']);
           jumlahSampah.value += jumlah;
         }
-        // print('JUMLAH KG :${jumlahSampah.value}');
+        print('JUMLAH KG :${jumlahSampah.value}');
 
         // Lakukan sesuatu dengan data tersebut
       }
@@ -79,9 +57,9 @@ class DashboardController extends GetxController {
         // Perulangan untuk mengakses nilai dari kunci 'jumlah'
         for (var detail in detailData) {
           int jumlah = int.parse(detail['jumlah']);
-          jumlahSampah.value += jumlah;
+          jumlahProduk.value += jumlah;
         }
-        print('JUMLAH  :${jumlahSampah.value}');
+        print('JUMLAH  PRODUK:${jumlahProduk.value}');
 
         // Lakukan sesuatu dengan data tersebut
       }
@@ -97,7 +75,7 @@ class DashboardController extends GetxController {
     List<QueryDocumentSnapshot> documents = querySnapshot.docs;
 
     for (var document in documents) {
-      QuerySnapshot pesananQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'beli').where('status',isGreaterThanOrEqualTo: '1').get();
+      QuerySnapshot pesananQuerySnapshot = await _firestore.collection('user').doc(document.id).collection('pesanan').where('jenis', isEqualTo: 'beli').where('status', isGreaterThanOrEqualTo: '1').get();
       pesananDocuments.addAll(pesananQuerySnapshot.docs);
     }
     jumlahPesanan.value = pesananDocuments.length;

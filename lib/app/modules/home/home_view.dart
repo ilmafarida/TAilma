@@ -21,99 +21,55 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return SafeArea(
-        child: controller.homeMode.value == HomeMode.USER
-            ? Scaffold(
-                body: StreamBuilder<DocumentSnapshot>(
-                    stream: controller.authC.streamUser(),
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.active:
-                        case ConnectionState.done:
-                          controller.authC.userData = UserData.fromSnapshot(snapshot.data!);
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: StreamBuilder<DocumentSnapshot>(
-                                  stream: controller.fetchData(),
-                                  builder: (context, snap) {
-                                    switch (snap.connectionState) {
-                                      case ConnectionState.active:
-                                      case ConnectionState.done:
-                                        var data = snap.data!.data() as Map<String, dynamic>;
-                                        print('$data');
-                                        return Column(
-                                          children: [
-                                            _header(),
-                                            _cardProfile(data),
-                                            _cardQuote(data),
-                                            _cardFoto(data),
-                                          ],
-                                        );
-                                      case ConnectionState.waiting:
-                                        return Center(child: CircularProgressIndicator(color: Color(ListColor.colorButtonGreen)));
-                                      default:
-                                        return Center(child: Text("Error"));
-                                    }
-                                  }),
-                            ),
-                          );
-                        case ConnectionState.waiting:
-                          return Center(child: CircularProgressIndicator(color: Color(ListColor.colorButtonGreen)));
-                        default:
-                          return Center(child: Text("Error"));
-                      }
-                    }),
-                bottomNavigationBar: _bottomNavBar(),
-              )
-            : controller.homeMode.value == HomeMode.ADMIN
-                ? Material(
-                    child: Container(
-                      color: Colors.white,
-                      height: double.infinity,
-                      padding: EdgeInsets.all(20),
-                      child: SingleChildScrollView(
-                        child: StreamBuilder<DocumentSnapshot>(
-                            stream: controller.fetchData(),
-                            builder: (context, snap) {
-                              switch (snap.connectionState) {
-                                case ConnectionState.active:
-                                case ConnectionState.done:
-                                  var data = snap.data!.data() as Map<String, dynamic>;
-                                  print('$data');
-                                  return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      CustomBackButton(onTap: () => Get.back()),
-                                      SizedBox(height: 20),
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: CustomSubmitButton(
-                                          width: 70,
-                                          onTap: () {
-                                            controller.setViewMode(HomeMode.EDIT);
-                                          },
-                                          text: 'Edit',
-                                        ),
-                                      ),
-                                      SizedBox(height: 20),
-                                      _content(title: 'Quote :', value: data['quote']),
-                                      _content(title: 'Foto :', value: data['image'], isImage: true),
-                                      _content(title: 'Deskripsi :', value: data['deskripsi']),
-                                    ],
-                                  );
-                                case ConnectionState.waiting:
-                                  return Center(child: CircularProgressIndicator(color: Color(ListColor.colorButtonGreen)));
-                                default:
-                                  return Center(child: Text("Error"));
-                              }
-                            }),
-                      ),
-                    ),
-                  )
-                : Scaffold(
-                    resizeToAvoidBottomInset: true,
-                    body: Material(
+      return Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: controller.homeMode.value == HomeMode.USER
+              ? Scaffold(
+                  body: StreamBuilder<DocumentSnapshot>(
+                      stream: controller.authC.streamUser(),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.active:
+                          case ConnectionState.done:
+                            controller.authC.userData = UserData.fromSnapshot(snapshot.data!);
+                            return SingleChildScrollView(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: StreamBuilder<DocumentSnapshot>(
+                                    stream: controller.fetchData(),
+                                    builder: (context, snap) {
+                                      switch (snap.connectionState) {
+                                        case ConnectionState.active:
+                                        case ConnectionState.done:
+                                          var data = snap.data!.data() as Map<String, dynamic>;
+                                          print('$data');
+                                          return Column(
+                                            children: [
+                                              _header(),
+                                              _cardProfile(data),
+                                              _cardQuote(data),
+                                              _cardFoto(data),
+                                            ],
+                                          );
+                                        case ConnectionState.waiting:
+                                          return Center(child: CircularProgressIndicator(color: Color(ListColor.colorButtonGreen)));
+                                        default:
+                                          return Center(child: Text("Error"));
+                                      }
+                                    }),
+                              ),
+                            );
+                          case ConnectionState.waiting:
+                            return Center(child: CircularProgressIndicator(color: Color(ListColor.colorButtonGreen)));
+                          default:
+                            return Center(child: Text("Error"));
+                        }
+                      }),
+                  bottomNavigationBar: _bottomNavBar(),
+                )
+              : controller.homeMode.value == HomeMode.ADMIN
+                  ? Material(
                       child: Container(
                         color: Colors.white,
                         height: double.infinity,
@@ -126,80 +82,26 @@ class HomeView extends GetView<HomeController> {
                                   case ConnectionState.active:
                                   case ConnectionState.done:
                                     var data = snap.data!.data() as Map<String, dynamic>;
-                                    controller.quoteC.text = data['quote'];
-                                    controller.deskripsiC.text = data['deskripsi'];
-                                    controller.fileC.value = File('${data['image']}');
-                                    print('${controller.fileC.value}');
+                                    print('$data');
                                     return Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        CustomBackButton(onTap: () {
-                                          controller.setViewMode(HomeMode.ADMIN);
-                                          controller.isUpdate.value = false;
-                                        }),
+                                        CustomBackButton(onTap: () => Get.back()),
                                         SizedBox(height: 20),
                                         Align(
                                           alignment: Alignment.topRight,
                                           child: CustomSubmitButton(
                                             width: 70,
-                                            onTap: () async {
-                                              await controller.submit();
+                                            onTap: () {
+                                              controller.setViewMode(HomeMode.EDIT);
                                             },
-                                            text: 'Submit',
+                                            text: 'Edit',
                                           ),
                                         ),
                                         SizedBox(height: 20),
-                                        Text(
-                                          'Quote :',
-                                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                                        ),
-                                        SizedBox(height: 8),
-                                        CustomTextField(
-                                          controller: controller.quoteC,
-                                          hintText: 'Masukkan quote',
-                                          maxLines: 5,
-                                          isWithBorder: false,
-                                        ),
-                                        Text(
-                                          'Foto :',
-                                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                                        ),
-                                        SizedBox(height: 8),
-                                        Material(
-                                          color: Colors.grey.shade50,
-                                          borderRadius: BorderRadius.circular(10),
-                                          child: Obx(() {
-                                            return InkWell(
-                                              borderRadius: BorderRadius.circular(10),
-                                              onTap: () => controller.showUpload(context),
-                                              onLongPress: () => controller.uploadComponent.previewFile(file: controller.fileC.value),
-                                              child: Container(
-                                                  constraints: BoxConstraints(minHeight: 113),
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                  ),
-                                                  padding: EdgeInsets.all(16),
-                                                  child: controller.isUpdate.value
-                                                      ? Image.file(
-                                                          controller.fileC.value!,
-                                                          fit: BoxFit.fitWidth,
-                                                        )
-                                                      : CachedNetworkImage(imageUrl: controller.fileC.value!.path)),
-                                            );
-                                          }),
-                                        ),
-                                        Text(
-                                          'Deskripsi :',
-                                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                                        ),
-                                        SizedBox(height: 8),
-                                        CustomTextField(
-                                          isWithBorder: false,
-                                          controller: controller.deskripsiC,
-                                          hintText: 'Masukkan deskripsi',
-                                          maxLines: 5,
-                                        ),
+                                        _content(title: 'Quote :', value: data['quote']),
+                                        _content(title: 'Foto :', value: data['image'], isImage: true),
+                                        _content(title: 'Deskripsi :', value: data['deskripsi']),
                                       ],
                                     );
                                   case ConnectionState.waiting:
@@ -210,8 +112,109 @@ class HomeView extends GetView<HomeController> {
                               }),
                         ),
                       ),
+                    )
+                  : Scaffold(
+                      resizeToAvoidBottomInset: true,
+                      body: Material(
+                        child: Container(
+                          color: Colors.white,
+                          height: double.infinity,
+                          padding: EdgeInsets.all(20),
+                          child: SingleChildScrollView(
+                            child: StreamBuilder<DocumentSnapshot>(
+                                stream: controller.fetchData(),
+                                builder: (context, snap) {
+                                  switch (snap.connectionState) {
+                                    case ConnectionState.active:
+                                    case ConnectionState.done:
+                                      var data = snap.data!.data() as Map<String, dynamic>;
+                                      controller.quoteC.text = data['quote'];
+                                      controller.deskripsiC.text = data['deskripsi'];
+                                      controller.fileC.value = File('${data['image']}');
+                                      print('${controller.fileC.value}');
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CustomBackButton(onTap: () {
+                                            controller.setViewMode(HomeMode.ADMIN);
+                                            controller.isUpdate.value = false;
+                                          }),
+                                          SizedBox(height: 20),
+                                          Align(
+                                            alignment: Alignment.topRight,
+                                            child: CustomSubmitButton(
+                                              width: 70,
+                                              onTap: () async {
+                                                await controller.submit();
+                                              },
+                                              text: 'Submit',
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text(
+                                            'Quote :',
+                                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                          ),
+                                          SizedBox(height: 8),
+                                          CustomTextField(
+                                            controller: controller.quoteC,
+                                            hintText: 'Masukkan quote',
+                                            maxLines: 5,
+                                            isWithBorder: false,
+                                          ),
+                                          Text(
+                                            'Foto :',
+                                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Material(
+                                            color: Colors.grey.shade50,
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Obx(() {
+                                              return InkWell(
+                                                borderRadius: BorderRadius.circular(10),
+                                                onTap: () => controller.showUpload(context),
+                                                onLongPress: () => controller.uploadComponent.previewFile(file: controller.fileC.value),
+                                                child: Container(
+                                                    constraints: BoxConstraints(minHeight: 113),
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                    padding: EdgeInsets.all(16),
+                                                    child: controller.isUpdate.value
+                                                        ? Image.file(
+                                                            controller.fileC.value!,
+                                                            fit: BoxFit.fitWidth,
+                                                          )
+                                                        : CachedNetworkImage(imageUrl: controller.fileC.value!.path)),
+                                              );
+                                            }),
+                                          ),
+                                          Text(
+                                            'Deskripsi :',
+                                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                          ),
+                                          SizedBox(height: 8),
+                                          CustomTextField(
+                                            isWithBorder: false,
+                                            controller: controller.deskripsiC,
+                                            hintText: 'Masukkan deskripsi',
+                                            maxLines: 5,
+                                          ),
+                                        ],
+                                      );
+                                    case ConnectionState.waiting:
+                                      return Center(child: CircularProgressIndicator(color: Color(ListColor.colorButtonGreen)));
+                                    default:
+                                      return Center(child: Text("Error"));
+                                  }
+                                }),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+        ),
       );
     });
   }

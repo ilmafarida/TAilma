@@ -533,10 +533,11 @@ class PesananView extends GetView<PesananController> {
                 GestureDetector(
                   onTap: () {
                     print(controller.dataDetail!['latlong']);
-                    // DisplayMaps.openMaps(
-                    //   latitude: (controller.dataDetail!['latlong'] as LatLng).latitude,
-                    //   longitude: (controller.dataDetail!['latlong'] as LatLng).longitude,
-                    // );
+                    Get.to(() => DisplayMaps(
+                          isAdmin: true,
+                          latitude: double.parse(controller.dataDetail!['latlong'].toString().split(',').first),
+                          longitude: double.parse(controller.dataDetail!['latlong'].toString().split(',').last),
+                        ));
                   },
                   child: Icon(
                     Icons.location_on,

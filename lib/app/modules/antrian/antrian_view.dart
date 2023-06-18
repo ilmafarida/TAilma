@@ -162,6 +162,7 @@ class AntrianView extends GetView<AntrianController> {
                               ),
                               Obx(() {
                                 if (controller.metode.value == "Tukar dengan Produk") {
+                                  controller.sisaTemp.value = int.parse(controller.dataTotalPoin.value);
                                   return Align(
                                     alignment: Alignment.centerLeft,
                                     child: _tukarPoinDengan(documents),
@@ -309,11 +310,6 @@ class AntrianView extends GetView<AntrianController> {
             }
           }
 
-          var totalPerkalian = 0.obs;
-          // for (var doc in indexTrue) {
-          //   print(doc.data().toString());
-          // }
-
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 30),
             child: Column(
@@ -406,7 +402,7 @@ class AntrianView extends GetView<AntrianController> {
                                             onTap: () {
                                               // num totalPoin = 0;
                                               controller.tambahItem(dataList[index], 1);
-                                              print(dataList[index]);
+                                              // print(dataList[index]);
                                               // if (totalPoin <= controller.sisaPoin.value) {
                                               //   // int.parse(dataList[index]['jumlah']) + 1;
                                               //   dataList[index].update('jumlah', (value) => (value + 1));

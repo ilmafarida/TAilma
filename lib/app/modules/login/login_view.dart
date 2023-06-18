@@ -11,8 +11,11 @@ class LoginView extends GetView<LoginController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
           backgroundColor: Colors.white,
           body: Padding(
             padding: const EdgeInsets.all(25),
@@ -42,7 +45,7 @@ class LoginView extends GetView<LoginController> {
                           cursorColor: Colors.black,
                           decoration: InputDecoration(
                             labelText: "Email",
-                            border: new OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF569F00))),
+                            border: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF569F00))),
                             hintText: "Masukkan email",
                             hintStyle: TextStyle(
                               color: Color(0xFF8391A1),
@@ -129,7 +132,9 @@ class LoginView extends GetView<LoginController> {
                 )
               ],
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

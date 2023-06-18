@@ -59,7 +59,7 @@ class CustomTextField extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Spacer(),
-                    icon!
+                    icon ?? SizedBox.shrink()
                   ],
                 ),
               ),

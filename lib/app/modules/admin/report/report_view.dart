@@ -4,21 +4,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_controller.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/report/report_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 
-import 'penukaran_controller.dart';
-
-class PenukaranView extends GetView<PenukaranController> {
+class ReportView extends GetView<ReportController> {
   @override
   Widget build(BuildContext context) {
     return Material(
       child: Obx(() {
-        if (controller.riwayatUserMode.value == PenukaranUserMode.LIST) {
+        if (controller.riwayatUserMode.value == ReportUserMode.LIST) {
           return DefaultTabController(
             length: 3,
             initialIndex: 0,
@@ -26,7 +26,7 @@ class PenukaranView extends GetView<PenukaranController> {
               backgroundColor: Colors.white,
               appBar: AppBar(
                 title: Text(
-                  'Penukaran',
+                  'Report',
                   style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
                 ),
                 centerTitle: true,
@@ -87,7 +87,7 @@ class PenukaranView extends GetView<PenukaranController> {
                 leading: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => controller.setViewMode(PenukaranUserMode.LIST),
+                    onTap: () => controller.setViewMode(ReportUserMode.LIST),
                     child: Icon(Icons.arrow_back_ios_outlined),
                   ),
                 ),
@@ -106,7 +106,6 @@ class PenukaranView extends GetView<PenukaranController> {
 
   Widget _detailContent(int tab) {
     print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,6 +117,7 @@ class PenukaranView extends GetView<PenukaranController> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _dataCard(title: 'Nama', value: controller.dataDetail!['nama']),
@@ -129,91 +129,84 @@ class PenukaranView extends GetView<PenukaranController> {
           ),
         ),
         _detailProduct(),
-        if (tab == 1 || tab == 2)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-              SizedBox(height: 10),
-              Align(
-                alignment: Alignment.center,
-                child: GestureDetector(
-                  onTap: () => controller.previewFile(Get.context!, 1),
-                  child: CachedNetworkImage(
-                    imageUrl: '${controller.dataDetail!['file-bukti']}',
-                    height: 100,
-                  ),
-                ),
+        if (controller.dataDetail!['jenis'] == "beli") ...[
+          if (tab == 2)
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(86, 159, 0, 0.3),
+                borderRadius: BorderRadius.circular(10),
               ),
-              SizedBox(height: 20),
-            ],
-          ),
-        if (tab == 1 || tab == 2)
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(86, 159, 0, 0.3),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  controller.dataDetail!['jenis'] == 'beli' ? 'Metode Pembayaran' : 'Metode Penukaran',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  '${controller.dataDetail!['metode']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                if (controller.dataDetail!['metode'] == 'Tukar dengan Produk')
-                  Column(
-                    children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: (controller.dataDetail!['tukar_dengan'] as List).length,
-                        itemBuilder: (context, i) {
-                          print(controller.dataDetail!['tukar_dengan'][i]['product']);
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    controller.dataDetail!['tukar_dengan'][i]['product']['nama'] + "  |  " + '${controller.dataDetail!['tukar_dengan'][i]['jumlah']}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    '${controller.dataDetail!['tukar_dengan'][i]['product']['poin']}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      SizedBox(height: 50),
-                      Row(children: [
-                        Text(
-                          'Total  :',
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                        ),
-                        Spacer(),
-                        Text(
-                          '${controller.dataDetail!['total_poin']} Poin',
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                        ),
-                      ])
-                    ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                  SizedBox(height: 10),
+                  Text(
+                    '${controller.dataDetail!['metode']}',
+                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                   ),
-              ],
+                  if (controller.dataDetail!['metode'] == 'Transfer') _uploadKTP(Get.context!, 1) else SizedBox.shrink(),
+                ],
+              ),
+            )
+          else if (tab == 3)
+            if (controller.dataDetail!['status'] == '4')
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(86, 159, 0, 0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
+                    SizedBox(height: 10),
+                    Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+                  ],
+                ),
+              )
+            else
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(86, 159, 0, 0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                    SizedBox(height: 10),
+                    Text(
+                      '${controller.dataDetail!['metode']}',
+                      style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                    ),
+                    if (controller.dataDetail!['metode'] == 'Transfer') _uploadKTP(Get.context!, 1) else SizedBox.shrink(),
+                  ],
+                ),
+              )
+          else if (tab == 4)
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(86, 159, 0, 0.3),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
+                  SizedBox(height: 10),
+                  Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+                ],
+              ),
             ),
-          ),
-        if (controller.dataDetail!['jenis'] == 'beli')
           if (tab == 1 || tab == 2)
             Padding(
               padding: EdgeInsets.only(top: 20),
@@ -233,18 +226,8 @@ class PenukaranView extends GetView<PenukaranController> {
                       await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).collection('pesanan').doc('${controller.dataDetail!['uid']}').update({
                         'status': tab == 1 ? '2' : '5',
                       });
-                      if (tab == 2) {
-                        if (controller.dataDetail!['metode'] == 'Poin') {
-                          DocumentSnapshot<Map<String, dynamic>> getUser = await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).get();
-                          Map<String, dynamic> dataUser = getUser.data()!;
-                          int hasiltambah = int.parse(dataUser['poin']) + int.parse(controller.dataDetail!['total_poin']);
-                          print(hasiltambah);
-                          await controller.firestore.collection('user').doc(dataUser['uid']).update({'poin': '$hasiltambah'});
-                        }
-                      }
-
-                      controller.setViewMode(PenukaranUserMode.LIST);
-                      Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
+                      controller.setViewMode(ReportUserMode.LIST);
+                      Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Report diproses');
                     },
                     text: tab == 1 ? 'Terima' : 'Selesai',
                     width: 100,
@@ -253,46 +236,115 @@ class PenukaranView extends GetView<PenukaranController> {
                 ],
               ),
             ),
-        if (controller.dataDetail!['jenis'] == 'tukar')
+        ] else ...[
           if (tab == 1 || tab == 2)
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (tab == 1)
-                    CustomSubmitButton(
-                      onTap: () => controller.openDialogReject(),
-                      text: 'Tolak',
-                      width: 100,
-                      height: 35,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                SizedBox(height: 10),
+                Text(
+                  '${controller.dataDetail!['metode']}',
+                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                ),
+                SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                    onTap: () => controller.previewFile(Get.context!, 1),
+                    child: CachedNetworkImage(
+                      imageUrl: '${controller.dataDetail!['file-bukti']}',
+                      height: 100,
                     ),
-                  CustomSubmitButton(
-                    onTap: () async {
-                      print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
-                      await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).collection('pesanan').doc('${controller.dataDetail!['uid']}').update({
-                        'status': tab == 1 ? '3' : '5',
-                      });
-                      if (tab == 2) {
-                        if (controller.dataDetail!['metode'] == 'Poin') {
-                          DocumentSnapshot<Map<String, dynamic>> getUser = await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).get();
-                          Map<String, dynamic> dataUser = getUser.data()!;
-                          int hasiltambah = int.parse(dataUser['poin']) - int.parse(controller.dataDetail!['total_poin']);
-                          print(hasiltambah);
-                          await controller.firestore.collection('user').doc(dataUser['uid']).update({'poin': '$hasiltambah'});
-                        }
-                      }
-                      controller.setViewMode(PenukaranUserMode.LIST);
-                      Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
-                    },
-                    text: tab == 1 ? 'Terima' : 'Selesai',
-                    width: 100,
-                    height: 35,
+                  ),
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
+          if (tab == 1 || tab == 2)
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(86, 159, 0, 0.3),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                  SizedBox(height: 4),
+                  Text(
+                    '${controller.dataDetail!['metode']}',
+                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: (controller.dataDetail!['detail'] as List).length,
+                        itemBuilder: (context, i) {
+                          return Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    controller.dataDetail!['detail'][i]['jenis'] + "  |  " + controller.dataDetail!['detail'][i]['jumlah'],
+                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    (controller.dataDetail!['jenis'] == "beli") ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}' : '${controller.dataDetail!['detail'][i]['poin']}',
+                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      SizedBox(height: 50),
+                      Row(children: [
+                        Text(
+                          'Total  :',
+                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                        ),
+                        Spacer(),
+                        if (controller.dataDetail!['jenis'] == "beli")
+                          Text.rich(
+                            TextSpan(
+                              text: 'Rp.',
+                              style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                              children: [
+                                TextSpan(
+                                  text: controller.dataDetail!['total_harga'],
+                                ),
+                                TextSpan(text: ' / '),
+                                TextSpan(
+                                  text: controller.dataDetail!['total_poin'],
+                                  style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                                  children: [
+                                    TextSpan(
+                                      text: ' poin',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Text(
+                            '${controller.dataDetail!['total_poin']} Poin',
+                            style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                          ),
+                      ])
+                    ],
                   ),
                 ],
               ),
-            ),
+            )
+        ]
       ],
     );
   }
@@ -370,7 +422,7 @@ class PenukaranView extends GetView<PenukaranController> {
     if (type == 1) {
       controller.fileBuktiPembayaran.value = File(controller.dataDetail!['file-bukti']);
     }
-    print(controller.fileBuktiPembayaran.value!.path);
+
     return Align(
       alignment: type == 1 ? Alignment.center : Alignment.topLeft,
       child: InkWell(
@@ -390,11 +442,18 @@ class PenukaranView extends GetView<PenukaranController> {
                   ),
                   child: Column(
                     children: [
-                      Image.file(
-                        controller.fileBuktiPembayaran.value!,
-                        fit: BoxFit.fitHeight,
-                        height: 100,
-                      ),
+                      if (type == 1)
+                        CachedNetworkImage(
+                          imageUrl: controller.dataDetail!['file-bukti'],
+                          fit: BoxFit.fitHeight,
+                          height: 100,
+                        )
+                      else
+                        Image.file(
+                          controller.fileBuktiPembayaran.value!,
+                          fit: BoxFit.fitHeight,
+                          height: 100,
+                        ),
                       if (type == 1)
                         SizedBox.shrink()
                       else ...[
@@ -474,15 +533,12 @@ class PenukaranView extends GetView<PenukaranController> {
               if (isMap)
                 GestureDetector(
                   onTap: () {
-                    // print(controller.dataDetail!['latlong']);
-                    List<String> coordinates = controller.dataDetail!['latlong'].split(',');
-                    Get.to(() {
-                      return DisplayMaps(
-                        isAdmin: true,
-                        latitude: double.parse(coordinates[0]),
-                        longitude: double.parse(coordinates[1]),
-                      );
-                    });
+                    print(controller.dataDetail!['latlong']);
+                    Get.to(() => DisplayMaps(
+                          isAdmin: true,
+                          latitude: double.parse(controller.dataDetail!['latlong'].toString().split(',').first),
+                          longitude: double.parse(controller.dataDetail!['latlong'].toString().split(',').last),
+                        ));
                   },
                   child: Icon(
                     Icons.location_on,
@@ -519,9 +575,9 @@ class PenukaranView extends GetView<PenukaranController> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot userDoc = snapshot.data!.docs[index];
               return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'tukar').snapshots(),
+                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
-                  print(tabNumber);
+                  // print(tabNumber);
                   if (orderSnapshot.hasError) {
                     return Text('Error: ${orderSnapshot.error}');
                   }
@@ -552,7 +608,7 @@ class PenukaranView extends GetView<PenukaranController> {
                             onTap: () {
                               controller.dataDetail = data as Map<String, dynamic>;
                               controller.dataIndexEdit.value = userDoc.id;
-                              controller.setViewMode(PenukaranUserMode.PAYMENT);
+                              controller.setViewMode(ReportUserMode.PAYMENT);
                               controller.dataDetail!.addAll({'nama': '${(userDoc.data() as Map<String, dynamic>)['fullname']}'});
                             },
                             borderRadius: BorderRadius.circular(10),
@@ -571,7 +627,7 @@ class PenukaranView extends GetView<PenukaranController> {
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    'Total poin : ${data['total_poin']} poin',
+                                    'Total harga : ${data['total_harga']} / ${data['total_poin']} poin',
                                     style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                                   ),
                                 ],

@@ -8,22 +8,25 @@ class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-            margin: EdgeInsets.all(15),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _backButton(),
-                  _cardProfile(),
-                  _listProfile(),
-                ],
-              ),
-            )),
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+              margin: EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _backButton(),
+                    _cardProfile(),
+                    _listProfile(),
+                  ],
+                ),
+              )),
+        ),
       ),
     );
   }
@@ -53,12 +56,12 @@ class ProfileView extends GetView<ProfileController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Sampah Kamu',
+            '${controller.authC.userData.fullname}',
             style: ListTextStyle.textStyleBlackW700,
           ),
           SizedBox(height: 10),
           Text(
-            '1000 ' 'Poin',
+            '${controller.authC.userData.poin} Poin',
             style: ListTextStyle.textStyleGreenW500,
           ),
         ],

@@ -247,13 +247,13 @@ class RiwayatController extends GetxController {
 
   void bayarPesanan() {
     try {
-      if (metode.value == 'Poin') {
-        var minus = (int.parse(authC.userData.poin!) - int.parse(dataDetail!['total_poin'])).toString();
-        print(minus);
-        firestore.collection('user').doc(authC.auth.currentUser!.uid.toString()).update({
-          'poin': minus,
-        });
-      }
+      // if (metode.value == 'Poin') {
+      //   var minus = (int.parse(authC.userData.poin!) - int.parse(dataDetail!['total_poin'])).toString();
+      //   print(minus);
+      //   firestore.collection('user').doc(authC.auth.currentUser!.uid.toString()).update({
+      //     'poin': minus,
+      //   });
+      // }
       if (metode.value == 'Transfer') {
         _uploadFileToFirestore(dataDetail!['uid']);
       }

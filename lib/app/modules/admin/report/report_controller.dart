@@ -5,49 +5,40 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
-import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:geolocator/geolocator.dart';
 
-enum AntrianUserMode { LIST, PAYMENT }
+enum ReportUserMode { LIST, PAYMENT }
 
-class AntrianController extends GetxController {
-  Rx<AntrianUserMode> antrianUserMode = AntrianUserMode.LIST.obs;
-  var dataDetail = Rxn();
-  var dataTotalPoin = ''.obs;
+class ReportController extends GetxController {
+  Rx<ReportUserMode> riwayatUserMode = ReportUserMode.LIST.obs;
+  Map<String, dynamic>? dataDetail;
   var dataIndexEdit = ''.obs;
+  var tabC = 1.obs;
+  var tabList = ['Antrian', 'Proses', 'Selesai'];
+  var listMetodePembayaran = ['Poin', 'Transfer', 'Bayar Ditempat'];
+  var fileBuktiPembayaran = Rxn<File>();
   var authC = Get.find<AuthController>();
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var fileSampah = Rxn<File>();
-  var listMetodePembayaran = ['Poin', 'Tukar dengan Produk'];
   var metode = ''.obs;
-  var detailTukarPoin = <Map<String, dynamic>>[];
-  // var textEditingC = <int>[].obs;
-  // var textEditingC = 0.obs;
-  var sisaPoin = RxNum(0);
-  var sisaTemp = RxNum(0);
-  var latLong = LatLng(-7.629039, 111.530110).obs;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  LatLng latLng = LatLng(-7.629039, 111.530110);
+  var formKey = Key('form');
 
   var noHpC = TextEditingController();
   var alamatC = TextEditingController().obs;
   var tanggalC = ''.obs;
   var waktuC = ''.obs;
   var informasiC = TextEditingController();
-  String? dateCreated;
+  var alasanC = TextEditingController();
 
   @override
   void onInit() {
-    setViewMode(AntrianUserMode.LIST);
+    setViewMode(ReportUserMode.LIST);
     super.onInit();
   }
 
@@ -61,107 +52,20 @@ class AntrianController extends GetxController {
     super.onClose();
   }
 
-  void setViewMode(AntrianUserMode mode) {
-    antrianUserMode.value = mode;
+  void setViewMode(ReportUserMode mode) {
+    riwayatUserMode.value = mode;
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>?> fetchData() async* {
     try {
-      yield* FirebaseFirestore.instance.collection('user').doc(authC.currentUser!.uid).collection('antrian').snapshots();
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>?> fetchDataProduk() async* {
-    try {
-      yield* FirebaseFirestore.instance.collection('produk').snapshots();
+      yield* FirebaseFirestore.instance.collection('user').doc(authC.currentUser!.uid).collection('pesanan').snapshots();
     } catch (e) {
       print('Error: $e');
     }
   }
 
   Stream<DocumentSnapshot> fetchDataDetail(String id) {
-    return FirebaseFirestore.instance.collection('antrian').doc(id).snapshots();
-  }
-
-  showDatePicker() async {
-    final DateTime? selected = await showDialog(
-      context: Get.context!,
-      builder: (context) {
-        return DatePickerDialog(
-          initialDate: DateTime.now(),
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2024),
-          initialEntryMode: DatePickerEntryMode.calendarOnly,
-        );
-      },
-    );
-    if (selected != null) {
-      String formattedDate = DateFormat('dd-MM-yyyy').format(selected);
-      tanggalC.value = formattedDate;
-    }
-  }
-
-  showWaktuPicker() async {
-    final TimeOfDay? selectedTime = await showTimePicker(
-      context: Get.context!,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-
-    if (selectedTime != null) {
-      // Lakukan sesuatu dengan waktu yang dipilih
-      print('Waktu yang dipilih: ${selectedTime.hour}:${selectedTime.minute}');
-      waktuC.value = '${selectedTime.hour}:${selectedTime.minute}';
-    }
-  }
-
-  void getLatLong() async {
-    var res = await Get.to(() => DisplayMaps(isAdmin: false));
-    if (res != null) {
-      latLong.value = LatLng(res['lat'], res['long']);
-      alamatC.value.text = res['alamat'];
-    }
-  }
-
-  void tambahItem(Map<String, dynamic> produk, int jumlah) {
-    log('$sisaTemp');
-      num totalPoin = 0;
-      sisaPoin.value = int.parse(dataTotalPoin.value);
-      num jumlahProduk = produk['jumlah'].value + jumlah;
-      totalPoin = num.parse(produk['poin']) * jumlahProduk;
-      if (totalPoin <= sisaPoin.value) {
-        produk['jumlah'].value += jumlah;
-        log('$totalPoin');
-        sisaPoin.value -= totalPoin;
-        sisaTemp.value -= totalPoin;
-        log('${sisaPoin.value}');
-        detailTukarPoin.add(produk);
-        // print('Berhasil menambahkan $jumlah ${produk['nama']}');
-        // print(detailTukarPoin);
-      } else {
-        print('Batas poin telah terlampaui. Tidak dapat menambahkan lebih banyak ${produk['nama']}');
-      }
-    
-  }
-
-  void kurangiItem(Map<String, dynamic> produk, int jumlah) {
-    if (produk['jumlah'].value >= jumlah) {
-      produk['jumlah'].value -= jumlah;
-      print('Berhasil mengurangi $jumlah ${produk['nama']}');
-      sisaPoin.value += num.parse(produk['poin']);
-      if (produk['jumlah'].value == 0) {
-        detailTukarPoin.remove(produk);
-      }
-    } else {
-      print('Jumlah ${produk['nama']} tidak mencukupi untuk dikurangi sebanyak $jumlah');
-    }
+    return FirebaseFirestore.instance.collection('pesanan').doc(id).snapshots();
   }
 
   showUpload(BuildContext context) {
@@ -269,8 +173,8 @@ class AntrianController extends GetxController {
   void getFromGallery() async {
     XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      fileSampah.value = File(pickedFile.path);
-      log(fileSampah.value!.path);
+      fileBuktiPembayaran.value = File(pickedFile.path);
+      log(fileBuktiPembayaran.value!.path);
     } else {
       // JIKA USER CANCEL UPLOAD
       return;
@@ -280,26 +184,26 @@ class AntrianController extends GetxController {
   void getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      fileSampah.value = File(pickedFile.path);
-      log(fileSampah.value!.path);
+      fileBuktiPembayaran.value = File(pickedFile.path);
+      log(fileBuktiPembayaran.value!.path);
     } else {
       // JIKA USER CANCEL UPLOAD
       return;
     }
   }
 
-  Future<void> uploadFileToFirestore(String uid) async {
+  Future<void> _uploadFileToFirestore(String uid) async {
     String fileName = '${authC.userData.fullname}-${DateTime.now()}';
-    Reference storageReference = FirebaseStorage.instance.ref().child('fileSampah/$fileName');
-    UploadTask uploadTask = storageReference.putFile(fileSampah.value!);
+    Reference storageReference = FirebaseStorage.instance.ref().child('file-bukti-pembayaran/$fileName');
+    UploadTask uploadTask = storageReference.putFile(fileBuktiPembayaran.value!);
     TaskSnapshot storageSnapshot = await uploadTask.whenComplete(() {});
     String downloadUrl = await storageSnapshot.ref.getDownloadURL();
     log(downloadUrl);
     // Data telah berhasil diunggah ke Firestore
-    await firestore.collection('user').doc(uid).collection('penukaran').doc(dataIndexEdit.value.toString()).update({'file': downloadUrl});
+    await firestore.collection('user').doc(authC.currentUser!.uid).collection('pesanan').doc(uid).update({'file-bukti': downloadUrl});
   }
 
-  previewFile(BuildContext context) {
+  previewFile(BuildContext context, int type) {
     showDialog(
       context: context,
       builder: (ctx) {
@@ -311,10 +215,12 @@ class AntrianController extends GetxController {
               SizedBox(
                 width: width * 0.9,
                 height: height * 0.7,
-                child: Image.file(
-                  fileSampah.value!,
-                  fit: BoxFit.fill,
-                ),
+                child: type == 1
+                    ? Image.network(dataDetail!['file-bukti'])
+                    : Image.file(
+                        fileBuktiPembayaran.value!,
+                        fit: BoxFit.fill,
+                      ),
               ),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
@@ -340,47 +246,98 @@ class AntrianController extends GetxController {
     );
   }
 
-  deleteCart(String idx) {
+  void bayarReport() {
+    try {
+      if (metode.value == 'Poin') {
+        var minus = (int.parse(authC.userData.poin!) - int.parse(dataDetail!['total_poin'])).toString();
+        print(minus);
+        firestore.collection('user').doc(authC.auth.currentUser!.uid.toString()).update({
+          'poin': minus,
+        });
+      }
+      if (metode.value == 'Transfer') {
+        _uploadFileToFirestore(dataDetail!['uid']);
+      }
+      firestore.collection('user').doc(authC.auth.currentUser!.uid.toString()).collection('pesanan').doc(dataDetail!['uid']).update({
+        'status': '3',
+        'metode': metode.value,
+      });
+      setViewMode(ReportUserMode.LIST);
+      tabC.value = 3;
+      Utils.showNotif(TypeNotif.SUKSES, 'Pembayaran berhasil');
+    } catch (e) {
+      Utils.showNotif(TypeNotif.ERROR, '$e');
+      print(e);
+    }
+  }
+
+  openDialogReject() {
+    print('ID : ${dataIndexEdit.value} |||| $dataDetail');
     showDialog(
       context: Get.context!,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color(ListColor.colorButtonGray),
-          insetPadding: EdgeInsets.symmetric(horizontal: 70),
+          backgroundColor: Color(0xFFEAEAEA),
+          insetPadding: EdgeInsets.symmetric(horizontal: 20),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          content: SizedBox(
-            height: 100,
-            width: 183,
+          content: Container(
+            constraints: BoxConstraints(
+              minHeight: 150,
+              minWidth: Get.width,
+            ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  'Apakah kamu yakin\ningin menghapus?',
+                  'Alasan penolakan :',
                   style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, height: 19.5 / 15),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: Text(
-                        'Tidak',
-                        style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15),
+                SizedBox(height: 10),
+                Form(
+                  key: formKey,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Color(ListColor.colorButtonGreen)),
+                      color: Colors.white,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextFormField(
+                      textInputAction: TextInputAction.done,
+                      controller: alasanC,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian').doc(idx).delete();
-                        Get.back();
-                      },
-                      child: Text(
-                        'Ya',
-                        style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15),
-                      ),
-                    ),
-                  ],
+                  ),
+                ),
+                SizedBox(height: 15),
+                GestureDetector(
+                  onTap: () async {
+                    if (alasanC.text.isEmpty) {
+                      Utils.showNotif(TypeNotif.ERROR, 'Alasan harus diisi !');
+                      return;
+                    }
+                    await firestore.collection('user').doc(dataIndexEdit.value).collection('pesanan').doc('${dataDetail!['uid']}').update({
+                      'status': '4',
+                      'alasan': alasanC.text,
+                    });
+                    Get.back();
+                    setViewMode(ReportUserMode.LIST);
+                    alasanC.clear();
+                    Utils.showNotif(TypeNotif.SUKSES, 'Berhasil ditolak');
+                  },
+                  child: Text(
+                    'Selesai',
+                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15),
+                  ),
                 )
               ],
             ),
@@ -389,55 +346,4 @@ class AntrianController extends GetxController {
       },
     );
   }
-
-  void submitPesanan(List<Map<String, dynamic>?> dataJson) async {
-    DateFormat dateFormat = DateFormat('d-M-y', 'id_ID');
-    dateCreated = '${Utils.generateRandomString(3)}-${dateFormat.format(DateTime.now())}';
-    await firestore.collection("user").doc(authC.currentUser!.uid).collection('pesanan').doc(dateCreated).set({
-      "nohp": noHpC.text,
-      "tanggal": tanggalC.value,
-      "jam": waktuC.value,
-      "informasi": informasiC.text,
-      "alamat": alamatC.value.text,
-      "jenis": 'tukar',
-      'status': '1',
-      'latlong': '${latLong.value.latitude},${latLong.value.longitude}',
-      'metode': metode.value,
-      'tukar-dengan': '',
-      'file-bukti': '',
-      "detail": FieldValue.arrayUnion(dataJson),
-      "total_poin": dataTotalPoin.value,
-      "total_harga": '',
-      'uid': dateCreated,
-      'tukar_dengan': detailTukarPoin,
-    });
-
-    //MENGHAPUS ISI KERANJANG
-    CollectionReference collectionRef = firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian');
-    QuerySnapshot querySnapshot = await collectionRef.get();
-    for (var doc in querySnapshot.docs) {
-      doc.reference.delete();
-    }
-    await _uploadFileToFirestore(dateCreated!);
-  }
-
-  Future<void> _uploadFileToFirestore(String uid) async {
-    String fileName = '${authC.userData.fullname}-${DateTime.now()}';
-    Reference storageReference = FirebaseStorage.instance.ref().child('file-bukti-pembayaran/$fileName');
-    UploadTask uploadTask = storageReference.putFile(fileSampah.value!);
-    TaskSnapshot storageSnapshot = await uploadTask.whenComplete(() {});
-    String downloadUrl = await storageSnapshot.ref.getDownloadURL();
-    log(downloadUrl);
-    // Data telah berhasil diunggah ke Firestore
-    await firestore.collection('user').doc(authC.currentUser!.uid).collection('pesanan').doc(uid).update({'file-bukti': downloadUrl});
-  }
-
-  // Fungsi untuk menghitung total poin
-  // int calculateTotalPoints() {
-  //   int total = 0;
-  //   for (var product in products) {
-  //     total += product.points * product.quantity;
-  //   }
-  //   return total;
-  // }
 }

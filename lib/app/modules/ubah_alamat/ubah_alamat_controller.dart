@@ -1,15 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 
 class UbahAlamatController extends GetxController {
   var authC = Get.find<AuthController>();
   var loading = false.obs;
   var kecamatanC = TextEditingController();
   var kelurahanC = TextEditingController();
-  var alamatC = TextEditingController();
+  var alamatC = RxnString();
   int? idKecamatan;
   int? idKelurahan;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   var listKecamatan = [
     "Kartoharjo",
@@ -53,7 +56,7 @@ class UbahAlamatController extends GetxController {
     if (listKecamatan.contains(kecamatanC.text)) idKecamatan = listKecamatan.indexOf(kecamatanC.text);
     kelurahanC.text = authC.userData.kelurahan.toString();
     if (listKelurahan.contains(kelurahanC.text)) idKelurahan = listKelurahan.indexOf(kelurahanC.text);
-    alamatC.text = authC.userData.alamat.toString();
+    alamatC.value = authC.userData.alamat.toString();
   }
 
   @override
@@ -61,32 +64,23 @@ class UbahAlamatController extends GetxController {
     super.onClose();
   }
 
-  void submit() {}
-
-  // void sendOtpCode(BuildContext context) async {
-  //   if (emailC.text.isNotEmpty) {
-  //     try {
-  //       var res = await emailAuth.sendOtp(recipientMail: emailC.text,otpLength: 4);
-  //       if (res) {
-  //         // OTP telah dikirim ke alamat email pengguna
-  //         Get.toNamed(Routes.OTP_VERIFIKASI);
-  //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Berhasil mengirim OTP ke ${emailC.text}')));
-  //       } else {
-  //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim OTP ke ${emailC.text}')));
-  //       }
-  //     } on FirebaseAuthException catch (e) {
-  //       if (e.code == 'user-not-found') {
-  //         // Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Email tidak terdaftar");
-  //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Email tidak terdaftar')));
-  //       }
-  //     } catch (e) {
-  //       print("error {$e}");
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error pada aplikasi kami')));
-  //       // Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Kesalahan pada aplikasi kami");
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Email harus diisi')));
-  //     // Get.defaultDialog(title: "Terjadi Kesalahan", middleText: "Email harus diisi");
-  //   }
-  // }
+  void submit() {
+    if (kecamatanC.text.isEmpty || kelurahanC.text.isEmpty || alamatC.value == null) {
+      Utils.showNotif(TypeNotif.ERROR, 'Field harus diisi');
+      return;
+    }
+    firestore.collection('user').doc(authC.currentUser!.uid).update({
+      'kecamatan': kecamatanC.text,
+      'kelurahan': kelurahanC.text,
+      'alamat': alamatC.value,
+    }).then((value) {
+      Get.back();
+      Get.back();
+      Utils.showNotif(TypeNotif.SUKSES, 'Ubah data berhasil');
+    }).onError((error, stackTrace) {
+      Get.back();
+      Get.back();
+      Utils.showNotif(TypeNotif.ERROR, 'Ubah data gagal');
+    });
+  }
 }

@@ -216,32 +216,114 @@ class RiwayatView extends GetView<RiwayatController> {
               ),
             ),
         ] else ...[
-          if (tab == 1 || tab == 2)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                SizedBox(height: 10),
-                Text(
-                  '${controller.dataDetail!['metode']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
-                ),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.center,
-                  child: GestureDetector(
-                    onTap: () => controller.previewFile(Get.context!, 1),
-                    child: CachedNetworkImage(
-                      imageUrl: '${controller.dataDetail!['file-bukti']}',
-                      height: 100,
-                    ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+              SizedBox(height: 10),
+              Text(
+                '${controller.dataDetail!['metode']}',
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+              ),
+              SizedBox(height: 10),
+              Align(
+                alignment: Alignment.center,
+                child: GestureDetector(
+                  onTap: () => controller.previewFile(Get.context!, 1),
+                  child: CachedNetworkImage(
+                    imageUrl: '${controller.dataDetail!['file-bukti']}',
+                    height: 100,
                   ),
                 ),
-                SizedBox(height: 20),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(86, 159, 0, 0.3),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                SizedBox(height: 4),
+                Text(
+                  '${controller.dataDetail!['metode']}',
+                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Column(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: (controller.dataDetail!['detail'] as List).length,
+                      itemBuilder: (context, i) {
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  controller.dataDetail!['detail'][i]['jenis'] + "  |  " + controller.dataDetail!['detail'][i]['jumlah'],
+                                  style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                ),
+                                Spacer(),
+                                Text(
+                                  (controller.dataDetail!['jenis'] == "beli") ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}' : '${controller.dataDetail!['detail'][i]['poin']}',
+                                  style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    SizedBox(height: 50),
+                    Row(children: [
+                      Text(
+                        'Total  :',
+                        style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                      ),
+                      Spacer(),
+                      if (controller.dataDetail!['jenis'] == "beli")
+                        Text.rich(
+                          TextSpan(
+                            text: 'Rp.',
+                            style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                            children: [
+                              TextSpan(
+                                text: controller.dataDetail!['total_harga'],
+                              ),
+                              TextSpan(text: ' / '),
+                              TextSpan(
+                                text: controller.dataDetail!['total_poin'],
+                                style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                                children: [
+                                  TextSpan(
+                                    text: ' poin',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Text(
+                          '${controller.dataDetail!['total_poin']} Poin',
+                          style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                        ),
+                    ])
+                  ],
+                ),
               ],
             ),
-          if (tab == 1 || tab == 2)
+          ),
+          if (tab == 4)
             Container(
+              margin: EdgeInsets.only(top: 10),
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               width: double.infinity,
               decoration: BoxDecoration(
@@ -251,78 +333,12 @@ class RiwayatView extends GetView<RiwayatController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text(
-                    '${controller.dataDetail!['metode']}',
-                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
+                  Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
                   SizedBox(height: 10),
-                  Column(
-                    children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: (controller.dataDetail!['detail'] as List).length,
-                        itemBuilder: (context, i) {
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    controller.dataDetail!['detail'][i]['jenis'] + "  |  " + controller.dataDetail!['detail'][i]['jumlah'],
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    (controller.dataDetail!['jenis'] == "beli") ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}' : '${controller.dataDetail!['detail'][i]['poin']}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      SizedBox(height: 50),
-                      Row(children: [
-                        Text(
-                          'Total  :',
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                        ),
-                        Spacer(),
-                        if (controller.dataDetail!['jenis'] == "beli")
-                          Text.rich(
-                            TextSpan(
-                              text: 'Rp.',
-                              style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                              children: [
-                                TextSpan(
-                                  text: controller.dataDetail!['total_harga'],
-                                ),
-                                TextSpan(text: ' / '),
-                                TextSpan(
-                                  text: controller.dataDetail!['total_poin'],
-                                  style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                                  children: [
-                                    TextSpan(
-                                      text: ' poin',
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          Text(
-                            '${controller.dataDetail!['total_poin']} Poin',
-                            style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                          ),
-                      ])
-                    ],
-                  ),
+                  Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
                 ],
               ),
-            )
+            ),
         ]
       ],
     );
@@ -350,7 +366,8 @@ class RiwayatView extends GetView<RiwayatController> {
               controller.metode.value = "";
             }
           } else if (value == "Transfer") {
-          } else {}
+          } else {
+          }
         } else {
           controller.metode.value = "";
         }
@@ -526,7 +543,7 @@ class RiwayatView extends GetView<RiwayatController> {
                       onTap: () {
                         var dataJson = documents[i].data();
                         controller.dataDetail = dataJson;
-                        print(controller.tabC.value);
+                        print(controller.dataDetail);
                         controller.setViewMode(RiwayatUserMode.PAYMENT);
                       },
                       borderRadius: BorderRadius.circular(10),
@@ -545,7 +562,7 @@ class RiwayatView extends GetView<RiwayatController> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Total harga : ${documents[i]['total_harga']} / ${documents[i]['total_poin']} poin',
+                              documents[i]['jenis'] == 'beli' ? 'Total harga : ${documents[i]['total_harga']} / ${documents[i]['total_poin']} poin' : 'Total poin : ${documents[i]['total_poin']} poin',
                               style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                             ),
                           ],

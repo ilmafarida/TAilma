@@ -14,7 +14,7 @@ import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 class DisplayMaps extends StatefulWidget {
   double? latitude;
   double? longitude;
-  bool? isAdmin;
+  bool isAdmin;
 
   DisplayMaps({
     this.latitude,
@@ -28,15 +28,23 @@ class DisplayMaps extends StatefulWidget {
 
 class _DisplayMapsState extends State<DisplayMaps> {
   String alamat = "";
-
+  late double latitude;
+  late double longitude;
   Timer? _debounceTimer;
 
   final Duration _debounceDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
-    _debounceTimer = Timer(_debounceDuration, () {});
     super.initState();
+    if (widget.latitude != null && widget.longitude != null) {
+      latitude = widget.latitude!;
+      longitude = widget.longitude!;
+    } else {
+      latitude = Utils().centerMadiun.latitude;
+      longitude = Utils().centerMadiun.longitude;
+    }
+    _debounceTimer = Timer(_debounceDuration, () {});
   }
 
   @override
@@ -46,29 +54,27 @@ class _DisplayMapsState extends State<DisplayMaps> {
         children: [
           FlutterMap(
             options: MapOptions(
-              keepAlive: true,
-              center: LatLng(
-                widget.latitude ?? Utils().centerMadiun.latitude,
-                widget.longitude ?? Utils().centerMadiun.longitude,
-              ),
+              // keepAlive: true,
+              center: LatLng(latitude, longitude),
               zoom: 17.0,
               maxZoom: 18.0,
               onPositionChanged: (position, hasGesture) async {
-                if (!widget.isAdmin!) {
+                if (!widget.isAdmin) {
                   if (hasGesture) {
                     _debounceTimer!.cancel();
                     // Mulai timer baru
                     _debounceTimer = Timer(_debounceDuration, () async {
                       setState(() {});
-                      widget.latitude = position.center!.latitude;
-                      widget.longitude = position.center!.longitude;
+                      latitude = position.center!.latitude;
+                      longitude = position.center!.longitude;
                       // Dapatkan alamat berdasarkan lat-long
-                      List<Placemark> placemarks = await placemarkFromCoordinates(widget.latitude!, widget.longitude!);
-                      alamat = placemarks.first.street ?? '';
+                      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+                      // print(placemarks);
+                      alamat = placemarks.first.street ?? placemarks.first.thoroughfare!;
                       // Jika alamat tidak tersedia, Anda dapat menggunakan komponen lain seperti `locality`, `postalCode`, dll.
                       // Gunakan latitude, longitude, dan alamat yang didapat sesuai kebutuhan Anda
-                      print('Latitude: ${widget.latitude}');
-                      print('Longitude: ${widget.longitude}');
+                      print('Latitude: $latitude');
+                      print('Longitude: $longitude');
                       print('Address: $alamat');
                     });
                   }
@@ -80,22 +86,23 @@ class _DisplayMapsState extends State<DisplayMaps> {
                 urlTemplate: "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
                 subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
               ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                      point: LatLng(widget.latitude!, widget.longitude!),
-                      builder: (context) {
-                        return Icon(
-                          Icons.location_on_rounded,
-                          color: Color(ListColor.colorButtonGreen),
-                          size: 40,
-                        );
-                      })
-                ],
-              )
+              if (widget.isAdmin)
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                        point: LatLng(latitude, longitude),
+                        builder: (context) {
+                          return Icon(
+                            Icons.location_on_rounded,
+                            color: Color(ListColor.colorButtonGreen),
+                            size: 40,
+                          );
+                        })
+                  ],
+                )
             ],
           ),
-          if (!widget.isAdmin!)
+          if (!widget.isAdmin)
             Align(
               alignment: Alignment.center,
               child: Icon(
@@ -104,7 +111,7 @@ class _DisplayMapsState extends State<DisplayMaps> {
                 size: 40,
               ),
             ),
-          if (!widget.isAdmin!)
+          if (!widget.isAdmin)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
               child: Align(
@@ -138,8 +145,8 @@ class _DisplayMapsState extends State<DisplayMaps> {
                           Get.back(
                             result: {
                               'alamat': alamat,
-                              'lat': widget.latitude,
-                              'long': widget.longitude,
+                              'lat': latitude,
+                              'long': longitude,
                             },
                           );
                         },

@@ -8,6 +8,7 @@ import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_text_field.dart';
+import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
 
 class UbahAlamatView extends GetView<UbahAlamatController> {
@@ -31,8 +32,8 @@ class UbahAlamatView extends GetView<UbahAlamatController> {
                       _backButton(),
                       _kecamatanField(),
                       _kelurahanField(),
-                      _alamatField(),
-                      CustomSubmitButton(onTap: () => controller.submit(), text: 'Simpan',width: 126),
+                      Obx(() => _alamatField()),
+                      CustomSubmitButton(onTap: () => controller.submit(), text: 'Simpan', width: 126),
                     ],
                   ),
           ),
@@ -42,7 +43,8 @@ class UbahAlamatView extends GetView<UbahAlamatController> {
   }
 
   Widget _backButton() {
-    return Align(alignment: Alignment.centerLeft,
+    return Align(
+      alignment: Alignment.centerLeft,
       child: Padding(
         padding: EdgeInsets.only(bottom: 50),
         child: InkWell(
@@ -119,6 +121,16 @@ class UbahAlamatView extends GetView<UbahAlamatController> {
   }
 
   Widget _alamatField() {
-    return CustomTextField(controller: controller.alamatC, hintText: 'Alamat');
+    return CustomTextField(
+      value: controller.alamatC.value,
+      hintText: 'Alamat',
+      onTap: () async {
+        var res = await Get.to(() => DisplayMaps(isAdmin: false));
+        if (res != null) {
+          print(res);
+          controller.alamatC.value = res['alamat'];
+        }
+      },
+    );
   }
 }

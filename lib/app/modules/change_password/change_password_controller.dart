@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 
 class ChangePasswordController extends GetxController {
   var authC = Get.find<AuthController>();
@@ -32,7 +33,10 @@ class ChangePasswordController extends GetxController {
       } else if (passC.text != passNewC.text) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Password tidak sama")));
       }
-      await authC.auth.currentUser!.updatePassword(passNewC.text);
+      await authC.auth.currentUser!.updatePassword(passNewC.text).then((value) {
+        Get.back();
+        Utils.showNotif(TypeNotif.SUKSES, 'Password telah diperbarui');
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Password kurang dari 6")));
