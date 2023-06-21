@@ -47,44 +47,46 @@ class TukarSampahView extends GetView<TukarSampahController> {
             body: Container(
               padding: EdgeInsets.all(16),
               width: double.infinity,
-              child: StreamBuilder(
-                  stream: controller.fetchData(),
-                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Text('Belum ada data');
-                    }
-                    final List<DocumentSnapshot> documents = snapshot.data!.docs;
-                    // final data = documents[i].data() as Map<String, dynamic>; // [MENGAMBIL SEMUA DATA]
-                    // final data = documents.where((e) => (e['role'] == 'user') && (e['status'] == '-1')).toList();
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Informasi Sampah',
-                          style: ListTextStyle.textStyleGreenW500.copyWith(fontSize: 22, fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          'Pilih jenis sampah dan masukkan perkiraan berat sampah',
-                          style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
-                        ),
-                        SizedBox(height: 35),
-                        ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: documents.length,
-                          itemBuilder: (BuildContext context, int i) => _listContent(i, documents),
-                        ),
-                      ],
-                    );
-                  }),
+              child: SingleChildScrollView(
+                child: StreamBuilder(
+                    stream: controller.fetchData(),
+                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+              
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+              
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Text('Belum ada data');
+                      }
+                      final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                      // final data = documents[i].data() as Map<String, dynamic>; // [MENGAMBIL SEMUA DATA]
+                      // final data = documents.where((e) => (e['role'] == 'user') && (e['status'] == '-1')).toList();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Informasi Sampah',
+                            style: ListTextStyle.textStyleGreenW500.copyWith(fontSize: 22, fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            'Pilih jenis sampah dan masukkan perkiraan berat sampah',
+                            style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
+                          ),
+                          SizedBox(height: 35),
+                          ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,physics: NeverScrollableScrollPhysics(),
+                            itemCount: documents.length,
+                            itemBuilder: (BuildContext context, int i) => _listContent(i, documents),
+                          ),
+                        ],
+                      );
+                    }),
+              ),
             ),
           );
         } else {

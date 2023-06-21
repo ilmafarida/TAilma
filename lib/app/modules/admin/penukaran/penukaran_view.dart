@@ -148,17 +148,17 @@ class PenukaranView extends GetView<PenukaranController> {
               SizedBox(height: 20),
             ],
           ),
-        if (tab == 1 || tab == 2)
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(86, 159, 0, 0.3),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(86, 159, 0, 0.3),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (tab == 2 || tab == 3) ...[
                 Text(
                   controller.dataDetail!['jenis'] == 'beli' ? 'Metode Pembayaran' : 'Metode Penukaran',
                   style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
@@ -169,50 +169,51 @@ class PenukaranView extends GetView<PenukaranController> {
                   style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
-                if (controller.dataDetail!['metode'] == 'Tukar dengan Produk')
-                  Column(
-                    children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: (controller.dataDetail!['tukar_dengan'] as List).length,
-                        itemBuilder: (context, i) {
-                          print(controller.dataDetail!['tukar_dengan'][i]['product']);
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    controller.dataDetail!['tukar_dengan'][i]['product']['nama'] + "  |  " + '${controller.dataDetail!['tukar_dengan'][i]['jumlah']}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    '${controller.dataDetail!['tukar_dengan'][i]['product']['poin']}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      SizedBox(height: 50),
-                      Row(children: [
-                        Text(
-                          'Total  :',
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                        ),
-                        Spacer(),
-                        Text(
-                          '${controller.dataDetail!['total_poin']} Poin',
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
-                        ),
-                      ])
-                    ],
-                  ),
               ],
-            ),
+              if (controller.dataDetail!['metode'] == 'Tukar dengan Produk')
+                Column(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: (controller.dataDetail!['tukar_dengan'] as List).length,
+                      itemBuilder: (context, i) {
+                        print(controller.dataDetail!['tukar_dengan'][i]);
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  controller.dataDetail!['tukar_dengan'][i]['nama'] + "  |  " + '${controller.dataDetail!['tukar_dengan'][i]['jumlah']}',
+                                  style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                ),
+                                Spacer(),
+                                Text(
+                                  '${controller.dataDetail!['tukar_dengan'][i]['poin']}',
+                                  style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    SizedBox(height: 50),
+                    Row(children: [
+                      Text(
+                        'Total  :',
+                        style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                      ),
+                      Spacer(),
+                      Text(
+                        '${controller.dataDetail!['total_tukar_poin']} Poin',
+                        style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                      ),
+                    ])
+                  ],
+                ),
+            ],
           ),
+        ),
         if (controller.dataDetail!['jenis'] == 'beli')
           if (tab == 1 || tab == 2)
             Padding(
@@ -240,6 +241,13 @@ class PenukaranView extends GetView<PenukaranController> {
                           int hasiltambah = int.parse(dataUser['poin']) + int.parse(controller.dataDetail!['total_poin']);
                           print(hasiltambah);
                           await controller.firestore.collection('user').doc(dataUser['uid']).update({'poin': '$hasiltambah'});
+                        }
+                        if (controller.dataDetail!['metode'] == 'Tukar dengan Produk') {
+                          DocumentSnapshot<Map<String, dynamic>> getUser = await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).get();
+                          Map<String, dynamic> dataUser = getUser.data()!;
+                          int hasilKurang = int.parse(dataUser['poin']) + int.parse(controller.dataDetail!['total_tukar_poin']);
+                          print(hasilKurang);
+                          await controller.firestore.collection('user').doc(dataUser['uid']).update({'poin': '$hasilKurang'});
                         }
                       }
 

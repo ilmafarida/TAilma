@@ -1,14 +1,11 @@
-import 'dart:developer';
 import 'dart:io';
-
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
@@ -16,8 +13,6 @@ import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:geolocator/geolocator.dart';
 
 enum AntrianUserMode { LIST, PAYMENT }
 
@@ -132,23 +127,23 @@ class AntrianController extends GetxController {
 
   void tambahItem(Map<String, dynamic> produk, int jumlah) {
     log('$sisaTemp');
-      num totalPoin = 0;
-      sisaPoin.value = int.parse(dataTotalPoin.value);
-      num jumlahProduk = produk['jumlah'].value + jumlah;
-      totalPoin = num.parse(produk['poin']) * jumlahProduk;
-      if (totalPoin <= sisaPoin.value) {
-        produk['jumlah'].value += jumlah;
-        log('$totalPoin');
-        sisaPoin.value -= totalPoin;
-        sisaTemp.value -= totalPoin;
-        log('${sisaPoin.value}');
-        detailTukarPoin.add(produk);
-        // print('Berhasil menambahkan $jumlah ${produk['nama']}');
-        // print(detailTukarPoin);
-      } else {
-        print('Batas poin telah terlampaui. Tidak dapat menambahkan lebih banyak ${produk['nama']}');
-      }
-    
+    num totalPoin = 0;
+    sisaPoin.value = int.parse(dataTotalPoin.value);
+    num jumlahProduk = produk['jumlah'].value + jumlah;
+    totalPoin = num.parse(produk['poin']) * jumlahProduk;
+    if (totalPoin <= sisaPoin.value) {
+      produk['jumlah'].value += jumlah;
+      log('$totalPoin');
+      sisaPoin.value -= totalPoin;
+      sisaTemp.value -= totalPoin;
+      log('${sisaPoin.value}');
+      detailTukarPoin.add(produk);
+      // print('Berhasil menambahkan $jumlah ${produk['nama']}');
+      print(detailTukarPoin);
+    } else {
+      sisaPoin.value = sisaTemp.value;
+      Utils.showNotif(TypeNotif.ERROR, 'Batas poin telah terlampaui. Tidak dapat menambahkan lebih banyak ${produk['nama']}');
+    }
   }
 
   void kurangiItem(Map<String, dynamic> produk, int jumlah) {
@@ -156,11 +151,12 @@ class AntrianController extends GetxController {
       produk['jumlah'].value -= jumlah;
       print('Berhasil mengurangi $jumlah ${produk['nama']}');
       sisaPoin.value += num.parse(produk['poin']);
+      sisaTemp.value += num.parse(produk['poin']);
       if (produk['jumlah'].value == 0) {
         detailTukarPoin.remove(produk);
       }
     } else {
-      print('Jumlah ${produk['nama']} tidak mencukupi untuk dikurangi sebanyak $jumlah');
+      Utils.showNotif(TypeNotif.ERROR, 'Jumlah ${produk['nama']} tidak mencukupi untuk dikurangi sebanyak $jumlah');
     }
   }
 
@@ -390,35 +386,73 @@ class AntrianController extends GetxController {
     );
   }
 
-  void submitPesanan(List<Map<String, dynamic>?> dataJson) async {
+  Future<void> submitPesanan(List<Map<String, dynamic>?> dataJson) async {
     DateFormat dateFormat = DateFormat('d-M-y', 'id_ID');
     dateCreated = '${Utils.generateRandomString(3)}-${dateFormat.format(DateTime.now())}';
-    await firestore.collection("user").doc(authC.currentUser!.uid).collection('pesanan').doc(dateCreated).set({
-      "nohp": noHpC.text,
-      "tanggal": tanggalC.value,
-      "jam": waktuC.value,
-      "informasi": informasiC.text,
-      "alamat": alamatC.value.text,
-      "jenis": 'tukar',
-      'status': '1',
-      'latlong': '${latLong.value.latitude},${latLong.value.longitude}',
-      'metode': metode.value,
-      'tukar-dengan': '',
-      'file-bukti': '',
-      "detail": FieldValue.arrayUnion(dataJson),
-      "total_poin": dataTotalPoin.value,
-      "total_harga": '',
-      'uid': dateCreated,
-      'tukar_dengan': detailTukarPoin,
-    });
+    // var data = {
+    //   "nohp": noHpC.text,
+    //   "tanggal": tanggalC.value,
+    //   "jam": waktuC.value,
+    //   "informasi": informasiC.text,
+    //   "alamat": alamatC.value.text,
+    //   "jenis": 'tukar',
+    //   'status': '1',
+    //   'latlong': '${latLong.value.latitude},${latLong.value.longitude}',
+    //   'metode': metode.value,
+    //   'file-bukti': '',
+    //   "detail": dataJson,
+    //   "total_poin": dataTotalPoin.value,
+    //   "total_harga": '',
+    //   'uid': dateCreated,
+    //   'tukar_dengan': detailTukarPoin,
+    // };
 
-    //MENGHAPUS ISI KERANJANG
-    CollectionReference collectionRef = firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian');
-    QuerySnapshot querySnapshot = await collectionRef.get();
-    for (var doc in querySnapshot.docs) {
-      doc.reference.delete();
+    // FORMAT DETAIL TUKAR POIN
+    List<Map<String, dynamic>> formattedList = [];
+
+    Map<String, dynamic> formattedData = {};
+    for (var data in detailTukarPoin) {
+      for (var entry in data.entries) {
+        String key = entry.key;
+        dynamic value = entry.value;
+
+        if (value is RxInt) {
+          value = value.value; // Mengkonversi RxInt menjadi int
+        }
+        formattedData[key] = value;
+      }
+      formattedList.add(formattedData);
     }
-    await _uploadFileToFirestore(dateCreated!);
+
+    try {
+      await firestore.collection("user").doc(authC.currentUser!.uid).collection('pesanan').doc(dateCreated).set({
+        "nohp": noHpC.text,
+        "tanggal": tanggalC.value,
+        "jam": waktuC.value,
+        "informasi": informasiC.text,
+        "alamat": alamatC.value.text,
+        "jenis": 'tukar',
+        'status': '1',
+        'latlong': '${latLong.value.latitude},${latLong.value.longitude}',
+        'metode': metode.value,
+        'file-bukti': '',
+        "detail": FieldValue.arrayUnion(dataJson),
+        "total_poin": dataTotalPoin.value,
+        "total_harga": '',
+        'uid': dateCreated,
+        'tukar_dengan': formattedList,
+        'total_tukar_poin': int.parse(dataTotalPoin.value) - sisaTemp.value,
+      });
+      // MENGHAPUS ISI KERANJANG
+      CollectionReference collectionRef = firestore.collection('user').doc(authC.currentUser!.uid).collection('antrian');
+      QuerySnapshot querySnapshot = await collectionRef.get();
+      for (var doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+      await _uploadFileToFirestore(dateCreated!);
+    } catch (e) {
+      Utils.showNotif(TypeNotif.ERROR, '$e');
+    }
   }
 
   Future<void> _uploadFileToFirestore(String uid) async {

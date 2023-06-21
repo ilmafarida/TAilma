@@ -28,23 +28,36 @@ class DisplayMaps extends StatefulWidget {
 
 class _DisplayMapsState extends State<DisplayMaps> {
   String alamat = "";
-  late double latitude;
-  late double longitude;
-  Timer? _debounceTimer;
-
-  final Duration _debounceDuration = Duration(milliseconds: 500);
+  double? latitude;
+  double? longitude;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    if (widget.latitude != null && widget.longitude != null) {
-      latitude = widget.latitude!;
-      longitude = widget.longitude!;
-    } else {
-      latitude = Utils().centerMadiun.latitude;
-      longitude = Utils().centerMadiun.longitude;
-    }
-    _debounceTimer = Timer(_debounceDuration, () {});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (widget.latitude != null && widget.longitude != null) {
+        latitude = widget.latitude!;
+        longitude = widget.longitude!;
+      } else {
+        await getPositionUser();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Future getPositionUser() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {});
+    latitude = position.latitude;
+    longitude = position.longitude;
   }
 
   @override
@@ -54,23 +67,22 @@ class _DisplayMapsState extends State<DisplayMaps> {
         children: [
           FlutterMap(
             options: MapOptions(
-              // keepAlive: true,
-              center: LatLng(latitude, longitude),
+              keepAlive: true,
+              center: LatLng(latitude!, longitude!),
               zoom: 17.0,
               maxZoom: 18.0,
-              onPositionChanged: (position, hasGesture) async {
+              onPositionChanged: (position, hasGesture) {
                 if (!widget.isAdmin) {
                   if (hasGesture) {
-                    _debounceTimer!.cancel();
-                    // Mulai timer baru
-                    _debounceTimer = Timer(_debounceDuration, () async {
-                      setState(() {});
+                    timer?.cancel();
+                    timer = Timer(Duration(milliseconds: 1000), () async {
                       latitude = position.center!.latitude;
                       longitude = position.center!.longitude;
                       // Dapatkan alamat berdasarkan lat-long
-                      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+                      List<Placemark> placemarks = await placemarkFromCoordinates(latitude!, longitude!);
+                      setState(() {});
                       // print(placemarks);
-                      alamat = placemarks.first.street ?? placemarks.first.thoroughfare!;
+                      alamat = placemarks.first.street!;
                       // Jika alamat tidak tersedia, Anda dapat menggunakan komponen lain seperti `locality`, `postalCode`, dll.
                       // Gunakan latitude, longitude, dan alamat yang didapat sesuai kebutuhan Anda
                       print('Latitude: $latitude');
@@ -90,7 +102,7 @@ class _DisplayMapsState extends State<DisplayMaps> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                        point: LatLng(latitude, longitude),
+                        point: LatLng(latitude!, longitude!),
                         builder: (context) {
                           return Icon(
                             Icons.location_on_rounded,

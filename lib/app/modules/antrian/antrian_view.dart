@@ -179,7 +179,7 @@ class AntrianView extends GetView<AntrianController> {
                                       Utils.showNotif(TypeNotif.ERROR, 'Data harus diisi');
                                       return;
                                     } else {
-                                      controller.submitPesanan(dataJson);
+                                      await controller.submitPesanan(dataJson);
                                       Get.offNamed(Routes.RIWAYAT);
                                       Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
                                     }
@@ -291,7 +291,14 @@ class AntrianView extends GetView<AntrianController> {
             return Text('Belum ada data');
           }
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
-          var indexTrue = documents.where((element) => int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!)).toList();
+          print('data asli${documents.length}');
+
+          print('POIN  :${controller.authC.userData.poin}');
+          var indexTrue = documents.where((element) {
+            print('PER POIN : ${element['poin']}');
+            return int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!);
+          }).toList();
+          print('data FILTER${indexTrue.length}');
           // controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
           List<Map<String, dynamic>> dataList = [];
 
@@ -391,16 +398,21 @@ class AntrianView extends GetView<AntrianController> {
                                               // controller.sisaPoin.value = hasilTambah;
                                               // print('SISAPOIN :${controller.sisaPoin.value}');
                                             },
-                                            child: Icon(
-                                              Icons.minimize_rounded,
-                                              color: Colors.white,
-                                              size: 20,
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.minimize_rounded,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
                                             ),
                                           ),
                                           Obx(() => Text('${dataList[index]['jumlah'].value}', style: TextStyle(color: Colors.white))),
                                           InkWell(
                                             onTap: () {
                                               // num totalPoin = 0;
+                                              if (controller.sisaPoin.value == 0) {
+                                                return;
+                                              }
                                               controller.tambahItem(dataList[index], 1);
                                               // print(dataList[index]);
                                               // if (totalPoin <= controller.sisaPoin.value) {
