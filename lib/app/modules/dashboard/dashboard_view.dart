@@ -32,6 +32,7 @@ class DashboardView extends GetView<DashboardController> {
                   _header(),
                   _cardProfile(controller.authC.userData),
                   _button(text: 'Verifikasi Akun', onTap: () => Get.toNamed(Routes.VERIFIKASI_AKUN)),
+                  _button(text: 'Akun Terverifikasi', onTap: () => Get.toNamed(Routes.AKUN_TERVERIFIKASI)),
                   _button(text: 'Post Dashboard', onTap: () => Get.toNamed(Routes.HOME)),
                   _button(text: 'Produk', onTap: () => Get.toNamed(Routes.ADMIN_PRODUCT)),
                   _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH)),

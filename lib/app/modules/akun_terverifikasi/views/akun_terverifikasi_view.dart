@@ -1,21 +1,22 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_controller.dart';
+import '../controllers/akun_terverifikasi_controller.dart';
+//import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
-import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
-import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
-import 'package:rumah_sampah_t_a/app/widgets/loading_component.dart';
+//import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
+//import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
+//import 'package:rumah_sampah_t_a/app/widgets/loading_component.dart';
 
-class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
+class AkunTerverifikasiView extends GetView<AkunTerverifikasiController> {
+  const AkunTerverifikasiView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Verifikasi Akun'),
+        title: Text('Akun Terverifikasi'),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -54,24 +55,33 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
                   Expanded(
                     child: Container(
                       width: double.infinity,
-                      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
+                      child:
+                          StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
                         stream: controller.fetchData(),
-                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?>
+                                snapshot) {
                           if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           }
 
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
                           }
 
-                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
                             return Text('Belum ada data');
                           }
                           // Memproses snapshot dan menampilkan data
-                          final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                          final List<DocumentSnapshot> documents =
+                              snapshot.data!.docs;
                           // final data = documents[i].data() as Map<String, dynamic>; // [MENGAMBIL SEMUA DATA]
-                          final data = documents.where((e) => (e['role'] == 'user') && (e['status'] == '-1')).toList();
+                          final data = documents
+                              .where((e) =>
+                                  (e['role'] == 'user') && (e['status'] == '1'))
+                              .toList();
                           return ListView.builder(
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
@@ -89,31 +99,22 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          _field(title: 'Nama', value: controller.dataEdit.value['fullname']),
-                          _field(title: 'Email', value: controller.dataEdit.value['email']),
-                          _field(title: 'Kecamatan', value: controller.dataEdit.value['kecamatan']),
-                          _field(title: 'Kelurahan', value: controller.dataEdit.value['kelurahan']),
-                          _field(title: 'Alamat', value: controller.dataEdit.value['alamat']),
+                          _field(
+                              title: 'Nama',
+                              value: controller.dataEdit.value['fullname']),
+                          _field(
+                              title: 'Email',
+                              value: controller.dataEdit.value['email']),
+                          _field(
+                              title: 'Kecamatan',
+                              value: controller.dataEdit.value['kecamatan']),
+                          _field(
+                              title: 'Kelurahan',
+                              value: controller.dataEdit.value['kelurahan']),
+                          _field(
+                              title: 'Alamat',
+                              value: controller.dataEdit.value['alamat']),
                           _fieldKtp(controller.dataEdit.value['ktp']),
-                          Padding(
-                            padding: EdgeInsets.only(top: 80),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                CustomSubmitButton(
-                                  onTap: () => controller.prosesVerifikasi(status: 0),
-                                  text: 'Unverifikasi',
-                                  width: 110,
-                                ),
-                                CustomSubmitButton(
-                                  onTap: () => controller.prosesVerifikasi(status: 1),
-                                  text: 'Verifikasi',
-                                  width: 110,
-                                )
-                              ],
-                            ),
-                          )
                         ],
                       ),
                     ),
@@ -149,16 +150,19 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
               children: [
                 Text(
                   '${data[i]['fullname']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                  style:
+                      ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
                 ),
                 SizedBox(height: 10),
                 Text(
                   '${data[i]['email']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: ListTextStyle.textStyleBlackW700
+                      .copyWith(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 Text(
                   '${data[i]['alamat']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: ListTextStyle.textStyleBlackW700
+                      .copyWith(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -222,7 +226,8 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
       alignment: Alignment.center,
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: () => file != "" ? controller.previewFile(Get.context!, file) : {},
+        onTap: () =>
+            file != "" ? controller.previewFile(Get.context!, file) : {},
         child: Column(
           children: [
             Container(
@@ -241,9 +246,15 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
                 errorBuilder: (context, error, stackTrace) => Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.red.shade200), padding: EdgeInsets.all(10), child: Icon(Icons.error_rounded)),
+                    Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: Colors.red.shade200),
+                        padding: EdgeInsets.all(10),
+                        child: Icon(Icons.error_rounded)),
                     SizedBox(height: 20),
-                    Text('Belum upload KTP', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 16)),
+                    Text('Belum upload KTP',
+                        style: ListTextStyle.textStyleBlack
+                            .copyWith(fontSize: 16)),
                   ],
                 ),
               ),

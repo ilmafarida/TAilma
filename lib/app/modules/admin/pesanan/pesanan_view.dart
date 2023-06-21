@@ -26,7 +26,8 @@ class PesananView extends GetView<PesananController> {
               appBar: AppBar(
                 title: Text(
                   'Pesanan',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
+                  style:
+                      ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
                 ),
                 centerTitle: true,
                 elevation: 0,
@@ -104,7 +105,8 @@ class PesananView extends GetView<PesananController> {
   }
 
   Widget _detailContent(int tab) {
-    print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
+    print(
+        'ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -120,10 +122,17 @@ class PesananView extends GetView<PesananController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _dataCard(title: 'Nama', value: controller.dataDetail!['nama']),
-              _dataCard(title: 'Tanggal Pengiriman', value: controller.dataDetail!['tanggal']),
+              _dataCard(
+                  title: 'Tanggal Pengiriman',
+                  value: controller.dataDetail!['tanggal']),
               _dataCard(title: 'Waktu', value: controller.dataDetail!['jam']),
-              _dataCard(title: 'Alamat', value: controller.dataDetail!['alamat'], isMap: true),
-              _dataCard(title: 'Informasi', value: controller.dataDetail!['informasi']),
+              _dataCard(
+                  title: 'Alamat',
+                  value: controller.dataDetail!['alamat'],
+                  isMap: true),
+              _dataCard(
+                  title: 'Informasi',
+                  value: controller.dataDetail!['informasi']),
             ],
           ),
         ),
@@ -140,13 +149,19 @@ class PesananView extends GetView<PesananController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                  Text('Metode Pembayaran',
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 16)),
                   SizedBox(height: 10),
                   Text(
                     '${controller.dataDetail!['metode']}',
-                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                    style:
+                        ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                   ),
-                  if (controller.dataDetail!['metode'] == 'Transfer') _uploadKTP(Get.context!, 1) else SizedBox.shrink(),
+                  if (controller.dataDetail!['metode'] == 'Transfer')
+                    _uploadKTP(Get.context!, 1)
+                  else
+                    SizedBox.shrink(),
                 ],
               ),
             )
@@ -162,9 +177,13 @@ class PesananView extends GetView<PesananController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
+                    Text('Alasan Penolakan :',
+                        style: ListTextStyle.textStyleBlackW700
+                            .copyWith(fontSize: 16, color: Colors.red)),
                     SizedBox(height: 10),
-                    Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+                    Text('${controller.dataDetail!['alasan']}',
+                        style: ListTextStyle.textStyleBlackW700
+                            .copyWith(fontSize: 14)),
                   ],
                 ),
               )
@@ -179,13 +198,19 @@ class PesananView extends GetView<PesananController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                    Text('Metode Pembayaran',
+                        style: ListTextStyle.textStyleBlackW700
+                            .copyWith(fontSize: 16)),
                     SizedBox(height: 10),
                     Text(
                       '${controller.dataDetail!['metode']}',
-                      style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 14),
                     ),
-                    if (controller.dataDetail!['metode'] == 'Transfer') _uploadKTP(Get.context!, 1) else SizedBox.shrink(),
+                    if (controller.dataDetail!['metode'] == 'Transfer')
+                      _uploadKTP(Get.context!, 1)
+                    else
+                      SizedBox.shrink(),
                   ],
                 ),
               )
@@ -200,9 +225,13 @@ class PesananView extends GetView<PesananController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Alasan Penolakan :', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16, color: Colors.red)),
+                  Text('Alasan Penolakan :',
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 16, color: Colors.red)),
                   SizedBox(height: 10),
-                  Text('${controller.dataDetail!['alasan']}', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+                  Text('${controller.dataDetail!['alasan']}',
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 14)),
                 ],
               ),
             ),
@@ -221,12 +250,19 @@ class PesananView extends GetView<PesananController> {
                   ),
                   CustomSubmitButton(
                     onTap: () async {
-                      print('ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
-                      await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).collection('pesanan').doc('${controller.dataDetail!['uid']}').update({
+                      print(
+                          'ID : ${controller.dataIndexEdit.value} |||| ${controller.dataDetail}');
+                      await controller.firestore
+                          .collection('user')
+                          .doc(controller.dataIndexEdit.value)
+                          .collection('pesanan')
+                          .doc('${controller.dataDetail!['uid']}')
+                          .update({
                         'status': tab == 1 ? '2' : '5',
                       });
                       controller.setViewMode(PesananUserMode.LIST);
-                      Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
+                      Utils.showNotif(TypeNotif.SUKSES,
+                          tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
                     },
                     text: tab == 1 ? 'Terima' : 'Selesai',
                     width: 100,
@@ -240,11 +276,14 @@ class PesananView extends GetView<PesananController> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Foto Sampah', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                Text('Foto Sampah',
+                    style: ListTextStyle.textStyleBlackW700
+                        .copyWith(fontSize: 16)),
                 SizedBox(height: 10),
                 Text(
                   '${controller.dataDetail!['metode']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                  style:
+                      ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                 ),
                 SizedBox(height: 10),
                 Align(
@@ -271,31 +310,43 @@ class PesananView extends GetView<PesananController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Metode Pembayaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                  Text('Metode Pembayaran',
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 16)),
                   SizedBox(height: 4),
                   Text(
                     '${controller.dataDetail!['metode']}',
-                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                    style: ListTextStyle.textStyleBlackW700
+                        .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   Column(
                     children: [
                       ListView.builder(
                         shrinkWrap: true,
-                        itemCount: (controller.dataDetail!['detail'] as List).length,
+                        itemCount:
+                            (controller.dataDetail!['detail'] as List).length,
                         itemBuilder: (context, i) {
                           return Column(
                             children: [
                               Row(
                                 children: [
                                   Text(
-                                    controller.dataDetail!['detail'][i]['jenis'] + "  |  " + controller.dataDetail!['detail'][i]['jumlah'],
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                    controller.dataDetail!['detail'][i]
+                                            ['jenis'] +
+                                        "  |  " +
+                                        controller.dataDetail!['detail'][i]
+                                            ['jumlah'],
+                                    style: ListTextStyle.textStyleBlack
+                                        .copyWith(fontSize: 14),
                                   ),
                                   Spacer(),
                                   Text(
-                                    (controller.dataDetail!['jenis'] == "beli") ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}' : '${controller.dataDetail!['detail'][i]['poin']}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                    (controller.dataDetail!['jenis'] == "beli")
+                                        ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}'
+                                        : '${controller.dataDetail!['detail'][i]['poin']}',
+                                    style: ListTextStyle.textStyleBlack
+                                        .copyWith(fontSize: 14),
                                   ),
                                 ],
                               ),
@@ -307,14 +358,16 @@ class PesananView extends GetView<PesananController> {
                       Row(children: [
                         Text(
                           'Total  :',
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                          style: ListTextStyle.textStyleBlackW700
+                              .copyWith(fontSize: 16),
                         ),
                         Spacer(),
                         if (controller.dataDetail!['jenis'] == "beli")
                           Text.rich(
                             TextSpan(
                               text: 'Rp.',
-                              style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                              style: ListTextStyle.textStyleBlack.copyWith(
+                                  fontWeight: FontWeight.w400, fontSize: 14),
                               children: [
                                 TextSpan(
                                   text: controller.dataDetail!['total_harga'],
@@ -322,7 +375,10 @@ class PesananView extends GetView<PesananController> {
                                 TextSpan(text: ' / '),
                                 TextSpan(
                                   text: controller.dataDetail!['total_poin'],
-                                  style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                                  style: ListTextStyle.textStyleGreenW500
+                                      .copyWith(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14),
                                   children: [
                                     TextSpan(
                                       text: ' poin',
@@ -335,7 +391,8 @@ class PesananView extends GetView<PesananController> {
                         else
                           Text(
                             '${controller.dataDetail!['total_poin']} Poin',
-                            style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                            style: ListTextStyle.textStyleBlackW700.copyWith(
+                                fontWeight: FontWeight.w400, fontSize: 14),
                           ),
                       ])
                     ],
@@ -348,11 +405,13 @@ class PesananView extends GetView<PesananController> {
     );
   }
 
-  Widget _radioButtonContent({@required String? title, bool? isSubtitle = false}) {
+  Widget _radioButtonContent(
+      {@required String? title, bool? isSubtitle = false}) {
     return RadioListTile(
       contentPadding: EdgeInsets.zero,
       dense: true,
-      title: Text(title!, style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+      title: Text(title!,
+          style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
       value: title,
       toggleable: true,
       activeColor: Colors.black,
@@ -361,9 +420,11 @@ class PesananView extends GetView<PesananController> {
         if (value != null) {
           controller.metode.value = value.toString();
           if (value == "Poin") {
-            if (int.parse(controller.dataDetail!['total_poin']) > int.parse(controller.authC.userData.poin!)) {
+            if (int.parse(controller.dataDetail!['total_poin']) >
+                int.parse(controller.authC.userData.poin!)) {
               ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-                content: Text("Poin tidak cukup. Poin kamu : ${controller.authC.userData.poin}"),
+                content: Text(
+                    "Poin tidak cukup. Poin kamu : ${controller.authC.userData.poin}"),
                 backgroundColor: Colors.red,
                 showCloseIcon: true,
               ));
@@ -391,7 +452,9 @@ class PesananView extends GetView<PesananController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('1928147847', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14)),
+                          Text('1928147847',
+                              style: ListTextStyle.textStyleBlack
+                                  .copyWith(fontSize: 14)),
                           _uploadKTP(Get.context!, 0),
                         ],
                       ),
@@ -419,13 +482,16 @@ class PesananView extends GetView<PesananController> {
 
   Widget _uploadKTP(BuildContext context, int type) {
     if (type == 1) {
-      controller.fileBuktiPembayaran.value = File(controller.dataDetail!['file-bukti']);
+      controller.fileBuktiPembayaran.value =
+          File(controller.dataDetail!['file-bukti']);
     }
 
     return Align(
       alignment: type == 1 ? Alignment.center : Alignment.topLeft,
       child: InkWell(
-        onTap: () => controller.fileBuktiPembayaran.value == null ? controller.showUpload(context) : controller.previewFile(context, type),
+        onTap: () => controller.fileBuktiPembayaran.value == null
+            ? controller.showUpload(context)
+            : controller.previewFile(context, type),
         child: Obx(() {
           if (controller.fileBuktiPembayaran.value != null) {
             return Column(
@@ -491,7 +557,9 @@ class PesananView extends GetView<PesananController> {
                   Text(
                     'Upload Bukti Transfer',
                     style: TextStyle(
-                      color: controller.fileBuktiPembayaran.value != null ? Colors.white : Color(ListColor.colorTextGray),
+                      color: controller.fileBuktiPembayaran.value != null
+                          ? Colors.white
+                          : Color(ListColor.colorTextGray),
                       fontFamily: 'Urbanist',
                       fontSize: 13,
                     ),
@@ -505,7 +573,8 @@ class PesananView extends GetView<PesananController> {
     );
   }
 
-  Widget _dataCard({@required String? title, @required String? value, bool isMap = false}) {
+  Widget _dataCard(
+      {@required String? title, @required String? value, bool isMap = false}) {
     return Row(
       children: [
         SizedBox(
@@ -535,8 +604,16 @@ class PesananView extends GetView<PesananController> {
                     print(controller.dataDetail!['latlong']);
                     Get.to(() => DisplayMaps(
                           isAdmin: true,
-                          latitude: double.parse(controller.dataDetail!['latlong'].toString().split(',').first),
-                          longitude: double.parse(controller.dataDetail!['latlong'].toString().split(',').last),
+                          latitude: double.parse(controller
+                              .dataDetail!['latlong']
+                              .toString()
+                              .split(',')
+                              .first),
+                          longitude: double.parse(controller
+                              .dataDetail!['latlong']
+                              .toString()
+                              .split(',')
+                              .last),
                         ));
                   },
                   child: Icon(
@@ -574,13 +651,21 @@ class PesananView extends GetView<PesananController> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot userDoc = snapshot.data!.docs[index];
               return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
+                stream: FirebaseFirestore.instance
+                    .collection('user')
+                    .doc(userDoc.id)
+                    .collection('pesanan')
+                    .where('status', isEqualTo: tabNumber.toString())
+                    .where('jenis', isEqualTo: 'beli')
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> orderSnapshot) {
                   // print(tabNumber);
                   if (orderSnapshot.hasError) {
                     return Text('Error: ${orderSnapshot.error}');
                   }
-                  if (orderSnapshot.connectionState == ConnectionState.waiting) {
+                  if (orderSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     // return Center(child: CircularProgressIndicator());
                     return SizedBox();
                   }
@@ -594,7 +679,8 @@ class PesananView extends GetView<PesananController> {
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
-                      DocumentSnapshot orderDoc = orderSnapshot.data!.docs[index];
+                      DocumentSnapshot orderDoc =
+                          orderSnapshot.data!.docs[index];
                       // print('ORDER:${orderDoc.id}');
                       Map? data = orderDoc.data() as Map?;
                       // Lakukan apa pun yang ingin Anda lakukan dengan pesanan yang memiliki status '[]
@@ -605,10 +691,14 @@ class PesananView extends GetView<PesananController> {
                           borderRadius: BorderRadius.circular(10),
                           child: InkWell(
                             onTap: () {
-                              controller.dataDetail = data as Map<String, dynamic>;
+                              controller.dataDetail =
+                                  data as Map<String, dynamic>;
                               controller.dataIndexEdit.value = userDoc.id;
                               controller.setViewMode(PesananUserMode.PAYMENT);
-                              controller.dataDetail!.addAll({'nama': '${(userDoc.data() as Map<String, dynamic>)['fullname']}'});
+                              controller.dataDetail!.addAll({
+                                'nama':
+                                    '${(userDoc.data() as Map<String, dynamic>)['fullname']}'
+                              });
                             },
                             borderRadius: BorderRadius.circular(10),
                             child: Container(
@@ -616,18 +706,23 @@ class PesananView extends GetView<PesananController> {
                                 color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 18),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    data!['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
-                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                    data!['jenis'] == 'beli'
+                                        ? 'Pembelian Produk'
+                                        : 'Tukar Sampah',
+                                    style: ListTextStyle.textStyleBlackW700
+                                        .copyWith(fontSize: 18),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
                                     'Total harga : ${data['total_harga']} / ${data['total_poin']} poin',
-                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                                    style: ListTextStyle.textStyleBlackW700
+                                        .copyWith(fontSize: 14),
                                   ),
                                 ],
                               ),
@@ -653,7 +748,9 @@ class PesananView extends GetView<PesananController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            (controller.dataDetail!['jenis'] == "beli") ? 'Detail produk :' : 'Detail sampah :',
+            (controller.dataDetail!['jenis'] == "beli")
+                ? 'Detail produk :'
+                : 'Detail sampah :',
             style: ListTextStyle.textStyleBlack.copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -677,13 +774,19 @@ class PesananView extends GetView<PesananController> {
                         Row(
                           children: [
                             Text(
-                              controller.dataDetail!['detail'][i]['jenis'] + "  |  " + controller.dataDetail!['detail'][i]['jumlah'],
-                              style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                              controller.dataDetail!['detail'][i]['jenis'] +
+                                  "  |  " +
+                                  controller.dataDetail!['detail'][i]['jumlah'],
+                              style: ListTextStyle.textStyleBlack
+                                  .copyWith(fontSize: 14),
                             ),
                             Spacer(),
                             Text(
-                              (controller.dataDetail!['jenis'] == "beli") ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}' : '${controller.dataDetail!['detail'][i]['poin']}',
-                              style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                              (controller.dataDetail!['jenis'] == "beli")
+                                  ? 'Rp ${controller.dataDetail!['detail'][i]['harga']}'
+                                  : '${controller.dataDetail!['detail'][i]['poin']}',
+                              style: ListTextStyle.textStyleBlack
+                                  .copyWith(fontSize: 14),
                             ),
                           ],
                         ),
@@ -696,14 +799,16 @@ class PesananView extends GetView<PesananController> {
                   children: [
                     Text(
                       'Total  :',
-                      style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 16),
                     ),
                     Spacer(),
                     if (controller.dataDetail!['jenis'] == "beli")
                       Text.rich(
                         TextSpan(
                           text: 'Rp.',
-                          style: ListTextStyle.textStyleBlack.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                          style: ListTextStyle.textStyleBlack.copyWith(
+                              fontWeight: FontWeight.w400, fontSize: 14),
                           children: [
                             TextSpan(
                               text: controller.dataDetail!['total_harga'],
@@ -711,7 +816,8 @@ class PesananView extends GetView<PesananController> {
                             TextSpan(text: ' / '),
                             TextSpan(
                               text: controller.dataDetail!['total_poin'],
-                              style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                              style: ListTextStyle.textStyleGreenW500.copyWith(
+                                  fontWeight: FontWeight.w400, fontSize: 14),
                               children: [
                                 TextSpan(
                                   text: ' poin',
@@ -724,7 +830,8 @@ class PesananView extends GetView<PesananController> {
                     else
                       Text(
                         '${controller.dataDetail!['total_poin']} Poin',
-                        style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                        style: ListTextStyle.textStyleBlackW700.copyWith(
+                            fontWeight: FontWeight.w400, fontSize: 14),
                       ),
                   ],
                 ),
