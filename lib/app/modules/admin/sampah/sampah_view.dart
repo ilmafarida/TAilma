@@ -17,6 +17,22 @@ class AdminSampahView extends GetView<AdminSampahController> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
+        appBar: AppBar(
+        title: Text('Sampah'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        leading: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+                  Get.back();
+                },
+            child: Icon(Icons.arrow_back_ios_outlined),
+          ),
+        ),
+      ),
         resizeToAvoidBottomInset: false,
         body: Padding(
           padding: EdgeInsets.all(20),
@@ -25,9 +41,9 @@ class AdminSampahView extends GetView<AdminSampahController> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomBackButton(onTap: () {
-                  Get.back();
-                }),
+                // CustomBackButton(onTap: () {
+                //   Get.back();
+                // }),
                 SizedBox(height: 30),
                 if (controller.sampahMode.value == SampahMode.VIEW) ...[
                   SingleChildScrollView(

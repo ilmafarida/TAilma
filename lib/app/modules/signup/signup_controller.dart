@@ -103,8 +103,8 @@ class SignupController extends GetxController {
             "kelurahan": kelurahanC.text,
             "alamat": alamatC.text,
             "ktp": '',
-            "poin": "",
-            "sampah": "",
+            "poin": "0",
+            "sampah": "0",
             "status": '-1',
             "role": 'user',
           });

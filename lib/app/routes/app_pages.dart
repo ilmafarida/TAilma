@@ -1,35 +1,35 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:get/get.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/penukaran/penukaran_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/penukaran/penukaran_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/product/product_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/product/product_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/verifikasi_akun/verifikasi_akun_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/antrian/antrian_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/change_password/change_password_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/ganti_password/ganti_password_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/keranjang/keranjang_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/lupa_password/lupa_password_view.dart';
-import 'package:rumah_sampah_t_a/app/modules/ganti_password/ganti_password_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_binding.dart';
-import 'package:rumah_sampah_t_a/app/modules/ubah_alamat/ubah_alamat_view.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/report/report_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/report/report_view.dart';
 
+import '../modules/admin/penukaran/penukaran_binding.dart';
+import '../modules/admin/penukaran/penukaran_view.dart';
+import '../modules/admin/pesanan/pesanan_binding.dart';
+import '../modules/admin/pesanan/pesanan_view.dart';
+import '../modules/admin/product/product_binding.dart';
+import '../modules/admin/product/product_view.dart';
 import '../modules/admin/sampah/sampah_binding.dart';
 import '../modules/admin/sampah/sampah_view.dart';
+import '../modules/admin/verifikasi_akun/verifikasi_akun_binding.dart';
+import '../modules/admin/verifikasi_akun/verifikasi_akun_view.dart';
+import '../modules/akun_terverifikasi/bindings/akun_terverifikasi_binding.dart';
+import '../modules/akun_terverifikasi/views/akun_terverifikasi_view.dart';
+import '../modules/antrian/antrian_binding.dart';
+import '../modules/antrian/antrian_view.dart';
+import '../modules/change_password/change_password_binding.dart';
+import '../modules/change_password/change_password_view.dart';
 import '../modules/dashboard/dashboard_binding.dart';
 import '../modules/dashboard/dashboard_view.dart';
+import '../modules/ganti_password/ganti_password_binding.dart';
+import '../modules/ganti_password/ganti_password_view.dart';
 import '../modules/home/home_binding.dart';
 import '../modules/home/home_view.dart';
+import '../modules/keranjang/keranjang_binding.dart';
+import '../modules/keranjang/keranjang_view.dart';
 import '../modules/login/login_binding.dart';
 import '../modules/login/login_view.dart';
+import '../modules/lupa_password/lupa_password_binding.dart';
+import '../modules/lupa_password/lupa_password_view.dart';
 import '../modules/produk/produk_binding.dart';
 import '../modules/produk/produk_view.dart';
 import '../modules/profile/profile_binding.dart';
@@ -40,10 +40,14 @@ import '../modules/signup/signup_binding.dart';
 import '../modules/signup/signup_view.dart';
 import '../modules/tukarsampah/tukarsampah_binding.dart';
 import '../modules/tukarsampah/tukarsampah_view.dart';
+import '../modules/ubah_alamat/ubah_alamat_binding.dart';
+import '../modules/ubah_alamat/ubah_alamat_view.dart';
 import '../modules/waiting/waiting_binding.dart';
 import '../modules/waiting/waiting_view.dart';
 import '../modules/welcome/welcome_binding.dart';
 import '../modules/welcome/welcome_view.dart';
+
+// ignore_for_file: prefer_const_constructors
 
 part 'app_routes.dart';
 
@@ -165,6 +169,16 @@ class AppPages {
       name: _Paths.PENUKARAN,
       page: () => PenukaranView(),
       binding: PenukaranBinding(),
+    ),
+    GetPage(
+      name: _Paths.AKUN_TERVERIFIKASI,
+      page: () => const AkunTerverifikasiView(),
+      binding: AkunTerverifikasiBinding(),
+    ),
+    GetPage(
+      name: _Paths.REPORT,
+      page: () => ReportView(),
+      binding: ReportBinding(),
     ),
   ];
 }

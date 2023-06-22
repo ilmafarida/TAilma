@@ -225,6 +225,15 @@ class PesananView extends GetView<PesananController> {
                       await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).collection('pesanan').doc('${controller.dataDetail!['uid']}').update({
                         'status': tab == 1 ? '2' : '5',
                       });
+                      if (tab == 2) {
+                        if (controller.dataDetail!['metode'] == 'Poin') {
+                          DocumentSnapshot<Map<String, dynamic>> getUser = await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).get();
+                          Map<String, dynamic> dataUser = getUser.data()!;
+                          int hasilKurang = int.parse(dataUser['poin']) - int.parse(controller.dataDetail!['total_poin']);
+                          print(hasilKurang);
+                          await controller.firestore.collection('user').doc(dataUser['uid']).update({'poin': '$hasilKurang'});
+                        }
+                      }
                       controller.setViewMode(PesananUserMode.LIST);
                       Utils.showNotif(TypeNotif.SUKSES, tab == 1 ? 'Berhasil diterima' : 'Pesanan diproses');
                     },
@@ -558,7 +567,7 @@ class PesananView extends GetView<PesananController> {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         }
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
         if (snapshot.data!.docs.isEmpty) {
@@ -574,7 +583,7 @@ class PesananView extends GetView<PesananController> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot userDoc = snapshot.data!.docs[index];
               return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').snapshots(),
+                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').orderBy('tanggal',descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
                   // print(tabNumber);
                   if (orderSnapshot.hasError) {

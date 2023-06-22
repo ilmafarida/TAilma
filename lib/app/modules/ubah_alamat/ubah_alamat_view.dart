@@ -125,7 +125,7 @@ class UbahAlamatView extends GetView<UbahAlamatController> {
       value: controller.alamatC.value,
       hintText: 'Alamat',
       onTap: () async {
-        var res = await Get.to(() => DisplayMaps(isAdmin: false));
+        var res = await Get.to(() => DisplayMaps());
         if (res != null) {
           print(res);
           controller.alamatC.value = res['alamat'];

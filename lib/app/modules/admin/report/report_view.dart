@@ -19,61 +19,118 @@ class ReportView extends GetView<ReportController> {
     return Material(
       child: Obx(() {
         if (controller.riwayatUserMode.value == ReportUserMode.LIST) {
-          return DefaultTabController(
-            length: 3,
-            initialIndex: 0,
-            child: Scaffold(
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              title: Text(
+                'Report',
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
+              ),
+              centerTitle: true,
+              elevation: 0,
               backgroundColor: Colors.white,
-              appBar: AppBar(
-                title: Text(
-                  'Report',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
-                ),
-                centerTitle: true,
-                elevation: 0,
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                leading: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => Get.back(),
-                    child: Icon(Icons.arrow_back_ios_outlined),
-                  ),
-                ),
-                bottom: PreferredSize(
-                  preferredSize: Size(double.infinity, 60),
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Color.fromRGBO(86, 159, 0, 0.3),
-                    ),
-                    child: TabBar(
-                      automaticIndicatorColorAdjustment: true,
-                      dividerColor: Color(ListColor.colorButtonGreen),
-                      labelColor: Colors.black,
-                      indicator: BoxDecoration(
-                        color: Colors.green.shade400,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      labelPadding: EdgeInsets.zero,
-                      onTap: (value) => controller.tabC.value = value + 1,
-                      tabs: [
-                        _tabContent('Antrian'),
-                        _tabContent('Proses'),
-                        _tabContent('Selesai'),
-                      ],
-                    ),
-                  ),
+              foregroundColor: Colors.black,
+              leading: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Get.back(),
+                  child: Icon(Icons.arrow_back_ios_outlined),
                 ),
               ),
-              body: TabBarView(
-                children: [
-                  buildTabContent(1),
-                  buildTabContent(3),
-                  buildTabContent(5),
-                ],
+            ),
+            body: SingleChildScrollView(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('user').snapshots(),
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.data!.docs.isEmpty) {
+                    // Tidak ada dokumen "pesanan" yang ditemukan
+                    return SizedBox.shrink();
+                  }
+
+                  return Padding(
+                    padding: EdgeInsets.all(10),
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        DocumentSnapshot userDoc = snapshot.data!.docs[index];
+                        return StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').snapshots(),
+                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
+                            // print(tabNumber);
+                            if (orderSnapshot.hasError) {
+                              return Text('Error: ${orderSnapshot.error}');
+                            }
+                            if (orderSnapshot.connectionState == ConnectionState.waiting) {
+                              // return Center(child: CircularProgressIndicator());
+                              return SizedBox();
+                            }
+                            if (orderSnapshot.data!.docs.isEmpty) {
+                              // Tidak ada dokumen "pesanan" yang ditemukan
+                              return SizedBox.shrink();
+                            }
+                            // Proses data pesanan yang ditemukan dengan status 1
+                            return ListView.builder(
+                              itemCount: orderSnapshot.data!.docs.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot orderDoc = orderSnapshot.data!.docs[index];
+                                // print('ORDER:${orderDoc.id}');
+                                Map? data = orderDoc.data() as Map?;
+                                // Lakukan apa pun yang ingin Anda lakukan dengan pesanan yang memiliki status '[]
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 16),
+                                  child: Material(
+                                    elevation: 1,
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: InkWell(
+                                      onTap: () {
+                                        controller.dataDetail = data as Map<String, dynamic>;
+                                        controller.dataIndexEdit.value = userDoc.id;
+                                        controller.setViewMode(ReportUserMode.PAYMENT);
+                                        controller.dataDetail!.addAll({'nama': '${(userDoc.data() as Map<String, dynamic>)['fullname']}'});
+                                      },
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              data!['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
+                                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(
+                                              'Total harga : ${data['total_harga']} / ${data['total_poin']} poin',
+                                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           );
@@ -549,101 +606,6 @@ class ReportView extends GetView<ReportController> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget buildTabContent(int tabNumber) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('user').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.data!.docs.isEmpty) {
-          // Tidak ada dokumen "pesanan" yang ditemukan
-          return SizedBox.shrink();
-        }
-
-        return Padding(
-          padding: EdgeInsets.all(10),
-          child: ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            shrinkWrap: true,
-            itemBuilder: (BuildContext context, int index) {
-              DocumentSnapshot userDoc = snapshot.data!.docs[index];
-              return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
-                  // print(tabNumber);
-                  if (orderSnapshot.hasError) {
-                    return Text('Error: ${orderSnapshot.error}');
-                  }
-                  if (orderSnapshot.connectionState == ConnectionState.waiting) {
-                    // return Center(child: CircularProgressIndicator());
-                    return SizedBox();
-                  }
-                  if (orderSnapshot.data!.docs.isEmpty) {
-                    // Tidak ada dokumen "pesanan" yang ditemukan
-                    return SizedBox.shrink();
-                  }
-                  // Proses data pesanan yang ditemukan dengan status 1
-                  return ListView.builder(
-                    itemCount: orderSnapshot.data!.docs.length,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot orderDoc = orderSnapshot.data!.docs[index];
-                      // print('ORDER:${orderDoc.id}');
-                      Map? data = orderDoc.data() as Map?;
-                      // Lakukan apa pun yang ingin Anda lakukan dengan pesanan yang memiliki status '[]
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 16),
-                        child: Material(
-                          elevation: 1,
-                          borderRadius: BorderRadius.circular(10),
-                          child: InkWell(
-                            onTap: () {
-                              controller.dataDetail = data as Map<String, dynamic>;
-                              controller.dataIndexEdit.value = userDoc.id;
-                              controller.setViewMode(ReportUserMode.PAYMENT);
-                              controller.dataDetail!.addAll({'nama': '${(userDoc.data() as Map<String, dynamic>)['fullname']}'});
-                            },
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data!['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
-                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    'Total harga : ${data['total_harga']} / ${data['total_poin']} poin',
-                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          ),
-        );
-      },
     );
   }
 

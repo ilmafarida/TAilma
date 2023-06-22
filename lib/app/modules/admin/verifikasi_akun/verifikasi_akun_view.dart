@@ -14,6 +14,26 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text('Verifikasi Akun'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        leading: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              print('::: ${controller.viewMode.value}');
+              if (controller.viewMode.value == ViewMode.VIEW) {
+                Get.back();
+              }
+              controller.setViewMode(ViewMode.VIEW);
+            },
+            child: Icon(Icons.arrow_back_ios_outlined),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -22,13 +42,13 @@ class VerifikasiAkunView extends GetView<VerifikasiAkunController> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomBackButton(onTap: () {
-                  print('::: ${controller.viewMode.value}');
-                  if (controller.viewMode.value == ViewMode.VIEW) {
-                    Get.back();
-                  }
-                  controller.setViewMode(ViewMode.VIEW);
-                }),
+                // CustomBackButton(onTap: () {
+                //   print('::: ${controller.viewMode.value}');
+                //   if (controller.viewMode.value == ViewMode.VIEW) {
+                //     Get.back();
+                //   }
+                //   controller.setViewMode(ViewMode.VIEW);
+                // }),
                 SizedBox(height: 20),
                 if (controller.viewMode.value == ViewMode.VIEW) ...[
                   Expanded(
