@@ -6,20 +6,24 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
-import 'package:rumah_sampah_t_a/app/utils/utils.dart';
-import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
+
+import '../utils/list_color.dart';
+import 'custom_submit_button.dart';
 
 class DisplayMaps extends StatefulWidget {
   double? latitude;
   double? longitude;
-  bool isAdmin;
+  final bool isAdmin;
+  String alamat;
+  Timer? timer;
 
   DisplayMaps({
     this.latitude,
     this.longitude,
     this.isAdmin = false,
+    this.alamat = "",
+    this.timer,
   });
 
   @override
@@ -27,67 +31,51 @@ class DisplayMaps extends StatefulWidget {
 }
 
 class _DisplayMapsState extends State<DisplayMaps> {
-  String alamat = "";
-  double? latitude;
-  double? longitude;
-  Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      if (widget.latitude != null && widget.longitude != null) {
-        latitude = widget.latitude!;
-        longitude = widget.longitude!;
-      } else {
-        await getPositionUser();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  Future getPositionUser() async {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {});
-    latitude = position.latitude;
-    longitude = position.longitude;
-  }
-
   @override
   Widget build(BuildContext context) {
+    if (widget.latitude == null || widget.longitude == null) {
+      getCurrentLocation().then(
+        (Position value) {
+          setState(() {});
+          print(value);
+
+          widget.latitude = value.latitude;
+          widget.longitude = value.longitude;
+        },
+      );
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Material(
       child: Stack(
         children: [
           FlutterMap(
             options: MapOptions(
               keepAlive: true,
-              center: LatLng(latitude!, longitude!),
+              center: LatLng(widget.latitude!, widget.longitude!),
               zoom: 17.0,
               maxZoom: 18.0,
+              onMapReady: () async {
+                List<Placemark> placemarks = await placemarkFromCoordinates(widget.latitude!, widget.longitude!);
+                setState(() {});
+                widget.alamat = placemarks.first.street!;
+                print('Latitude: ${widget.latitude}');
+                print('Longitude: ${widget.longitude}');
+                print('Address: ${widget.alamat}');
+              },
               onPositionChanged: (position, hasGesture) {
                 if (!widget.isAdmin) {
                   if (hasGesture) {
-                    timer?.cancel();
-                    timer = Timer(Duration(milliseconds: 1000), () async {
-                      latitude = position.center!.latitude;
-                      longitude = position.center!.longitude;
-                      // Dapatkan alamat berdasarkan lat-long
-                      List<Placemark> placemarks = await placemarkFromCoordinates(latitude!, longitude!);
+                    widget.timer?.cancel();
+                    widget.timer = Timer(Duration(milliseconds: 1000), () async {
+                      widget.latitude = position.center!.latitude;
+                      widget.longitude = position.center!.longitude;
+                      List<Placemark> placemarks = await placemarkFromCoordinates(widget.latitude!, widget.longitude!);
                       setState(() {});
-                      // print(placemarks);
-                      alamat = placemarks.first.street!;
-                      // Jika alamat tidak tersedia, Anda dapat menggunakan komponen lain seperti `locality`, `postalCode`, dll.
-                      // Gunakan latitude, longitude, dan alamat yang didapat sesuai kebutuhan Anda
-                      print('Latitude: $latitude');
-                      print('Longitude: $longitude');
-                      print('Address: $alamat');
+                      widget.alamat = placemarks.first.street!;
+                      print('Latitude: ${widget.latitude}');
+                      print('Longitude: ${widget.longitude}');
+                      print('Address: ${widget.alamat}');
                     });
                   }
                 }
@@ -102,7 +90,7 @@ class _DisplayMapsState extends State<DisplayMaps> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                        point: LatLng(latitude!, longitude!),
+                        point: LatLng(widget.latitude!, widget.longitude!),
                         builder: (context) {
                           return Icon(
                             Icons.location_on_rounded,
@@ -144,7 +132,7 @@ class _DisplayMapsState extends State<DisplayMaps> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          alamat,
+                          widget.alamat,
                           style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                         ),
                       ),
@@ -156,9 +144,9 @@ class _DisplayMapsState extends State<DisplayMaps> {
                         onTap: () async {
                           Get.back(
                             result: {
-                              'alamat': alamat,
-                              'lat': latitude,
-                              'long': longitude,
+                              'alamat': widget.alamat,
+                              'lat': widget.latitude,
+                              'long': widget.longitude,
                             },
                           );
                         },

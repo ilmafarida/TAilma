@@ -25,6 +25,7 @@ abstract class Routes {
   static const PESANAN = _Paths.PESANAN;
   static const PENUKARAN = _Paths.PENUKARAN;
   static const AKUN_TERVERIFIKASI = _Paths.AKUN_TERVERIFIKASI;
+  static const REPORT = _Paths.REPORT;
 }
 
 abstract class _Paths {
@@ -51,4 +52,5 @@ abstract class _Paths {
   static const PESANAN = '/pesanan';
   static const PENUKARAN = '/penukaran';
   static const AKUN_TERVERIFIKASI = '/akun-terverifikasi';
+  static const REPORT = '/report';
 }

@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/report/report_binding.dart';
+import 'package:rumah_sampah_t_a/app/modules/admin/report/report_view.dart';
 
 import '../modules/admin/penukaran/penukaran_binding.dart';
 import '../modules/admin/penukaran/penukaran_view.dart';
@@ -172,6 +174,11 @@ class AppPages {
       name: _Paths.AKUN_TERVERIFIKASI,
       page: () => const AkunTerverifikasiView(),
       binding: AkunTerverifikasiBinding(),
+    ),
+    GetPage(
+      name: _Paths.REPORT,
+      page: () => ReportView(),
+      binding: ReportBinding(),
     ),
   ];
 }

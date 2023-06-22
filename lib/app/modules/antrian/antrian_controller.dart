@@ -118,7 +118,7 @@ class AntrianController extends GetxController {
   }
 
   void getLatLong() async {
-    var res = await Get.to(() => DisplayMaps(isAdmin: false));
+    var res = await Get.to(() => DisplayMaps());
     if (res != null) {
       latLong.value = LatLng(res['lat'], res['long']);
       alamatC.value.text = res['alamat'];

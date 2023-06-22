@@ -38,7 +38,7 @@ class DashboardView extends GetView<DashboardController> {
                   _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH)),
                   _button(text: 'Pesanan', onTap: () => Get.toNamed(Routes.PESANAN), isWithNotif: true, notifCount: controller.jumlahPesanan.value),
                   _button(text: 'Penukaran Sampah', onTap: () => Get.toNamed(Routes.PENUKARAN), isWithNotif: true, notifCount: controller.jumlahPenukaran.value),
-                  _button(text: 'Report', onTap: () => Get.toNamed(Routes.PENUKARAN)),
+                  _button(text: 'Report', onTap: () => Get.toNamed(Routes.REPORT)),
                 ],
               );
             }),
@@ -217,12 +217,12 @@ class DashboardView extends GetView<DashboardController> {
               fontSize: 20,
             ),
           ),
-          Spacer(),
-          IconButton(
-            onPressed: () => authC.logout(),
-            // onPressed: () => authC.logout(),
-            icon: Icon(Icons.logout),
-          ),
+          // Spacer(),
+          // IconButton(
+          //   onPressed: () => authC.logout(),
+          //   // onPressed: () => authC.logout(),
+          //   icon: Icon(Icons.logout),
+          // ),
         ],
       ),
     );

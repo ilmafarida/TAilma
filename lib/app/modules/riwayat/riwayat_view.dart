@@ -335,6 +335,15 @@ class RiwayatView extends GetView<RiwayatController> {
         if (value != null) {
           controller.metode.value = value.toString();
           if (value == "Poin") {
+            if (controller.authC.userData.poin == "" || controller.authC.userData.poin == '0') {
+              ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+                content: Text("Poin tidak cukup. Poin kamu : ${controller.authC.userData.poin != '' ? controller.authC.userData.poin : "0"}"),
+                backgroundColor: Colors.red,
+                showCloseIcon: true,
+              ));
+              controller.metode.value = "";
+              return;
+            }
             if (int.parse(controller.dataDetail!['total_poin']) > int.parse(controller.authC.userData.poin!)) {
               ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
                 content: Text("Poin tidak cukup. Poin kamu : ${controller.authC.userData.poin}"),
@@ -342,6 +351,7 @@ class RiwayatView extends GetView<RiwayatController> {
                 showCloseIcon: true,
               ));
               controller.metode.value = "";
+              return;
             }
           } else if (value == "Transfer") {
           } else {}
