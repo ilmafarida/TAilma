@@ -156,20 +156,20 @@ class AntrianView extends GetView<AntrianController> {
                                   children: [
                                     Text('Metode Penukaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
                                     _radioButtonContent(title: controller.listMetodePembayaran[0]),
-                                    _radioButtonContent(title: controller.listMetodePembayaran[1]),
+                                    // _radioButtonContent(title: controller.listMetodePembayaran[1]),
                                   ],
                                 ),
                               ),
-                              Obx(() {
-                                if (controller.metode.value == "Tukar dengan Produk") {
-                                  controller.sisaTemp.value = int.parse(controller.dataTotalPoin.value);
-                                  return Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: _tukarPoinDengan(documents),
-                                  );
-                                }
-                                return SizedBox.shrink();
-                              }),
+                              // Obx(() {
+                              //   if (controller.metode.value == "Tukar dengan Produk") {
+                              //     controller.sisaTemp.value = int.parse(controller.dataTotalPoin.value);
+                              //     return Align(
+                              //       alignment: Alignment.centerLeft,
+                              //       child: _tukarPoinDengan(documents),
+                              //     );
+                              //   }
+                              //   return SizedBox.shrink();
+                              // }),
                               Padding(
                                 padding: EdgeInsets.only(top: 8.0),
                                 child: CustomSubmitButton(
@@ -179,9 +179,10 @@ class AntrianView extends GetView<AntrianController> {
                                       Utils.showNotif(TypeNotif.ERROR, 'Data harus diisi');
                                       return;
                                     } else {
-                                      await controller.submitPesanan(dataJson);
-                                      Get.offNamed(Routes.RIWAYAT);
-                                      Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
+                                      await controller.submitPesanan(dataJson).then((value) {
+                                        Get.offNamed(Routes.RIWAYAT);
+                                        Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
+                                      });
                                     }
                                   },
                                   text: 'Selesai',
@@ -293,10 +294,10 @@ class AntrianView extends GetView<AntrianController> {
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
           print('data asli${documents.length}');
 
-          print('POIN  :${controller.authC.userData.poin}');
+          print('POIN  :${controller.dataTotalPoin.value}');
           var indexTrue = documents.where((element) {
             print('PER POIN : ${element['poin']}');
-            return int.parse(element['poin']) <= int.parse(controller.authC.userData.poin!);
+            return int.parse(element['poin']) <= int.parse(controller.dataTotalPoin.value);
           }).toList();
           print('data FILTER${indexTrue.length}');
           // controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);

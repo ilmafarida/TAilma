@@ -217,12 +217,12 @@ class DashboardView extends GetView<DashboardController> {
               fontSize: 20,
             ),
           ),
-          // Spacer(),
-          // IconButton(
-          //   onPressed: () => authC.logout(),
-          //   // onPressed: () => authC.logout(),
-          //   icon: Icon(Icons.logout),
-          // ),
+          Spacer(),
+          IconButton(
+            onPressed: () => authC.logout(),
+            // onPressed: () => authC.logout(),
+            icon: Icon(Icons.logout),
+          ),
         ],
       ),
     );

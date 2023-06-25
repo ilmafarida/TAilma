@@ -158,18 +158,16 @@ class PenukaranView extends GetView<PenukaranController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (tab == 2 || tab == 3) ...[
-                Text(
-                  controller.dataDetail!['jenis'] == 'beli' ? 'Metode Pembayaran' : 'Metode Penukaran',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  '${controller.dataDetail!['metode']}',
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-              ],
+              Text(
+                controller.dataDetail!['jenis'] == 'beli' ? 'Metode Pembayaran' : 'Metode Penukaran',
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+              ),
+              SizedBox(height: 4),
+              Text(
+                '${controller.dataDetail!['metode']}',
+                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
               if (controller.dataDetail!['metode'] == 'Tukar dengan Produk')
                 Column(
                   children: [
@@ -286,7 +284,7 @@ class PenukaranView extends GetView<PenukaranController> {
                         if (controller.dataDetail!['metode'] == 'Poin') {
                           DocumentSnapshot<Map<String, dynamic>> getUser = await controller.firestore.collection('user').doc(controller.dataIndexEdit.value).get();
                           Map<String, dynamic> dataUser = getUser.data()!;
-                          int hasiltambah = int.parse(dataUser['poin']) - int.parse(controller.dataDetail!['total_poin']);
+                          int hasiltambah = int.parse(dataUser['poin']) + int.parse(controller.dataDetail!['total_poin']);
                           print(hasiltambah);
                           await controller.firestore.collection('user').doc(dataUser['uid']).update({'poin': '$hasiltambah'});
                         }
