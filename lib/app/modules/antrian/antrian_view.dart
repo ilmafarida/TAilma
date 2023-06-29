@@ -43,7 +43,9 @@ class AntrianView extends GetView<AntrianController> {
               width: double.infinity,
               child: StreamBuilder(
                   stream: controller.fetchData(),
-                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?>
+                          snapshot) {
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     }
@@ -55,7 +57,8 @@ class AntrianView extends GetView<AntrianController> {
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                       return Center(child: Text('Belum ada data'));
                     }
-                    final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                    final List<DocumentSnapshot> documents =
+                        snapshot.data!.docs;
                     int kaliPoin = 0;
                     for (var element in documents) {
                       int jumlah = int.parse(element['jumlah']);
@@ -80,7 +83,8 @@ class AntrianView extends GetView<AntrianController> {
                           child: CustomSubmitButton(
                             onTap: () {
                               controller.setViewMode(AntrianUserMode.PAYMENT);
-                              controller.noHpC.text = controller.authC.userData.nohp.toString();
+                              controller.noHpC.text =
+                                  controller.authC.userData.nohp.toString();
                             },
                             text: 'Tukar',
                             width: 126,
@@ -121,30 +125,57 @@ class AntrianView extends GetView<AntrianController> {
                   children: [
                     StreamBuilder(
                         stream: controller.fetchData(),
-                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?>
+                                snapshot) {
                           if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           }
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
                           }
-                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
                             return Center(child: Text('Belum ada data'));
                           }
-                          final List<DocumentSnapshot<Map<String, dynamic>>> documents = snapshot.data!.docs;
-                          var dataJson = documents.map((snapshot) => snapshot.data()).toList();
+                          final List<DocumentSnapshot<Map<String, dynamic>>>
+                              documents = snapshot.data!.docs;
+                          var dataJson = documents
+                              .map((snapshot) => snapshot.data())
+                              .toList();
                           return Column(
                             children: [
                               SizedBox(height: 30),
-                              CustomTextField(controller: controller.noHpC, hintText: 'Masukkan No Hp *'),
-                              Obx(() => CustomTextField(icon: GestureDetector(onTap: () => controller.getLatLong(), child: Icon(Icons.location_on_rounded, color: Colors.black)), hintText: 'Masukkan Alamat *', title: 'Alamat', controller: controller.alamatC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.calendar_month), onTap: () => controller.showDatePicker(), title: 'Tanggal pengiriman *', value: controller.tanggalC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu *', value: controller.waktuC.value)),
-                              CustomTextField(hintText: 'Informasi *', controller: controller.informasiC),
+                              CustomTextField(
+                                  controller: controller.noHpC,
+                                  hintText: 'Masukkan No Hp *'),
+                              Obx(() => CustomTextField(
+                                  icon: GestureDetector(
+                                      onTap: () => controller.getLatLong(),
+                                      child: Icon(Icons.location_on_rounded,
+                                          color: Colors.black)),
+                                  hintText: 'Masukkan Alamat *',
+                                  title: 'Alamat',
+                                  controller: controller.alamatC.value)),
+                              Obx(() => CustomTextField(
+                                  icon: Icon(Icons.calendar_month),
+                                  onTap: () => controller.showDatePicker(),
+                                  title: 'Tanggal pengambilan *',
+                                  value: controller.tanggalC.value)),
+                              Obx(() => CustomTextField(
+                                  icon: Icon(Icons.alarm),
+                                  onTap: () => controller.showWaktuPicker(),
+                                  title: 'Waktu pengambilan *',
+                                  value: controller.waktuC.value)),
+                              CustomTextField(
+                                  hintText: 'Informasi *',
+                                  controller: controller.informasiC),
                               _uploadKTP(context),
                               _detailProduct(documents),
                               Container(
-                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   color: Color.fromRGBO(86, 159, 0, 0.3),
@@ -154,8 +185,12 @@ class AntrianView extends GetView<AntrianController> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Metode Penukaran', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
-                                    _radioButtonContent(title: controller.listMetodePembayaran[0]),
+                                    Text('Metode Penukaran',
+                                        style: ListTextStyle.textStyleBlackW700
+                                            .copyWith(fontSize: 16)),
+                                    _radioButtonContent(
+                                        title:
+                                            controller.listMetodePembayaran[0]),
                                     // _radioButtonContent(title: controller.listMetodePembayaran[1]),
                                   ],
                                 ),
@@ -175,13 +210,23 @@ class AntrianView extends GetView<AntrianController> {
                                 child: CustomSubmitButton(
                                   onTap: () async {
                                     // print(':::  ${controller.dataIndexEdit.value}');
-                                    if (controller.noHpC.text.isEmpty || controller.alamatC.value.text.isEmpty || controller.tanggalC.value == "" || controller.waktuC.value == "" || controller.informasiC.value.text.isEmpty || controller.fileSampah.value == null) {
-                                      Utils.showNotif(TypeNotif.ERROR, 'Data harus diisi');
+                                    if (controller.noHpC.text.isEmpty ||
+                                        controller.alamatC.value.text.isEmpty ||
+                                        controller.tanggalC.value == "" ||
+                                        controller.waktuC.value == "" ||
+                                        controller
+                                            .informasiC.value.text.isEmpty ||
+                                        controller.fileSampah.value == null) {
+                                      Utils.showNotif(
+                                          TypeNotif.ERROR, 'Data harus diisi');
                                       return;
                                     } else {
-                                      await controller.submitPesanan(dataJson).then((value) {
+                                      await controller
+                                          .submitPesanan(dataJson)
+                                          .then((value) {
                                         Get.offNamed(Routes.RIWAYAT);
-                                        Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
+                                        Utils.showNotif(TypeNotif.SUKSES,
+                                            'Penukaran berhasil dikirim');
                                       });
                                     }
                                   },
@@ -233,13 +278,17 @@ class AntrianView extends GetView<AntrianController> {
                         Row(
                           children: [
                             Text(
-                              documents[i]['jenis'] + "  |  " + documents[i]['jumlah'],
-                              style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                              documents[i]['jenis'] +
+                                  "  |  " +
+                                  documents[i]['jumlah'],
+                              style: ListTextStyle.textStyleBlack
+                                  .copyWith(fontSize: 14),
                             ),
                             Spacer(),
                             Text(
                               '${documents[i]['poin']}',
-                              style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                              style: ListTextStyle.textStyleBlack
+                                  .copyWith(fontSize: 14),
                             ),
                           ],
                         ),
@@ -252,13 +301,15 @@ class AntrianView extends GetView<AntrianController> {
                   children: [
                     Text(
                       'Total poin :',
-                      style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                      style: ListTextStyle.textStyleBlackW700
+                          .copyWith(fontSize: 16),
                     ),
                     Spacer(),
                     Text.rich(
                       TextSpan(
                         text: controller.dataTotalPoin.value,
-                        style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                        style: ListTextStyle.textStyleGreenW500.copyWith(
+                            fontWeight: FontWeight.w400, fontSize: 14),
                         children: [
                           TextSpan(
                             text: ' poin',
@@ -279,7 +330,8 @@ class AntrianView extends GetView<AntrianController> {
   Widget _tukarPoinDengan(List<DocumentSnapshot<Object?>> documents) {
     return StreamBuilder(
         stream: controller.fetchDataProduk(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+        builder: (BuildContext context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }
@@ -297,7 +349,8 @@ class AntrianView extends GetView<AntrianController> {
           print('POIN  :${controller.dataTotalPoin.value}');
           var indexTrue = documents.where((element) {
             print('PER POIN : ${element['poin']}');
-            return int.parse(element['poin']) <= int.parse(controller.dataTotalPoin.value);
+            return int.parse(element['poin']) <=
+                int.parse(controller.dataTotalPoin.value);
           }).toList();
           print('data FILTER${indexTrue.length}');
           // controller.textEditingC.value = List<int>.filled(indexTrue.length, 0, growable: true);
@@ -306,10 +359,12 @@ class AntrianView extends GetView<AntrianController> {
           for (var documentSnapshot in indexTrue) {
             // Periksa apakah data ada sebelumnya atau belum
             if (documentSnapshot.data() != null) {
-              Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+              Map<String, dynamic>? data =
+                  documentSnapshot.data() as Map<String, dynamic>?;
 
               if (data != null) {
-                data['jumlah'] = 0.obs; // Isi dengan nilai yang sesuai untuk 'jumlah'
+                data['jumlah'] =
+                    0.obs; // Isi dengan nilai yang sesuai untuk 'jumlah'
                 dataList.add(data);
               }
             } else {
@@ -350,22 +405,26 @@ class AntrianView extends GetView<AntrianController> {
                                 Row(
                                   children: [
                                     Text(
-                                      dataList[index]['nama'] + " (${dataList[index]['poin']})",
+                                      dataList[index]['nama'] +
+                                          " (${dataList[index]['poin']})",
                                       maxLines: 2,
-                                      style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14),
+                                      style: ListTextStyle.textStyleBlack
+                                          .copyWith(fontSize: 14),
                                     ),
                                     Spacer(),
                                     Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
                                         // color: dataList == index ? Color(ListColor.colorButtonGreen) : Colors.grey.shade600,
-                                        color: Color(ListColor.colorButtonGreen),
+                                        color:
+                                            Color(ListColor.colorButtonGreen),
                                       ),
                                       child: Row(
                                         children: [
                                           InkWell(
                                             onTap: () {
-                                              controller.kurangiItem(dataList[index], 1);
+                                              controller.kurangiItem(
+                                                  dataList[index], 1);
                                               print(dataList[index]);
 
                                               // num totalPoin = 0;
@@ -407,14 +466,19 @@ class AntrianView extends GetView<AntrianController> {
                                               ),
                                             ),
                                           ),
-                                          Obx(() => Text('${dataList[index]['jumlah'].value}', style: TextStyle(color: Colors.white))),
+                                          Obx(() => Text(
+                                              '${dataList[index]['jumlah'].value}',
+                                              style: TextStyle(
+                                                  color: Colors.white))),
                                           InkWell(
                                             onTap: () {
                                               // num totalPoin = 0;
-                                              if (controller.sisaPoin.value == 0) {
+                                              if (controller.sisaPoin.value ==
+                                                  0) {
                                                 return;
                                               }
-                                              controller.tambahItem(dataList[index], 1);
+                                              controller.tambahItem(
+                                                  dataList[index], 1);
                                               // print(dataList[index]);
                                               // if (totalPoin <= controller.sisaPoin.value) {
                                               //   // int.parse(dataList[index]['jumlah']) + 1;
@@ -453,7 +517,8 @@ class AntrianView extends GetView<AntrianController> {
 
                                               // print('SISAPOIN :${controller.sisaPoin.value}');
                                             },
-                                            child: Icon(Icons.add, color: Colors.white),
+                                            child: Icon(Icons.add,
+                                                color: Colors.white),
                                           ),
                                         ],
                                       ),
@@ -469,10 +534,13 @@ class AntrianView extends GetView<AntrianController> {
                       Obx(() {
                         return Row(
                           children: [
-                            Text('Sisa poin : ', style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16)),
+                            Text('Sisa poin : ',
+                                style: ListTextStyle.textStyleBlackW700
+                                    .copyWith(fontSize: 16)),
                             Text(
                               '${controller.sisaPoin.value}',
-                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 16),
+                              style: ListTextStyle.textStyleBlackW700
+                                  .copyWith(fontSize: 16),
                             ),
                           ],
                         );
@@ -490,7 +558,9 @@ class AntrianView extends GetView<AntrianController> {
     return Align(
       alignment: Alignment.center,
       child: InkWell(
-        onTap: () => controller.fileSampah.value == null ? controller.showUpload(context) : controller.previewFile(context),
+        onTap: () => controller.fileSampah.value == null
+            ? controller.showUpload(context)
+            : controller.previewFile(context),
         child: Obx(() {
           return controller.fileSampah.value != null
               ? Column(
@@ -545,7 +615,9 @@ class AntrianView extends GetView<AntrianController> {
                       Text(
                         'Upload Foto Sampahmu',
                         style: TextStyle(
-                          color: controller.fileSampah.value != null ? Colors.white : Color(ListColor.colorTextGray),
+                          color: controller.fileSampah.value != null
+                              ? Colors.white
+                              : Color(ListColor.colorTextGray),
                           fontFamily: 'Urbanist',
                           fontSize: 15,
                         ),
@@ -561,7 +633,8 @@ class AntrianView extends GetView<AntrianController> {
   Widget _totalHarga() {
     return Container(
       margin: EdgeInsets.only(top: 50),
-      decoration: BoxDecoration(color: Color(0xFFD9D9D9), borderRadius: BorderRadius.circular(30)),
+      decoration: BoxDecoration(
+          color: Color(0xFFD9D9D9), borderRadius: BorderRadius.circular(30)),
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       // height: 43,
       width: double.infinity,
@@ -576,7 +649,8 @@ class AntrianView extends GetView<AntrianController> {
           Text.rich(
             TextSpan(
               text: controller.dataTotalPoin.value,
-              style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+              style: ListTextStyle.textStyleGreenW500
+                  .copyWith(fontWeight: FontWeight.w400, fontSize: 14),
               children: [
                 TextSpan(
                   text: ' poin',
@@ -604,12 +678,14 @@ class AntrianView extends GetView<AntrianController> {
                 Text(
                   '${data[i]['jenis']}',
                   maxLines: 2,
-                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+                  style: ListTextStyle.textStyleBlackW700
+                      .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 13),
                 Text(
                   '${data[i]['poin']}' ' poin',
-                  style: ListTextStyle.textStyleGreenW500.copyWith(fontWeight: FontWeight.w400, fontSize: 14),
+                  style: ListTextStyle.textStyleGreenW500
+                      .copyWith(fontWeight: FontWeight.w400, fontSize: 14),
                 ),
               ],
             ),
@@ -650,12 +726,19 @@ class AntrianView extends GetView<AntrianController> {
                         InkWell(
                             borderRadius: BorderRadius.circular(20),
                             onTap: () {
-                              if (data[i]['jumlah'] == '1' || data[i]['jumlah'] == '0') {
+                              if (data[i]['jumlah'] == '1' ||
+                                  data[i]['jumlah'] == '0') {
                                 return;
                               } else {
-                                controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('antrian').doc(data[i]['uid']).update(
+                                controller.firestore
+                                    .collection('user')
+                                    .doc(controller.authC.currentUser!.uid)
+                                    .collection('antrian')
+                                    .doc(data[i]['uid'])
+                                    .update(
                                   {
-                                    'jumlah': (int.parse(data[i]['jumlah']) - 1).toString(),
+                                    'jumlah': (int.parse(data[i]['jumlah']) - 1)
+                                        .toString(),
                                   },
                                 );
                               }
@@ -668,20 +751,31 @@ class AntrianView extends GetView<AntrianController> {
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: controller.dataDetail.value == 1 ? Colors.grey : Colors.white,
+                                  color: controller.dataDetail.value == 1
+                                      ? Colors.grey
+                                      : Colors.white,
                                 ),
                               ),
                             )),
                         Text(
                           data[i]['jumlah'],
-                          style: ListTextStyle.textStyleBlackW700.copyWith(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white),
+                          style: ListTextStyle.textStyleBlackW700.copyWith(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                              color: Colors.white),
                         ),
                         InkWell(
                           borderRadius: BorderRadius.circular(20),
                           onTap: () {
-                            controller.firestore.collection('user').doc(controller.authC.currentUser!.uid).collection('antrian').doc(data[i]['uid']).update(
+                            controller.firestore
+                                .collection('user')
+                                .doc(controller.authC.currentUser!.uid)
+                                .collection('antrian')
+                                .doc(data[i]['uid'])
+                                .update(
                               {
-                                'jumlah': (int.parse(data[i]['jumlah']) + 1).toString(),
+                                'jumlah': (int.parse(data[i]['jumlah']) + 1)
+                                    .toString(),
                               },
                             );
                           },
@@ -707,7 +801,8 @@ class AntrianView extends GetView<AntrianController> {
     return Obx(() => RadioListTile(
           contentPadding: EdgeInsets.zero,
           dense: true,
-          title: Text(title!, style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
+          title: Text(title!,
+              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14)),
           value: title,
           toggleable: true,
           activeColor: Colors.black,
@@ -725,10 +820,13 @@ class AntrianView extends GetView<AntrianController> {
                 //   ));
                 //   controller.metode.value = "";
                 // }
-                var tambah = int.parse(controller.authC.userData.poin!) + int.parse(controller.dataTotalPoin.value);
-                print('${controller.authC.userData.poin!} + ${controller.dataTotalPoin.value} = $tambah');
+                var tambah = int.parse(controller.authC.userData.poin!) +
+                    int.parse(controller.dataTotalPoin.value);
+                print(
+                    '${controller.authC.userData.poin!} + ${controller.dataTotalPoin.value} = $tambah');
               } else {
-                controller.sisaPoin.value = int.parse(controller.dataTotalPoin.value);
+                controller.sisaPoin.value =
+                    int.parse(controller.dataTotalPoin.value);
               }
             } else {
               controller.metode.value = "";

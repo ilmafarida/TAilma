@@ -224,7 +224,7 @@ class AdminProductView extends GetView<AdminProductController> {
   Widget _field({@required TextEditingController? controller, @required String? hint, bool? isNumber = false, int? maxLinex = 1}) {
     return CustomTextField(
       controller: controller!,
-      hintText: 'Masukkan $hint',
+      hintText: 'Masukkan $hint *',
       isNumber: isNumber,
       maxLines: maxLinex,
     );

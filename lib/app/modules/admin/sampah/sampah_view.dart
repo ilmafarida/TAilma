@@ -18,21 +18,21 @@ class AdminSampahView extends GetView<AdminSampahController> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-        title: Text('Sampah'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        leading: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-                  Get.back();
-                },
-            child: Icon(Icons.arrow_back_ios_outlined),
+          title: Text('Sampah'),
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          leading: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Get.back();
+              },
+              child: Icon(Icons.arrow_back_ios_outlined),
+            ),
           ),
         ),
-      ),
         resizeToAvoidBottomInset: false,
         body: Padding(
           padding: EdgeInsets.all(20),
@@ -66,27 +66,39 @@ class AdminSampahView extends GetView<AdminSampahController> {
                           SizedBox(height: 30),
                           StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
                             stream: controller.fetchData(),
-                            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot<
+                                        QuerySnapshot<Map<String, dynamic>>?>
+                                    snapshot) {
                               if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
                               }
 
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Center(child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: CircularProgressIndicator());
                               }
 
-                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              if (!snapshot.hasData ||
+                                  snapshot.data!.docs.isEmpty) {
                                 return Text('Belum ada data');
                               }
                               // Memproses snapshot dan menampilkan data
-                              final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                              final List<DocumentSnapshot> documents =
+                                  snapshot.data!.docs;
                               return GridView.builder(
                                 shrinkWrap: true,
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2, // Menentukan jumlah kolom dalam grid
-                                  mainAxisSpacing: 8.0, // Jarak antar elemen pada sumbu utama (vertikal)
-                                  crossAxisSpacing: 8.0, // Jarak antar elemen pada sumbu lintang (horizontal)
-                                  childAspectRatio: 1.0, // Perbandingan lebar-tinggi setiap elemen dalam grid
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount:
+                                      2, // Menentukan jumlah kolom dalam grid
+                                  mainAxisSpacing:
+                                      8.0, // Jarak antar elemen pada sumbu utama (vertikal)
+                                  crossAxisSpacing:
+                                      8.0, // Jarak antar elemen pada sumbu lintang (horizontal)
+                                  childAspectRatio:
+                                      1.0, // Perbandingan lebar-tinggi setiap elemen dalam grid
                                 ),
                                 itemCount: documents.length,
                                 itemBuilder: (context, i) {
@@ -96,12 +108,16 @@ class AdminSampahView extends GetView<AdminSampahController> {
                                       borderRadius: BorderRadius.circular(18),
                                       child: InkWell(
                                         customBorder: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
                                         ),
                                         onTap: () {
-                                          controller.dataIndexEdit.value = documents[i]['uid'];
-                                          controller.dataEdit.value = documents[i];
-                                          controller.setViewMode(SampahMode.EDIT);
+                                          controller.dataIndexEdit.value =
+                                              documents[i]['uid'];
+                                          controller.dataEdit.value =
+                                              documents[i];
+                                          controller
+                                              .setViewMode(SampahMode.EDIT);
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(18),
@@ -109,7 +125,9 @@ class AdminSampahView extends GetView<AdminSampahController> {
                                           child: Text(
                                             '${documents[i]['jenis']}',
                                             textAlign: TextAlign.center,
-                                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                            style: ListTextStyle
+                                                .textStyleBlackW700
+                                                .copyWith(fontSize: 18),
                                           ),
                                         ),
                                       ),
@@ -124,19 +142,30 @@ class AdminSampahView extends GetView<AdminSampahController> {
                       ),
                     ),
                   )
-                ] else if (controller.sampahMode.value == SampahMode.CREATE) ...[
+                ] else if (controller.sampahMode.value ==
+                    SampahMode.CREATE) ...[
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          _field(controller: controller.jenisC, hint: 'Jenis Sampah'),
-                          _field(controller: controller.syaratC, hint: 'Syarat', maxLinex: 7),
-                          _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
+                          _field(
+                              controller: controller.jenisC,
+                              hint: 'Jenis Sampah'),
+                          _field(
+                              controller: controller.syaratC,
+                              hint: 'Syarat',
+                              maxLinex: 7),
+                          _field(
+                              controller: controller.poinC,
+                              hint: 'Poin',
+                              isNumber: true),
                           _fieldFoto(),
                           Padding(
                             padding: EdgeInsets.only(top: 40),
                             child: CustomSubmitButton(
-                              onTap: () => controller.prosesSubmit(status: 0, uid: controller.dataIndexEdit.value),
+                              onTap: () => controller.prosesSubmit(
+                                  status: 0,
+                                  uid: controller.dataIndexEdit.value),
                               text: 'Simpan',
                               width: 110,
                             ),
@@ -156,7 +185,8 @@ class AdminSampahView extends GetView<AdminSampahController> {
                               return Text('Error: ${snapshot.error}');
                             }
 
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return Center(child: CircularProgressIndicator());
                             }
 
@@ -164,7 +194,8 @@ class AdminSampahView extends GetView<AdminSampahController> {
                               return Text('Belum ada data');
                             }
                             // Memproses snapshot dan menampilkan data
-                            final documents = snapshot.data!.data() as Map<String, dynamic>;
+                            final documents =
+                                snapshot.data!.data() as Map<String, dynamic>;
                             print('::::::::::::$documents');
                             controller.jenisC.text = documents['jenis'];
                             controller.syaratC.text = documents['syarat'];
@@ -172,26 +203,43 @@ class AdminSampahView extends GetView<AdminSampahController> {
                             if (!controller.isUpload.value) {
                               controller.file.value = File(documents['gambar']);
                             }
-                            print(':::::${controller.dataIndexEdit.value} $documents');
+                            print(
+                                ':::::${controller.dataIndexEdit.value} $documents');
                             return Column(
                               children: [
-                                _field(controller: controller.jenisC, hint: 'Jenis Sampah'),
-                                _field(controller: controller.syaratC, hint: 'Syarat', maxLinex: 7),
-                                _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
+                                _field(
+                                    controller: controller.jenisC,
+                                    hint: 'Jenis Sampah'),
+                                _field(
+                                    controller: controller.syaratC,
+                                    hint: 'Syarat',
+                                    maxLinex: 7),
+                                _field(
+                                    controller: controller.poinC,
+                                    hint: 'Poin',
+                                    isNumber: true),
                                 _fieldFoto(),
                                 Padding(
                                   padding: EdgeInsets.only(top: 40),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       CustomSubmitButton(
-                                        onTap: () => controller.prosesSubmit(status: -1, uid: controller.dataIndexEdit.value),
+                                        onTap: () => controller.prosesSubmit(
+                                            status: -1,
+                                            uid:
+                                                controller.dataIndexEdit.value),
                                         text: 'Hapus',
                                         width: 110,
                                       ),
                                       CustomSubmitButton(
-                                        onTap: () => controller.prosesSubmit(status: 1, uid: controller.dataIndexEdit.value),
+                                        onTap: () => controller.prosesSubmit(
+                                            status: 1,
+                                            uid:
+                                                controller.dataIndexEdit.value),
                                         text: 'Simpan',
                                         width: 110,
                                       )
@@ -216,10 +264,14 @@ class AdminSampahView extends GetView<AdminSampahController> {
   //   return
   // }
 
-  Widget _field({@required TextEditingController? controller, @required String? hint, bool? isNumber = false, int? maxLinex = 1}) {
+  Widget _field(
+      {@required TextEditingController? controller,
+      @required String? hint,
+      bool? isNumber = false,
+      int? maxLinex = 1}) {
     return CustomTextField(
       controller: controller!,
-      hintText: 'Masukkan $hint',
+      hintText: 'Masukkan $hint *',
       isNumber: isNumber,
       maxLines: maxLinex,
     );
@@ -339,7 +391,9 @@ class AdminSampahView extends GetView<AdminSampahController> {
                       Text(
                         'Icon Sampah',
                         style: TextStyle(
-                          color: controller.file.value != null ? Colors.white : Color(ListColor.colorTextGray),
+                          color: controller.file.value != null
+                              ? Colors.white
+                              : Color(ListColor.colorTextGray),
                           fontFamily: 'Urbanist',
                           fontSize: 15,
                         ),

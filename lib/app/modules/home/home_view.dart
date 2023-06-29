@@ -509,7 +509,7 @@ class HomeView extends GetView<HomeController> {
           ),
           RichText(
             text: TextSpan(
-              text: controller.authC.userData.sampah,
+              text: controller.authC.userData.sampah.toString(),
               style: ListTextStyle.textStyleWhite.copyWith(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
