@@ -1,19 +1,12 @@
 import 'dart:developer';
-import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:rumah_sampah_t_a/app/modules/admin/pesanan/pesanan_controller.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/report/report_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
-import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
-import 'package:rumah_sampah_t_a/app/widgets/display_maps.dart';
 
 class ReportView extends GetView<ReportController> {
   @override
@@ -40,8 +33,8 @@ class ReportView extends GetView<ReportController> {
                 ),
               ),
             ),
-            body: Padding(
-              padding: EdgeInsets.only(top: 28.0),
+            body: RefreshIndicator(
+              onRefresh: () => controller.onRefresh(),
               child: Obx(
                 () {
                   if (controller.laporanPesanan.isEmpty) {
@@ -55,13 +48,11 @@ class ReportView extends GetView<ReportController> {
                     itemBuilder: (context, index) {
                       String bulan = controller.laporanPesanan.keys.toList()[index];
                       List<DocumentSnapshot> pesananBulan = controller.laporanPesanan[bulan]!;
-
                       return GestureDetector(
                         onTap: () {
+                          controller.detailPesanan.clear();
+                          controller.detailPesanan.value = pesananBulan;
                           controller.reportUserMode.value = ReportUserMode.DETAIL;
-                          // controller.indexBulanDetail.value = bulan;
-                          // log('$pesananBulan');
-                          controller.detailPesanan = pesananBulan;
                         },
                         child: Container(
                           width: Get.width,
@@ -86,19 +77,6 @@ class ReportView extends GetView<ReportController> {
                               ),
                             ],
                           ),
-
-                          // child: ExpansionTile(
-                          //   title: Text('Bulan: $bulan'),
-                          //   children: pesananBulan.map((pesananDoc) {
-                          //     DateTime tanggal = DateFormat("dd-MM-yyyy").parse((pesananDoc.data() as Map<String, dynamic>)['tanggal']);
-                          //     String formattedDate = controller.formatDate(tanggal);
-
-                          //     return ListTile(
-                          //       title: Text('Tanggal: $formattedDate'),
-                          //       subtitle: Text('ID Pesanan: ${pesananDoc.id}'),
-                          //     );
-                          //   }).toList(),
-                          // ),
                         ),
                       );
                     },
@@ -136,12 +114,65 @@ class ReportView extends GetView<ReportController> {
                 )),
           );
         } else {
-          print(controller.indexDataDetail.value);
-          // if (controller.indexDataDetail.value == 0) {
-          //   for (var element in controller.detailPesanan) {
-              
-          //   }
-          // }
+          String? titleReport;
+          if (controller.indexDataDetail.value == 0) {
+            titleReport = 'Total Produk';
+          } else if (controller.indexDataDetail.value == 1) {
+            titleReport = 'Total Sampah';
+          } else {
+            titleReport = 'Total Pembayaran';
+          }
+          Map<String, int> productReport = {};
+          int totalTerjual = 0;
+          if (productReport.isNotEmpty) productReport.clear();
+          if (controller.indexDataDetail.value == 0) {
+            for (var document in controller.detailPesanan) {
+              var detailList = document['detail'] as List<dynamic>?;
+
+              if (detailList != null) {
+                for (var detail in detailList) {
+                  var jenisProduk = detail['jenis'] as String?;
+                  var jumlahProduk = int.parse(detail['jumlah']);
+
+                  if (jenisProduk != null) {
+                    productReport[jenisProduk] = (productReport[jenisProduk] ?? 0) + jumlahProduk;
+                    totalTerjual += jumlahProduk;
+                  }
+                }
+              }
+              log('$productReport');
+            }
+          } else if (controller.indexDataDetail.value == 1) {
+            for (var document in controller.detailPesanan) {
+              var detailList = document['detail'] as List<dynamic>?;
+
+              if (detailList != null) {
+                for (var detail in detailList) {
+                  var jenisProduk = detail['jenis'] as String?;
+                  var jumlahProduk = int.parse(detail['jumlah']);
+
+                  if (jenisProduk != null) {
+                    productReport[jenisProduk] = (productReport[jenisProduk] ?? 0) + jumlahProduk;
+                    totalTerjual += jumlahProduk;
+                  }
+                }
+              }
+            }
+            log('$productReport');
+          } else {
+            for (var document in controller.detailPesanan) {
+              // var detailList = document['detail'] as List<dynamic>?;
+              var jenisProduk = document['metode'] as String?;
+              var jumlahProduk = int.parse(document['total_harga']);
+
+              if (jenisProduk != null) {
+                productReport[jenisProduk] = (productReport[jenisProduk] ?? 0) + jumlahProduk;
+                totalTerjual += jumlahProduk;
+              }
+            }
+            log('$productReport');
+          }
+
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
@@ -151,46 +182,62 @@ class ReportView extends GetView<ReportController> {
                 leading: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => controller.reportUserMode.value = ReportUserMode.DETAIL,
-                    // onTap: () {},
+                    onTap: () => controller.reportUserMode.value = ReportUserMode.LIST,
                     child: Icon(Icons.arrow_back_ios_outlined),
                   ),
                 ),
               ),
               backgroundColor: Colors.white,
               // if (controller.indexDataDetail.value == 0) ...[],
-              body: Padding(
-                padding: EdgeInsets.all(30.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Total Produk',
-                          style: ListTextStyle.textStyleBlack,
-                        ),
-                        Spacer(),
-                        Text(
-                          '${controller.detailPesanan.length}',
-                          style: ListTextStyle.textStyleBlack,
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: controller.detailPesanan.length,
-                        itemBuilder: (context, index) {
-                          DocumentSnapshot pesananDoc = controller.detailPesanan[index];
-
-                          return Column(
-                            children: [
-                              Text('ID Pesanan: ${(pesananDoc.data() as Map<String, dynamic>)['tanggal']}'),
-                            ],
-                          );
-                        },
+              body: RefreshIndicator(
+                onRefresh: () => controller.onRefresh(),
+                child: Padding(
+                  padding: EdgeInsets.all(30.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            titleReport,
+                            style: ListTextStyle.textStyleBlackW700,
+                          ),
+                          Spacer(),
+                          Text(
+                            '${controller.indexDataDetail.value == 2 ? Utils.formatUang(totalTerjual.toDouble()) : totalTerjual}',
+                            style: ListTextStyle.textStyleBlackW700,
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) => Divider(
+                              color: Color(ListColor.colorButtonGreen),
+                            ),
+                            itemCount: productReport.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var produk = productReport.keys.elementAt(index);
+                              var jumlahTerjual = productReport.values.elementAt(index);
+                              return Row(
+                                children: [
+                                  Text(
+                                    produk,
+                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w200),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    '${controller.indexDataDetail.value == 2 ? Utils.formatUang(jumlahTerjual.toDouble()) : jumlahTerjual} ${controller.indexDataDetail.value == 1 ? "Kg" : ""}',
+                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w200),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -208,6 +255,7 @@ class ReportView extends GetView<ReportController> {
       onTap: () {
         controller.reportUserMode.value = ReportUserMode.DETAIL_DATA;
         controller.indexDataDetail.value = index!;
+        controller.getAllPesanan();
       },
       child: Padding(
         padding: EdgeInsets.only(bottom: 17),

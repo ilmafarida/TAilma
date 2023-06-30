@@ -31,4 +31,14 @@ class Utils {
       ));
     }
   }
+
+  static String formatUang(double value, {String currency = "Rp", String comaSeparator = "."}) {
+    var string = "";
+    var convertString = value.toString().split(comaSeparator);
+    for (var index = 0; index < convertString[0].length; index++) {
+      string = (index % 3 == 2 && index != (convertString[0].length - 1) ? "." : "") + convertString[0][(convertString[0].length - 1 - index)] + string;
+    }
+    if (convertString.length > 1 && int.parse(convertString[1]) > 0) string += ",${convertString[1]}";
+    return "$currency$string";
+  }
 }
