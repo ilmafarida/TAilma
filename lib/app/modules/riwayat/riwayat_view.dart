@@ -375,7 +375,7 @@ class RiwayatView extends GetView<RiwayatController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('1928147847', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14)),
+                          Text('1132786552', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14)),
                           _uploadKTP(Get.context!, 0),
                         ],
                       ),

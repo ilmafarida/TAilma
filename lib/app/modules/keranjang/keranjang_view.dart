@@ -140,7 +140,7 @@ class KeranjangView extends GetView<KeranjangController> {
                               CustomTextField(controller: controller.noHpC, hintText: 'Masukkan No Hp *'),
                               Obx(() => CustomTextField(icon: GestureDetector(onTap: () => controller.getLatLong(), child: Icon(Icons.location_on_rounded, color: Colors.black)), hintText: 'Masukkan Alamat *', title: 'Alamat', controller: controller.alamatC.value)),
                               Obx(() => CustomTextField(icon: Icon(Icons.calendar_month), onTap: () => controller.showDatePicker(), title: 'Tanggal pengiriman *', value: controller.tanggalC.value)),
-                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu *', value: controller.waktuC.value)),
+                              Obx(() => CustomTextField(icon: Icon(Icons.alarm), onTap: () => controller.showWaktuPicker(), title: 'Waktu pengiriman *', value: controller.waktuC.value)),
                               CustomTextField(hintText: 'Informasi *', controller: controller.informasiC),
                               _detailProduct(documents),
                               CustomSubmitButton(
@@ -151,7 +151,7 @@ class KeranjangView extends GetView<KeranjangController> {
                                     try {
                                       controller.submitPesanan(dataJson);
                                       Get.offNamed(Routes.RIWAYAT);
-                                      Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil diproses');
+                                      Utils.showNotif(TypeNotif.SUKSES, 'Pesanan berhasil dikirim');
                                     } catch (e) {
                                       print('ERORR $e');
                                     }
