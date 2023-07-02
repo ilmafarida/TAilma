@@ -1,18 +1,7 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:rumah_sampah_t_a/app/controllers/auth_controller.dart';
-import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
-import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
-import 'package:rumah_sampah_t_a/app/utils/utils.dart';
+import 'dart:developer';
 
 enum ReportUserMode { LIST, DETAIL, DETAIL_DATA }
 
@@ -21,17 +10,21 @@ class ReportController extends GetxController {
   var laporanPesanan = {}.obs;
   var indexDataDetail = 0.obs;
   var indexBulanDetail = "".obs;
-  var detailPesanan = <DocumentSnapshot>[];
+  var detailPesanan = <DocumentSnapshot>[].obs;
 
   Stream<List<QueryDocumentSnapshot>> getPesananUserStream(String userId) {
-    return FirebaseFirestore.instance.collection('user').doc(userId).collection('pesanan').snapshots().map((snapshot) => snapshot.docs);
+    return FirebaseFirestore.instance.collection('user').doc(userId).collection('pesanan').where('status', isEqualTo: '5').where('jenis', isEqualTo: indexDataDetail.value == 1 ? 'tukar' : 'beli').snapshots().map((snapshot) {
+      // log("$userId = ${snapshot.docs.length}");
+      return snapshot.docs;
+    });
   }
 
   Future<void> getAllPesanan() async {
+    laporanPesanan.clear();
     QuerySnapshot userSnapshot = await FirebaseFirestore.instance.collection('user').get();
 
     Map<String, List<DocumentSnapshot>> laporanPesananMap = {};
-
+    laporanPesananMap.clear();
     for (DocumentSnapshot userDoc in userSnapshot.docs) {
       List<QueryDocumentSnapshot> pesananUser = await getPesananUserStream(userDoc.id).first;
 
@@ -46,8 +39,8 @@ class ReportController extends GetxController {
         laporanPesananMap[bulan]!.add(pesananDoc);
       }
     }
-
     laporanPesanan.assignAll(laporanPesananMap);
+    // laporanPesanan.value = laporanPesananMap;
   }
 
   String formatDate(DateTime date) {
@@ -58,5 +51,18 @@ class ReportController extends GetxController {
   void onInit() {
     getAllPesanan();
     super.onInit();
+  }
+
+  Future<void> onRefresh() {
+    // Lakukan operasi refresh yang diperlukan, seperti mengambil ulang data dari Firestore
+    // atau melakukan tindakan lain yang sesuai dengan kebutuhan Anda
+
+    // Contoh: mengambil ulang data dengan memanggil metode getData()
+    return getAllPesanan().then((_) {
+      // Refresh berhasil, tidak perlu mengembalikan nilai
+    }).catchError((error) {
+      // Meng-handle error jika terjadi
+      print('Error: $error');
+    });
   }
 }

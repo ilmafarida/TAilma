@@ -337,7 +337,7 @@ class PenukaranView extends GetView<PenukaranController> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Image.asset(
-                      'assets/bank_mandiri.png',
+                      'assets/bni.png',
                       height: 20,
                       width: 47,
                     ),
@@ -346,7 +346,7 @@ class PenukaranView extends GetView<PenukaranController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('1928147847', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14)),
+                          Text('1132786552', style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14)),
                           _uploadKTP(Get.context!, 0),
                         ],
                       ),

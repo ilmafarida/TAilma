@@ -366,7 +366,7 @@ class RiwayatView extends GetView<RiwayatController> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Image.asset(
-                      'assets/bank_mandiri.png',
+                      'assets/bni.png',
                       height: 20,
                       width: 47,
                     ),
