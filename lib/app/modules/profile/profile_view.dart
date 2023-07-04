@@ -5,27 +5,33 @@ import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import '../../routes/app_pages.dart';
 
 class ProfileView extends GetView<ProfileController> {
-  const ProfileView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            leading: _backButton(),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
           backgroundColor: Colors.white,
           body: Container(
-              margin: EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _backButton(),
-                    _cardProfile(),
-                    _listProfile(),
-                  ],
-                ),
-              )),
+            margin: EdgeInsets.all(20),
+            height: Get.height,
+            width: Get.width,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _cardProfile(),
+                  _listProfile(),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -37,6 +43,7 @@ class ProfileView extends GetView<ProfileController> {
       child: Icon(
         Icons.arrow_back_ios,
         size: 18,
+        color: Colors.black,
       ),
     );
   }
@@ -86,7 +93,8 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   Widget _listProfileContent({bool? isLogout = false, String? title, String? value, bool? isCanTap = false, VoidCallback? onTap}) {
-    return Padding(
+    return Container(
+      width: Get.width,
       padding: EdgeInsets.only(bottom: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -102,29 +110,25 @@ class ProfileView extends GetView<ProfileController> {
             ),
           ),
           if (value != null)
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: SizedBox(
-                  child: Text(
-                    value,
-                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
-                    maxLines: 3,
-                  ),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: SizedBox(
+                child: Text(
+                  value,
+                  style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
+                  maxLines: 3,
                 ),
               ),
             ),
           if (isCanTap!) ...[
-            // Spacer(),
+            Spacer(),
             Align(
               alignment: Alignment.centerRight,
               child: SizedBox(
                 width: 15,
-                child: Expanded(
-                  child: GestureDetector(
-                    onTap: onTap,
-                    child: Icon(Icons.arrow_forward_ios_rounded, size: 14),
-                  ),
+                child: GestureDetector(
+                  onTap: onTap,
+                  child: Icon(Icons.arrow_forward_ios_rounded, size: 14),
                 ),
               ),
             ),

@@ -70,7 +70,6 @@ class AdminProductController extends GetxController {
       try {
         await firestore.collection('produk').doc('$uid').delete();
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Hapus Berhasil")));
-        // print(':::${dataEdit.value['status']}');
       } catch (e) {
         log('ERROR : $e');
       }

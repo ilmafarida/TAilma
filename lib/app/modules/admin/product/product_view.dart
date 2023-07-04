@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/product/product_controller.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
+import 'package:rumah_sampah_t_a/app/utils/utils.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_back_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_submit_button.dart';
 import 'package:rumah_sampah_t_a/app/widgets/custom_text_field.dart';
@@ -15,59 +16,153 @@ import 'package:rumah_sampah_t_a/app/widgets/upload_component.dart';
 class AdminProductView extends GetView<AdminProductController> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-        title: Text('Produk'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        leading: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: Text('Produk'),
+            centerTitle: true,
+            elevation: 0,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            leading: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
                   Get.back();
                 },
-            child: Icon(Icons.arrow_back_ios_outlined),
+                child: Icon(Icons.arrow_back_ios_outlined),
+              ),
+            ),
           ),
-        ),
-      ),
-        resizeToAvoidBottomInset: false,
-        body: Padding(
-          padding: EdgeInsets.all(20),
-          child: Obx(
-            () => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // CustomBackButton(onTap: () {
-                //   Get.back();
-                // }),
-                SizedBox(height: 30),
-                if (controller.productMode.value == ProductMode.VIEW) ...[
-                  SingleChildScrollView(
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: CustomSubmitButton(
-                              onTap: () {
-                                controller.setViewMode(ProductMode.CREATE);
-                                print('::: ${controller.dataIndexEdit.value}');
-                              },
-                              text: '+ produk',
-                              width: 100,
+          resizeToAvoidBottomInset: false,
+          body: Padding(
+            padding: EdgeInsets.all(20),
+            child: Obx(
+              () => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // CustomBackButton(onTap: () {
+                  //   Get.back();
+                  // }),
+                  SizedBox(height: 30),
+                  if (controller.productMode.value == ProductMode.VIEW) ...[
+                    SingleChildScrollView(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          children: [
+                            SizedBox(height: 20),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: CustomSubmitButton(
+                                onTap: () {
+                                  controller.setViewMode(ProductMode.CREATE);
+                                  print('::: ${controller.dataIndexEdit.value}');
+                                },
+                                text: '+ produk',
+                                width: 100,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 30),
-                          StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
-                            stream: controller.fetchData(),
-                            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                            SizedBox(height: 30),
+                            StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
+                              stream: controller.fetchData(),
+                              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>?> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                }
+
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(child: CircularProgressIndicator());
+                                }
+
+                                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                  return Text('Belum ada data');
+                                }
+                                // Memproses snapshot dan menampilkan data
+                                final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2, // Menentukan jumlah kolom dalam grid
+                                    mainAxisSpacing: 8.0, // Jarak antar elemen pada sumbu utama (vertikal)
+                                    crossAxisSpacing: 8.0, // Jarak antar elemen pada sumbu lintang (horizontal)
+                                    childAspectRatio: 1.0, // Perbandingan lebar-tinggi setiap elemen dalam grid
+                                  ),
+                                  itemCount: documents.length,
+                                  itemBuilder: (context, i) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: Material(
+                                        borderRadius: BorderRadius.circular(18),
+                                        child: InkWell(
+                                          customBorder: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(18),
+                                          ),
+                                          onTap: () {
+                                            controller.dataIndexEdit.value = documents[i]['uid'];
+                                            controller.dataEdit.value = documents[i];
+                                            controller.setViewMode(ProductMode.EDIT);
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(18),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              '${documents[i]['nama']}',
+                                              textAlign: TextAlign.center,
+                                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                                // );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ] else if (controller.productMode.value == ProductMode.CREATE) ...[
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _field(controller: controller.namaC, hint: 'Nama Produk'),
+                            _field(controller: controller.hargaC, hint: 'Harga', isNumber: true),
+                            _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
+                            _field(controller: controller.deskripsiC, hint: 'Deskripsi', maxLinex: 6),
+                            _fieldFoto(),
+                            Padding(
+                              padding: EdgeInsets.only(top: 40),
+                              child: CustomSubmitButton(
+                                onTap: () {
+                                  if (controller.deskripsiC.text.isEmpty || controller.namaC.text.isEmpty || controller.poinC.text.isEmpty || controller.hargaC.text.isEmpty || controller.file.value == null) {
+                                    Utils.showNotif(TypeNotif.ERROR, 'Field harus diisi');
+                                    return;
+                                  }
+                                  controller.prosesSubmit(status: 0, uid: controller.dataIndexEdit.value);
+                                },
+                                text: 'Simpan',
+                                width: 110,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    // EDIT
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: StreamBuilder<DocumentSnapshot>(
+                            stream: controller.fetchDataDetail(),
+                            builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
                               }
@@ -76,140 +171,62 @@ class AdminProductView extends GetView<AdminProductController> {
                                 return Center(child: CircularProgressIndicator());
                               }
 
-                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              if (!snapshot.hasData || !snapshot.data!.exists) {
                                 return Text('Belum ada data');
                               }
                               // Memproses snapshot dan menampilkan data
-                              final List<DocumentSnapshot> documents = snapshot.data!.docs;
-                              return GridView.builder(
-                                shrinkWrap: true,
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2, // Menentukan jumlah kolom dalam grid
-                                  mainAxisSpacing: 8.0, // Jarak antar elemen pada sumbu utama (vertikal)
-                                  crossAxisSpacing: 8.0, // Jarak antar elemen pada sumbu lintang (horizontal)
-                                  childAspectRatio: 1.0, // Perbandingan lebar-tinggi setiap elemen dalam grid
-                                ),
-                                itemCount: documents.length,
-                                itemBuilder: (context, i) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(bottom: 10),
-                                    child: Material(
-                                      borderRadius: BorderRadius.circular(18),
-                                      child: InkWell(
-                                        customBorder: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
+                              final documents = snapshot.data!.data() as Map<String, dynamic>;
+                              print('::::::::::::$documents');
+                              controller.namaC.text = documents['nama'];
+                              controller.hargaC.text = documents['harga'];
+                              controller.poinC.text = documents['poin'];
+                              controller.deskripsiC.text = documents['deskripsi'];
+                              controller.deskripsiC.text = documents['deskripsi'];
+                              if (!controller.isUpload.value) {
+                                controller.file.value = File(documents['gambar']);
+                              }
+                              print(':::::${controller.dataIndexEdit.value} $documents');
+                              return Column(
+                                children: [
+                                  _field(controller: controller.namaC, hint: 'Nama Produk'),
+                                  _field(controller: controller.hargaC, hint: 'Harga', isNumber: true),
+                                  _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
+                                  _field(controller: controller.deskripsiC, hint: 'Deskripsi', maxLinex: 6),
+                                  _fieldFoto(),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 40),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        CustomSubmitButton(
+                                          onTap: () => controller.prosesSubmit(status: -1, uid: controller.dataIndexEdit.value),
+                                          text: 'Hapus',
+                                          width: 110,
                                         ),
-                                        onTap: () {
-                                          controller.dataIndexEdit.value = documents[i]['uid'];
-                                          controller.dataEdit.value = documents[i];
-                                          controller.setViewMode(ProductMode.EDIT);
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(18),
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            '${documents[i]['nama']}',
-                                            textAlign: TextAlign.center,
-                                            style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                                          ),
-                                        ),
-                                      ),
+                                        CustomSubmitButton(
+                                          onTap: () {
+                                            if (controller.deskripsiC.text.isEmpty || controller.namaC.text.isEmpty || controller.poinC.text.isEmpty || controller.hargaC.text.isEmpty || controller.file.value == null) {
+                                              Utils.showNotif(TypeNotif.ERROR, 'Field harus diisi');
+                                              return;
+                                            }
+
+                                            controller.prosesSubmit(status: 1, uid: controller.dataIndexEdit.value);
+                                          },
+                                          text: 'Simpan',
+                                          width: 110,
+                                        )
+                                      ],
                                     ),
-                                  );
-                                },
+                                  )
+                                ],
                               );
-                              // );
-                            },
-                          ),
-                        ],
+                            }),
                       ),
                     ),
-                  )
-                ] else if (controller.productMode.value == ProductMode.CREATE) ...[
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _field(controller: controller.namaC, hint: 'Nama Produk'),
-                          _field(controller: controller.hargaC, hint: 'Harga', isNumber: true),
-                          _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
-                          _field(controller: controller.deskripsiC, hint: 'Deskripsi', maxLinex: 6),
-                          _fieldFoto(),
-                          Padding(
-                            padding: EdgeInsets.only(top: 40),
-                            child: CustomSubmitButton(
-                              onTap: () => controller.prosesSubmit(status: 0, uid:controller.dataIndexEdit.value),
-                              text: 'Simpan',
-                              width: 110,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  // EDIT
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: StreamBuilder<DocumentSnapshot>(
-                          stream: controller.fetchDataDetail(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            }
-
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            }
-
-                            if (!snapshot.hasData || !snapshot.data!.exists) {
-                              return Text('Belum ada data');
-                            }
-                            // Memproses snapshot dan menampilkan data
-                            final documents = snapshot.data!.data() as Map<String, dynamic>;
-                            print('::::::::::::$documents');
-                            controller.namaC.text = documents['nama'];
-                            controller.hargaC.text = documents['harga'];
-                            controller.poinC.text = documents['poin'];
-                            controller.deskripsiC.text = documents['deskripsi'];
-                            controller.deskripsiC.text = documents['deskripsi'];
-                            if (!controller.isUpload.value) {
-                              controller.file.value = File(documents['gambar']);
-                            }
-                            print(':::::${controller.dataIndexEdit.value} $documents');
-                            return Column(
-                              children: [
-                                _field(controller: controller.namaC, hint: 'Nama Produk'),
-                                _field(controller: controller.hargaC, hint: 'Harga', isNumber: true),
-                                _field(controller: controller.poinC, hint: 'Poin', isNumber: true),
-                                _field(controller: controller.deskripsiC, hint: 'Deskripsi', maxLinex: 6),
-                                _fieldFoto(),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 40),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      CustomSubmitButton(
-                                        onTap: () => controller.prosesSubmit(status: -1, uid: controller.dataIndexEdit.value),
-                                        text: 'Hapus',
-                                        width: 110,
-                                      ),
-                                      CustomSubmitButton(
-                                        onTap: () => controller.prosesSubmit(status: 1, uid: controller.dataIndexEdit.value),
-                                        text: 'Simpan',
-                                        width: 110,
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            );
-                          }),
-                    ),
-                  ),
-                ]
-              ],
+                  ]
+                ],
+              ),
             ),
           ),
         ),
