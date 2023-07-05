@@ -517,6 +517,7 @@ class PesananView extends GetView<PesananController> {
 
   Widget _dataCard({@required String? title, @required String? value, bool isMap = false}) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           width: 150,
