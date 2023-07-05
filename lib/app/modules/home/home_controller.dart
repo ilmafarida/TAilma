@@ -27,6 +27,8 @@ class HomeController extends GetxController {
   var isUpdate = false.obs;
   var isLoading = false.obs;
 
+  var formKey = GlobalKey();
+
   @override
   Future<void> onInit() async {
     var role = await SharedPreference.getUserRole();

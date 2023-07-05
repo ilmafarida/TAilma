@@ -162,13 +162,11 @@ class HomeView extends GetView<HomeController> {
                                             child: CustomSubmitButton(
                                               width: 70,
                                               onTap: () async {
-                                                if (controller.isUpdate.value) {
-                                                  if (controller.quoteC.text.isEmpty || controller.deskripsiC.text.isEmpty || controller.fileC.value == null) {
-                                                    Utils.showNotif(TypeNotif.ERROR, 'Field harus diisi');
-                                                    return;
-                                                  }
+                                                if (controller.quoteC.text.isEmpty || controller.deskripsiC.text.isEmpty || controller.fileC.value == null) {
+                                                  Utils.showNotif(TypeNotif.ERROR, 'Field harus diisi');
+                                                  return;
                                                 }
-                                                await controller.submit().then((value) => Utils.showNotif(TypeNotif.SUKSES, 'Edit berhasil disimpan'));
+                                                await controller.submit();
                                               },
                                               text: 'Submit',
                                             ),
@@ -224,6 +222,7 @@ class HomeView extends GetView<HomeController> {
                                             controller: controller.deskripsiC,
                                             hintText: 'Masukkan deskripsi',
                                             maxLines: 5,
+                                            validator: 'field harus diisi',
                                           ),
                                         ],
                                       );

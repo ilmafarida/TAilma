@@ -119,6 +119,7 @@ class PesananView extends GetView<PesananController> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _dataCard(title: 'No Resi', value: controller.dataDetail!['uid']),
               _dataCard(title: 'Nama', value: controller.dataDetail!['nama']),
               _dataCard(title: 'Tanggal Pengiriman', value: controller.dataDetail!['tanggal']),
               _dataCard(title: 'Waktu', value: controller.dataDetail!['jam']),
@@ -567,7 +568,7 @@ class PesananView extends GetView<PesananController> {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         }
-      if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
         if (snapshot.data!.docs.isEmpty) {
@@ -583,7 +584,7 @@ class PesananView extends GetView<PesananController> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot userDoc = snapshot.data!.docs[index];
               return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').orderBy('tanggal',descending: true).snapshots(),
+                stream: FirebaseFirestore.instance.collection('user').doc(userDoc.id).collection('pesanan').where('status', isEqualTo: tabNumber.toString()).where('jenis', isEqualTo: 'beli').orderBy('tanggal', descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> orderSnapshot) {
                   // print(tabNumber);
                   if (orderSnapshot.hasError) {
@@ -632,6 +633,11 @@ class PesananView extends GetView<PesananController> {
                                   Text(
                                     data!['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
                                     style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'No Resi : ${data['uid']}',
+                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
