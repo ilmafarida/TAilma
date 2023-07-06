@@ -549,6 +549,11 @@ class RiwayatView extends GetView<RiwayatController> {
                             ),
                             SizedBox(height: 5),
                             Text(
+                              'No Resi : ${documents[i]['uid']}',
+                              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
                               documents[i]['jenis'] == 'beli' ? 'Total harga : ${documents[i]['total_harga']} / ${documents[i]['total_poin']} poin' : 'Total poin : ${documents[i]['total_poin']} poin',
                               style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                             ),
