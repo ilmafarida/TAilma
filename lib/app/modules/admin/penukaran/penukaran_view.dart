@@ -15,7 +15,6 @@ import 'penukaran_controller.dart';
 
 class PenukaranView extends GetView<PenukaranController> {
   @override
-  
   Widget build(BuildContext context) {
     return Material(
       child: Obx(() {
@@ -575,6 +574,11 @@ class PenukaranView extends GetView<PenukaranController> {
                                   Text(
                                     data!['jenis'] == 'beli' ? 'Pembelian Produk' : 'Tukar Sampah',
                                     style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'No Resi : ${data['uid']}',
+                                    style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 14),
                                   ),
                                   SizedBox(height: 5),
                                   Text(

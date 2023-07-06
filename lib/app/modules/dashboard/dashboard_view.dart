@@ -31,14 +31,14 @@ class DashboardView extends GetView<DashboardController> {
                 children: [
                   _header(),
                   _cardProfile(controller.authC.userData),
-                  _button(text: 'Verifikasi Akun', onTap: () => Get.toNamed(Routes.VERIFIKASI_AKUN)),
-                  _button(text: 'Akun Terverifikasi', onTap: () => Get.toNamed(Routes.AKUN_TERVERIFIKASI)),
-                  _button(text: 'Post Dashboard', onTap: () => Get.toNamed(Routes.HOME)),
-                  _button(text: 'Produk', onTap: () => Get.toNamed(Routes.ADMIN_PRODUCT)),
-                  _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH)),
-                  _button(text: 'Pesanan', onTap: () => Get.toNamed(Routes.PESANAN), isWithNotif: true, notifCount: controller.jumlahPesanan.value),
-                  _button(text: 'Penukaran Sampah', onTap: () => Get.toNamed(Routes.PENUKARAN), isWithNotif: true, notifCount: controller.jumlahPenukaran.value),
-                  _button(text: 'Report', onTap: () => Get.toNamed(Routes.REPORT)),
+                  _button(text: 'Verifikasi Akun', onTap: () => Get.toNamed(Routes.VERIFIKASI_AKUN),icons: Icon(Icons.abc)),
+                  _button(text: 'Akun Terverifikasi', onTap: () => Get.toNamed(Routes.AKUN_TERVERIFIKASI),icons: Icon(Icons.ac_unit)),
+                  _button(text: 'Post Dashboard', onTap: () => Get.toNamed(Routes.HOME),icons: Icon(Icons.access_alarm)),
+                  _button(text: 'Sampah', onTap: () => Get.toNamed(Routes.ADMIN_SAMPAH),icons: Icon(Icons.add_comment_outlined)),
+                  _button(text: 'Produk', onTap: () => Get.toNamed(Routes.ADMIN_PRODUCT),icons: Icon(Icons.accessible_sharp)),
+                  _button(text: 'Pesanan', onTap: () => Get.toNamed(Routes.PESANAN), isWithNotif: true, notifCount: controller.jumlahPesanan.value,icons: Icon(Icons.youtube_searched_for_outlined)),
+                  _button(text: 'Penukaran Sampah', onTap: () => Get.toNamed(Routes.PENUKARAN), isWithNotif: true, notifCount: controller.jumlahPenukaran.value,icons: Icon(Icons.work_off_rounded)),
+                  _button(text: 'Report', onTap: () => Get.toNamed(Routes.REPORT),icons: Icon(Icons.save_as_rounded)),
                 ],
               );
             }),
@@ -163,28 +163,34 @@ class DashboardView extends GetView<DashboardController> {
     );
   }
 
-  Widget _button({String? text, VoidCallback? onTap, bool isWithNotif = false, int? notifCount}) {
+  Widget _button({String? text, VoidCallback? onTap, bool isWithNotif = false, int? notifCount, Icon? icons}) {
     return Stack(
       children: [
         InkWell(
           onTap: onTap!,
           child: Container(
             width: 260,
-            height: 80,
+            // height: 80,
+            padding: EdgeInsets.all(8),
             margin: EdgeInsets.only(bottom: 27),
             decoration: BoxDecoration(
               color: Color(ListColor.colorButtonGreen),
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,
-            child: Text(
-              text!,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Urbanist",
-                fontWeight: FontWeight.w700,
-                fontSize: 24,
-              ),
+            child: Row(
+              children: [
+                icons!,
+                Text(
+                  text!,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Urbanist",
+                    fontWeight: FontWeight.w700,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
