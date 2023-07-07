@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rumah_sampah_t_a/app/modules/admin/report/report_controller.dart';
+import 'package:rumah_sampah_t_a/app/utils/chart_display.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_color.dart';
 import 'package:rumah_sampah_t_a/app/utils/list_text_style.dart';
 import 'package:rumah_sampah_t_a/app/utils/utils.dart';
@@ -12,238 +13,138 @@ class ReportView extends GetView<ReportController> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Obx(() {
-        if (controller.reportUserMode.value == ReportUserMode.LIST) {
-          return Scaffold(
+      child: Obx(
+        () => Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: Text(
+              'Report' ' ${controller.selectedValue.value != "Semua" ? controller.selectedValue.value : ""}',
+              style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
+            ),
+            centerTitle: true,
+            elevation: 0,
             backgroundColor: Colors.white,
-            appBar: AppBar(
-              title: Text(
-                'Report',
-                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 24),
-              ),
-              centerTitle: true,
-              elevation: 0,
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              leading: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => Get.back(),
-                  child: Icon(Icons.arrow_back_ios_outlined),
-                ),
+            foregroundColor: Colors.black,
+            leading: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Get.back(),
+                child: Icon(Icons.arrow_back_ios_outlined),
               ),
             ),
-            body: RefreshIndicator(
-              onRefresh: () => controller.onRefresh(),
-              child: Obx(
-                () {
-                  if (controller.laporanPesanan.isEmpty) {
-                    return Center(
-                      child: Text('Tidak ada pesanan.'),
-                    );
-                  }
-                  return ListView.separated(
-                    itemCount: controller.laporanPesanan.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      String bulan = controller.laporanPesanan.keys.toList()[index];
-                      List<DocumentSnapshot> pesananBulan = controller.laporanPesanan[bulan]!;
-                      return GestureDetector(
-                        onTap: () {
-                          controller.detailPesanan.clear();
-                          controller.detailPesanan.value = pesananBulan;
-                          controller.reportUserMode.value = ReportUserMode.DETAIL;
-                        },
-                        child: Container(
-                          width: Get.width,
-                          margin: EdgeInsets.symmetric(horizontal: 22),
-                          padding: EdgeInsets.symmetric(horizontal: 17, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Color(ListColor.colorBackgroundGray),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                bulan,
-                                style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
-                              ),
-                              Spacer(),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.black,
-                                size: 15,
-                              ),
-                            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: () => controller.onRefresh(),
+            child: Obx(
+              () {
+                if (controller.laporanPesanan.isEmpty && controller.laporanPesananByBulan.isEmpty) {
+                  return Center(
+                    child: Text('Tidak ada pesanan.'),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: SizedBox(
+                    height: Get.height,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // TODO : IMPLEMENTASI DROPDOWN
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            constraints: BoxConstraints(maxWidth: 120),
+                            decoration: BoxDecoration(
+                              color: Color(ListColor.colorButtonGreen),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: DropdownButtonFormField(
+                              alignment: Alignment.center,
+                              style: ListTextStyle.textStyleWhite,
+                              dropdownColor: Color(ListColor.colorButtonGreen),
+                              decoration: InputDecoration(border: InputBorder.none),
+                              value: controller.laporanPesananByBulan.keys.first,
+                              // value: controller.selectedValue,
+                              // items: List.generate(
+                              //   controller.laporanPesananByBulan.length,
+                              //   (index) {
+                              //     final item = controller.laporanPesananByBulan[index];
+                              //     print(item);
+                              //    ) return DropdownMenuItem<Map<String, dynamic>>(
+                              //       value: item,
+                              //       child: Text('$item'), // Menggunakan kunci (keys) sebagai teks item
+                              //     );
+                              //   },
+                              // ),
+                              items: controller.laporanPesananByBulan.keys.map<DropdownMenuItem<String>>((key) {
+                                return DropdownMenuItem<String>(
+                                  value: key,
+                                  child: Text('$key'),
+                                );
+                              }).toList(),
+                              onChanged: (str) {
+                                controller.selectedValue.value = str.toString();
+                                print(str);
+                              },
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          );
-        } else if (controller.reportUserMode.value == ReportUserMode.DETAIL) {
-          return SafeArea(
-            child: Scaffold(
-                appBar: AppBar(
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  leading: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => controller.reportUserMode.value = ReportUserMode.LIST,
-                      // onTap: () {},
-                      child: Icon(Icons.arrow_back_ios_outlined),
+                        SizedBox(
+                          height: 300,
+                          child: ChartContainer(title: 'Produk Dijual', chart: controller.laporanPesananByBulan.values.first),
+                        )
+
+                        // ListView.separated(
+                        //   shrinkWrap: true,
+                        //   itemCount: controller.laporanPesanan.length,
+                        //   separatorBuilder: (context, index) => SizedBox(height: 8),
+                        //   itemBuilder: (context, index) {
+                        //     String bulan = controller.laporanPesanan.keys.toList()[index];
+                        //     List<DocumentSnapshot> pesananBulan = controller.laporanPesanan[bulan]!;
+                        //     return GestureDetector(
+                        //       onTap: () {
+                        //         controller.detailPesanan.clear();
+                        //         controller.detailPesanan.value = pesananBulan;
+                        //         controller.reportUserMode.value = ReportUserMode.DETAIL;
+                        //       },
+                        //       child: Container(
+                        //         width: Get.width,
+                        //         margin: EdgeInsets.symmetric(horizontal: 22),
+                        //         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 10),
+                        //         decoration: BoxDecoration(
+                        //           color: Color(ListColor.colorBackgroundGray),
+                        //           borderRadius: BorderRadius.circular(10),
+                        //         ),
+                        //         child: Row(
+                        //           crossAxisAlignment: CrossAxisAlignment.center,
+                        //           children: [
+                        //             Text(
+                        //               bulan,
+                        //               style: ListTextStyle.textStyleBlackW700.copyWith(fontSize: 18),
+                        //             ),
+                        //             Spacer(),
+                        //             Icon(
+                        //               Icons.arrow_forward_ios,
+                        //               color: Colors.black,
+                        //               size: 15,
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
+                      ],
                     ),
                   ),
-                ),
-                backgroundColor: Colors.white,
-                body: Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: Column(
-                    children: [
-                      _widgetDetail(index: 0, text: 'Produk Terjual'),
-                      _widgetDetail(index: 1, text: 'Sampah Masuk'),
-                      _widgetDetail(index: 2, text: 'Pembayaran'),
-                    ],
-                  ),
-                )),
-          );
-        } else {
-          String? titleReport;
-          if (controller.indexDataDetail.value == 0) {
-            titleReport = 'Total Produk';
-          } else if (controller.indexDataDetail.value == 1) {
-            titleReport = 'Total Sampah';
-          } else {
-            titleReport = 'Total Pembayaran';
-          }
-          Map<String, int> productReport = {};
-          int totalTerjual = 0;
-          if (productReport.isNotEmpty) productReport.clear();
-          if (controller.indexDataDetail.value == 0) {
-            for (var document in controller.detailPesanan) {
-              var detailList = document['detail'] as List<dynamic>?;
-
-              if (detailList != null) {
-                for (var detail in detailList) {
-                  var jenisProduk = detail['jenis'] as String?;
-                  var jumlahProduk = int.parse(detail['jumlah']);
-
-                  if (jenisProduk != null) {
-                    productReport[jenisProduk] = (productReport[jenisProduk] ?? 0) + jumlahProduk;
-                    totalTerjual += jumlahProduk;
-                  }
-                }
-              }
-              log('$productReport');
-            }
-          } else if (controller.indexDataDetail.value == 1) {
-            for (var document in controller.detailPesanan) {
-              var detailList = document['detail'] as List<dynamic>?;
-
-              if (detailList != null) {
-                for (var detail in detailList) {
-                  var jenisProduk = detail['jenis'] as String?;
-                  var jumlahProduk = int.parse(detail['jumlah']);
-
-                  if (jenisProduk != null) {
-                    productReport[jenisProduk] = (productReport[jenisProduk] ?? 0) + jumlahProduk;
-                    totalTerjual += jumlahProduk;
-                  }
-                }
-              }
-            }
-            log('$productReport');
-          } else {
-            for (var document in controller.detailPesanan) {
-              // var detailList = document['detail'] as List<dynamic>?;
-              var jenisProduk = document['metode'] as String?;
-              var jumlahProduk = int.parse(document['total_harga']);
-
-              if (jenisProduk != null) {
-                productReport[jenisProduk] = (productReport[jenisProduk] ?? 0) + jumlahProduk;
-                totalTerjual += jumlahProduk;
-              }
-            }
-            log('$productReport');
-          }
-
-          return SafeArea(
-            child: Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                leading: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => controller.reportUserMode.value = ReportUserMode.LIST,
-                    child: Icon(Icons.arrow_back_ios_outlined),
-                  ),
-                ),
-              ),
-              backgroundColor: Colors.white,
-              // if (controller.indexDataDetail.value == 0) ...[],
-              body: RefreshIndicator(
-                onRefresh: () => controller.onRefresh(),
-                child: Padding(
-                  padding: EdgeInsets.all(30.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            titleReport,
-                            style: ListTextStyle.textStyleBlackW700,
-                          ),
-                          Spacer(),
-                          Text(
-                            '${controller.indexDataDetail.value == 2 ? Utils.formatUang(totalTerjual.toDouble()) : totalTerjual}',
-                            style: ListTextStyle.textStyleBlackW700,
-                          ),
-                        ],
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) => Divider(
-                              color: Color(ListColor.colorButtonGreen),
-                            ),
-                            itemCount: productReport.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              var produk = productReport.keys.elementAt(index);
-                              var jumlahTerjual = productReport.values.elementAt(index);
-                              return Row(
-                                children: [
-                                  Text(
-                                    produk,
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w200),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    '${controller.indexDataDetail.value == 2 ? Utils.formatUang(jumlahTerjual.toDouble()) : jumlahTerjual} ${controller.indexDataDetail.value == 1 ? "Kg" : ""}',
-                                    style: ListTextStyle.textStyleBlack.copyWith(fontSize: 14, fontWeight: FontWeight.w200),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                );
+              },
             ),
-          );
-        }
-      }),
+          ),
+        ),
+      ),
     );
   }
 
@@ -253,9 +154,9 @@ class ReportView extends GetView<ReportController> {
   }) {
     return GestureDetector(
       onTap: () {
-        controller.reportUserMode.value = ReportUserMode.DETAIL_DATA;
+        controller.reportUserMode.value = ReportUserMode.ALL;
         controller.indexDataDetail.value = index!;
-        controller.getAllPesanan();
+        controller.getPesananByBulan();
       },
       child: Padding(
         padding: EdgeInsets.only(bottom: 17),
