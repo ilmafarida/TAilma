@@ -35,88 +35,91 @@ class ReportView extends GetView<ReportController> {
           ),
           body: Obx(
             () {
-              if (controller.laporanPesanan.isEmpty && controller.laporanPesananByBulan.isEmpty) {
-                return Center(
-                  child: Text('Tidak ada pesanan.'),
+              if (controller.loadingData.value) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return SizedBox(
+                  height: Get.height,
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // TODO : IMPLEMENTASI DROPDOWN
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            constraints: BoxConstraints(maxWidth: 120),
+                            decoration: BoxDecoration(
+                              color: Color(ListColor.colorButtonGreen),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: DropdownButtonFormField(
+                              alignment: Alignment.center,
+                              style: ListTextStyle.textStyleWhite,
+                              dropdownColor: Color(ListColor.colorButtonGreen),
+                              decoration: InputDecoration(border: InputBorder.none),
+                              value: controller.selectedValue.value,
+                              items: controller.dataDropdown.keys.map<DropdownMenuItem<String>>((key) {
+                                return DropdownMenuItem<String>(
+                                  value: key,
+                                  child: Text('$key'),
+                                );
+                              }).toList(),
+                              onChanged: (str) {
+                                controller.selectedValue.value = str.toString();
+                                print(str);
+                                controller.refreshData();
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 300,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Produk Terjual', style: ListTextStyle.textStyleBlackW700),
+                              Expanded(
+                                child: controller.buildBarChart(controller.laporanProdukSeriesList.value, 'Produk Terjual'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 300,
+                          margin: EdgeInsets.only(top: 20),
+                          child: Obx(() => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Sampah Masuk', style: ListTextStyle.textStyleBlackW700),
+                                  Expanded(
+                                    child: controller.buildBarChart(controller.laporanSampahSeriesList.value, 'Sampah Masuk'),
+                                  ),
+                                ],
+                              )),
+                        ),
+                        Container(
+                          height: 300,
+                          margin: EdgeInsets.only(top: 20),
+                          child: Obx(
+                            () => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Pembayaran', style: ListTextStyle.textStyleBlackW700),
+                                Expanded(
+                                  child: controller.buildBarChartPembelian(controller.laporanPembayaranSeriesList.value, 'Sampah Masuk'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               }
-              return SizedBox(
-                height: Get.height,
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // TODO : IMPLEMENTASI DROPDOWN
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          constraints: BoxConstraints(maxWidth: 120),
-                          decoration: BoxDecoration(
-                            color: Color(ListColor.colorButtonGreen),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: DropdownButtonFormField(
-                            alignment: Alignment.center,
-                            style: ListTextStyle.textStyleWhite,
-                            dropdownColor: Color(ListColor.colorButtonGreen),
-                            decoration: InputDecoration(border: InputBorder.none),
-                            value: controller.laporanPesananByBulan.keys.first,
-                            // value: controller.selectedValue,
-                            // items: List.generate(
-                            //   controller.laporanPesananByBulan.length,
-                            //   (index) {
-                            //     final item = controller.laporanPesananByBulan[index];
-                            //     print(item);
-                            //    ) return DropdownMenuItem<Map<String, dynamic>>(
-                            //       value: item,
-                            //       child: Text('$item'), // Menggunakan kunci (keys) sebagai teks item
-                            //     );
-                            //   },
-                            // ),
-                            items: controller.laporanPesananByBulan.keys.map<DropdownMenuItem<String>>((key) {
-                              return DropdownMenuItem<String>(
-                                value: key,
-                                child: Text('$key'),
-                              );
-                            }).toList(),
-                            onChanged: (str) {
-                              controller.selectedValue.value = str.toString();
-                              print(str);
-                            },
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 300,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Produk Terjual', style: ListTextStyle.textStyleBlackW700),
-                            Expanded(
-                              child: controller.buildBarChart(controller.laporanProdukSeriesList as List<Map<String, dynamic>>, 'Produk Terjual'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        height: 300,
-                        margin: EdgeInsets.only(top: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Sampah Masuk', style: ListTextStyle.textStyleBlackW700),
-                            Expanded(
-                              child: controller.buildBarChart(controller.laporanSampahSeriesList as List<Map<String, dynamic>>, 'Sampah Masuk'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
             },
           ),
         ),
