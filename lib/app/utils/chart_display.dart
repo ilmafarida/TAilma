@@ -4,26 +4,68 @@ import 'package:charts_flutter/flutter.dart' as charts;
 
 class ChartContainer extends StatelessWidget {
   final String title;
-  final List chart;
+  final List<dynamic> chartData;
+  final bool animate;
+  List<charts.Series<dynamic, String>> seriesList = [];
 
-  const ChartContainer({
-    Key? key,
-    required this.title,
-    required this.chart,
-  }) : super(key: key);
+  ChartContainer({super.key, required this.title, required this.seriesList, required this.animate, required this.chartData});
 
   @override
   Widget build(BuildContext context) {
-    print(chart);
-    final List<BarChartModel> data = [];
-    List<charts.Series<BarChartModel, String>> series = [
-      charts.Series(
-        id: title,
-        data: data,
-        domainFn: (BarChartModel series, _) => series.bottom,
-        measureFn: (BarChartModel series, _) => series.left,
-      ),
-    ];
+    // List<charts.Series<dynamic, String>> createSeries(List<Map<String, dynamic>> chartData) {
+    //   Map<String, int> jumlahPerJenis = {};
+
+    //   // Menghitung jumlah per jenis
+    //   chartData.forEach((map) {
+    //     List<Map<String, dynamic>> detail = map['detail'];
+    //     detail.forEach((item) {
+    //       String jenis = item['jenis'];
+    //       int jumlah = item['jumlah'];
+
+    //       if (jumlahPerJenis.containsKey(jenis)) {
+    //         jumlahPerJenis[jenis] += jumlah;
+    //       } else {
+    //         jumlahPerJenis[jenis] = jumlah;
+    //       }
+    //     });
+    //   });
+
+    //   // Membuat list data series
+    //   List<charts.Series<dynamic, String>> seriesList = [
+    //     charts.Series<dynamic, String>(
+    //       id: 'Produk Terjual',
+    //       data: jumlahPerJenis.entries.map((entry) {
+    //         return {
+    //           'jenis': entry.key,
+    //           'jumlah': entry.value,
+    //         };
+    //       }).toList(),
+    //       domainFn: (item, _) => item['jenis'] as String,
+    //       measureFn: (item, _) => item['jumlah'] as int,
+    //     ),
+    //   ];
+
+    //   return seriesList;
+    // }
+
+    // Widget buildBarChart(List<Map<String, dynamic>> chartData) {
+    //   List<charts.Series<dynamic, String>> seriesList = createSeries(chartData);
+
+    //   return charts.BarChart(
+    //     seriesList,
+    //     animate: true,
+    //     vertical: false,
+    //     barRendererDecorator: charts.BarLabelDecorator<String>(),
+    //     domainAxis: charts.OrdinalAxisSpec(
+    //       renderSpec: charts.NoneRenderSpec(),
+    //     ),
+    //     primaryMeasureAxis: charts.NumericAxisSpec(
+    //       tickProviderSpec: charts.BasicNumericTickProviderSpec(
+    //         desiredTickCount: 5,
+    //       ),
+    //     ),
+    //   );
+    // }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,13 +88,16 @@ class ChartContainer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Expanded(
-                    child: Container(
-                  padding: EdgeInsets.only(top: 10),
-                  child: charts.BarChart(
-                    series,
-                    animate: true,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 10),
+                    child: charts.BarChart(
+                      seriesList,
+                      animate: true,
+                      vertical: false,
+                      barRendererDecorator: charts.BarLabelDecorator<String>(),
+                    ),
                   ),
-                ))
+                )
               ],
             ),
           ),
@@ -62,12 +107,10 @@ class ChartContainer extends StatelessWidget {
   }
 }
 
-class BarChartModel {
-  String bottom;
-  int left;
+class ChartData {
+  final String jenis;
+  final int jumlah;
+  final charts.Color color;
 
-  BarChartModel({
-    required this.bottom,
-    required this.left,
-  });
+  ChartData(this.jenis, this.jumlah, this.color);
 }
